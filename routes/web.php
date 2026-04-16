@@ -18,5 +18,6 @@ $router->get('/add-book', [PageController::class, 'addBook']);
 $router->post('/add-book', [BookController::class, 'store']);
 $router->post('/request-book', [RequestController::class, 'store']);
 $router->post('/accept-request', [RequestController::class, 'accept']);
+$router->post('/reject-request', [RequestController::class, 'reject']);
 $router->get('/admin', [PageController::class, 'admin']);
 $router->post('/logout', [AuthController::class, 'logout']);

@@ -59,7 +59,8 @@ final class BookRequest
     public function mine(int $requesterId): array
     {
         $statement = $this->db->prepare(
-            'SELECT r.*, b.title, b.subject, b.school_level AS level_label, u.name AS owner_name
+            'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price,
+                    u.name AS owner_name, u.email AS owner_email, u.phone AS owner_phone
              FROM requests r
              INNER JOIN books b ON b.id = r.book_id
              INNER JOIN users u ON u.id = b.owner_id
@@ -74,7 +75,8 @@ final class BookRequest
     public function received(int $ownerId): array
     {
         $statement = $this->db->prepare(
-            'SELECT r.*, b.title, b.owner_id, u.name AS requester_name
+            'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price, b.owner_id,
+                    u.name AS requester_name, u.email AS requester_email, u.phone AS requester_phone
              FROM requests r
              INNER JOIN books b ON b.id = r.book_id
              INNER JOIN users u ON u.id = r.requester_id
@@ -128,11 +130,100 @@ final class BookRequest
         $this->db->commit();
     }
 
+    public function reject(int $requestId): void
+    {
+        $statement = $this->db->prepare(
+            'UPDATE requests SET status = :status WHERE id = :id'
+        );
+        $statement->execute([
+            'status' => 'rejected',
+            'id' => $requestId,
+        ]);
+    }
+
     public function countAccepted(): int
     {
         $statement = $this->db->prepare('SELECT COUNT(*) FROM requests WHERE status = :status');
         $statement->execute(['status' => 'accepted']);
 
         return (int) $statement->fetchColumn();
+    }
+
+    public function countAcceptedForRequester(int $requesterId): int
+    {
+        $statement = $this->db->prepare(
+            'SELECT COUNT(*)
+             FROM requests
+             WHERE requester_id = :requester_id AND status = :status'
+        );
+        $statement->execute([
+            'requester_id' => $requesterId,
+            'status' => 'accepted',
+        ]);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    public function countAcceptedForOwner(int $ownerId): int
+    {
+        $statement = $this->db->prepare(
+            'SELECT COUNT(*)
+             FROM requests r
+             INNER JOIN books b ON b.id = r.book_id
+             WHERE b.owner_id = :owner_id AND r.status = :status'
+        );
+        $statement->execute([
+            'owner_id' => $ownerId,
+            'status' => 'accepted',
+        ]);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    public function sumAcceptedValueForRequester(int $requesterId): float
+    {
+        $statement = $this->db->prepare(
+            'SELECT NVL(SUM(b.estimated_price), 0)
+             FROM requests r
+             INNER JOIN books b ON b.id = r.book_id
+             WHERE r.requester_id = :requester_id AND r.status = :status'
+        );
+        $statement->execute([
+            'requester_id' => $requesterId,
+            'status' => 'accepted',
+        ]);
+
+        return (float) $statement->fetchColumn();
+    }
+
+    public function sumAcceptedValueForOwner(int $ownerId): float
+    {
+        $statement = $this->db->prepare(
+            'SELECT NVL(SUM(b.estimated_price), 0)
+             FROM requests r
+             INNER JOIN books b ON b.id = r.book_id
+             WHERE b.owner_id = :owner_id AND r.status = :status'
+        );
+        $statement->execute([
+            'owner_id' => $ownerId,
+            'status' => 'accepted',
+        ]);
+
+        return (float) $statement->fetchColumn();
+    }
+
+    public function sumAcceptedValueGlobal(): float
+    {
+        $statement = $this->db->prepare(
+            'SELECT NVL(SUM(b.estimated_price), 0)
+             FROM requests r
+             INNER JOIN books b ON b.id = r.book_id
+             WHERE r.status = :status'
+        );
+        $statement->execute([
+            'status' => 'accepted',
+        ]);
+
+        return (float) $statement->fetchColumn();
     }
 }

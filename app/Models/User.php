@@ -48,6 +48,19 @@ final class User
         return $user ?: null;
     }
 
+    public function findById(int $id): ?array
+    {
+        $statement = $this->db->prepare(
+            'SELECT * FROM (
+                SELECT * FROM users WHERE id = :id
+            ) WHERE ROWNUM = 1'
+        );
+        $statement->execute(['id' => $id]);
+        $user = $statement->fetch();
+
+        return $user ?: null;
+    }
+
     public function countAll(): int
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM users')->fetchColumn();

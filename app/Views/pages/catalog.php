@@ -27,14 +27,18 @@
                     <p class="eyebrow">Resultats</p>
                     <h2>Livres disponibles</h2>
                 </div>
-                <span id="book-count"><?= count($catalogBooks ?? []) ?> livre(s) trouve(s)</span>
+                <div class="hero-actions">
+                    <span id="book-count"><?= count($catalogBooks ?? []) ?> livre(s) trouve(s)</span>
+                    <a class="button button-secondary button-small" href="<?= htmlspecialchars($basePath) ?>/add-book">Donner un livre</a>
+                </div>
             </div>
             <div class="card-grid" id="book-grid">
                 <?php foreach (($catalogBooks ?? []) as $book): ?>
                     <article class="book-card">
                         <span class="badge"><?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></span>
-                        <h3><?= htmlspecialchars((string) $book['title']) ?></h3>
-                        <p class="meta"><?= htmlspecialchars((string) $book['subject']) ?></p>
+                        <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>
+                        <p class="meta">Classe: <?= htmlspecialchars((string) ($book['class_label'] ?? '')) ?></p>
+                        <p class="meta">Prix estime: <?= htmlspecialchars((string) ($book['estimated_price'] ?? 0)) ?> DT</p>
                         <p class="meta">Proprietaire: <?= htmlspecialchars((string) ($book['owner_name'] ?? '')) ?></p>
                         <div class="hero-actions">
                             <span class="badge badge-alt"><?= htmlspecialchars((string) $book['condition_label']) ?></span>
@@ -52,9 +56,10 @@
         <div class="container">
             <div class="panel">
                 <p class="eyebrow">Fiche livre</p>
-                <h2><?= htmlspecialchars((string) $selectedBook['title']) ?></h2>
-                <p class="meta"><?= htmlspecialchars((string) $selectedBook['subject']) ?> | <?= htmlspecialchars((string) ($selectedBook['level_label'] ?? '')) ?></p>
-                <p><?= htmlspecialchars((string) ($selectedBook['description'] ?? 'Aucune description fournie.')) ?></p>
+                <h2><?= htmlspecialchars((string) $selectedBook['subject']) ?></h2>
+                <p class="meta">Niveau: <?= htmlspecialchars((string) ($selectedBook['level_label'] ?? '')) ?></p>
+                <p class="meta">Classe: <?= htmlspecialchars((string) ($selectedBook['class_label'] ?? '')) ?></p>
+                <p class="meta">Prix estime: <?= htmlspecialchars((string) ($selectedBook['estimated_price'] ?? 0)) ?> DT</p>
                 <p class="meta">Proprietaire: <?= htmlspecialchars((string) ($selectedBook['owner_name'] ?? '')) ?></p>
                 <div class="hero-actions">
                     <span class="badge"><?= htmlspecialchars((string) $selectedBook['status']) ?></span>

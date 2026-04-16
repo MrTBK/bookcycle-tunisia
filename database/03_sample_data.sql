@@ -15,17 +15,17 @@ VALUES ('Sarra Trabelsi', 'sarra@bookcycle.tn', '$2y$10$8NCFh6eMdQ.T9OFQaCtY5eOr
 INSERT INTO users (name, email, password, phone, role)
 VALUES ('Youssef Hamdi', 'youssef@bookcycle.tn', '$2y$10$6wBxyuNDL1CkBuldMDMnKuF91Bs8cuCDs9K6IC4Uw8HMy2Z3tUf.u', '99111444', 'user');
 
-INSERT INTO books (title, subject, school_level, condition_label, description, owner_id, status, is_active)
-VALUES ('Mathematiques 9eme', 'Mathematiques', 'College', 'Bon', 'Livre propre et complet.', 2, 'available', 1);
+INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
+VALUES ('Mathematiques - 9eme - College', 'Mathematiques', '9eme', 'College', 'Bon', 28, 'Livre propre et complet.', 2, 'available', 1);
 
-INSERT INTO books (title, subject, school_level, condition_label, description, owner_id, status, is_active)
-VALUES ('Sciences 1ere annee', 'Sciences', 'Lycee', 'Neuf', 'Edition recente.', 2, 'available', 1);
+INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
+VALUES ('Sciences - 1ere annee - Lycee', 'Sciences', '1ere annee', 'Lycee', 'Neuf', 35, 'Edition recente.', 2, 'available', 1);
 
-INSERT INTO books (title, subject, school_level, condition_label, description, owner_id, status, is_active)
-VALUES ('Arabe 6eme', 'Arabe', 'Primaire', 'Usage', 'Bon etat general.', 3, 'reserved', 1);
+INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
+VALUES ('Arabe - 6eme - Primaire', 'Arabe', '6eme', 'Primaire', 'Usage', 18, 'Bon etat general.', 3, 'reserved', 1);
 
-INSERT INTO books (title, subject, school_level, condition_label, description, owner_id, status, is_active)
-VALUES ('Physique Bac', 'Physique', 'Lycee', 'Bon', 'Avec exercices supplementaires.', 4, 'exchanged', 1);
+INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
+VALUES ('Physique - Bac - Lycee', 'Physique', 'Bac', 'Lycee', 'Bon', 42, 'Avec exercices supplementaires.', 4, 'exchanged', 1);
 
 INSERT INTO requests (book_id, requester_id, status, meeting_note, request_date)
 VALUES (1, 3, 'pending', NULL, SYSDATE - 2);

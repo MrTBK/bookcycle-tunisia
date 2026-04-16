@@ -14,12 +14,19 @@ final class PageController extends Controller
 {
     public function home(): void
     {
-        $books = (new Book())->latest(4);
+        $bookModel = new Book();
+        $requestModel = new BookRequest();
+        $acceptedCount = $requestModel->countAccepted();
 
         $this->render('home', [
             'pageTitle' => 'Accueil',
             'currentUser' => Auth::user(),
-            'featuredBooks' => $books,
+            'featuredBooks' => $bookModel->latest(4),
+            'homeStats' => [
+                'totalBooks' => $bookModel->countActive(),
+                'totalExchanges' => $acceptedCount,
+                'moneySaved' => $requestModel->sumAcceptedValueGlobal(),
+            ],
         ]);
     }
 
@@ -69,6 +76,10 @@ final class PageController extends Controller
 
         $requests = new BookRequest();
         $bookModel = new Book();
+        $booksReceived = $requests->countAcceptedForRequester((int) Auth::id());
+        $booksGiven = $requests->countAcceptedForOwner((int) Auth::id());
+        $moneySaved = $requests->sumAcceptedValueForRequester((int) Auth::id());
+        $moneySavedForOthers = $requests->sumAcceptedValueForOwner((int) Auth::id());
 
         $this->render('dashboard', [
             'pageTitle' => 'Tableau de bord',
@@ -76,6 +87,12 @@ final class PageController extends Controller
             'myBooks' => $bookModel->mine((int) Auth::id()),
             'receivedRequests' => $requests->received((int) Auth::id()),
             'sentRequests' => $requests->mine((int) Auth::id()),
+            'dashboardStats' => [
+                'booksReceived' => $booksReceived,
+                'booksGiven' => $booksGiven,
+                'moneySaved' => $moneySaved,
+                'moneySavedForOthers' => $moneySavedForOthers,
+            ],
             'flashError' => $this->pullFlash('flash_error'),
             'flashSuccess' => $this->pullFlash('flash_success'),
         ]);
@@ -93,6 +110,7 @@ final class PageController extends Controller
             'currentUser' => Auth::user(),
             'flashError' => $this->pullFlash('flash_error'),
             'flashSuccess' => $this->pullFlash('flash_success'),
+            'classOptions' => $this->classOptions(),
         ]);
     }
 
@@ -104,7 +122,8 @@ final class PageController extends Controller
         }
 
         $bookModel = new Book();
-        $acceptedCount = (new BookRequest())->countAccepted();
+        $requestModel = new BookRequest();
+        $acceptedCount = $requestModel->countAccepted();
 
         $this->render('admin', [
             'pageTitle' => 'Administration',
@@ -113,7 +132,7 @@ final class PageController extends Controller
                 'totalUsers' => (new User())->countAll(),
                 'totalBooks' => $bookModel->countActive(),
                 'totalExchanges' => $acceptedCount,
-                'moneySaved' => $acceptedCount * 25,
+                'moneySaved' => $requestModel->sumAcceptedValueGlobal(),
             ],
             'adminBooks' => array_slice($bookModel->all(['status' => 'all']), 0, 10),
         ]);
@@ -125,5 +144,43 @@ final class PageController extends Controller
         unset($_SESSION[$key]);
 
         return is_string($value) ? $value : null;
+    }
+
+    private function classOptions(): array
+    {
+        return [
+            'Primaire' => [
+                '1ere annee',
+                '2eme annee',
+                '3eme annee',
+                '4eme annee',
+                '5eme annee',
+                '6eme annee',
+            ],
+            'College' => [
+                '7eme annee',
+                '8eme annee',
+                '9eme annee',
+            ],
+            'Lycee' => [
+                '1ere secondaire',
+                '2eme info',
+                '2eme sc',
+                '2eme lettre',
+                '2eme eco',
+                '3eme math',
+                '3eme tech',
+                '3eme info',
+                '3eme sc',
+                '3eme lettre',
+                '3eme eco',
+                'bac math',
+                'bac tech',
+                'bac info',
+                'bac sc',
+                'bac lettre',
+                'bac eco',
+            ],
+        ];
     }
 }

@@ -5,13 +5,7 @@
 Dans le cadre du projet **BookCycle Tunisia**, la partie Programmation Web 2 consiste a developper une application Web permettant de gerer le don, la consultation et la demande de livres scolaires.  
 L'objectif principal est de proposer une plateforme simple et pratique reliant les utilisateurs a une base de donnees afin de faciliter la reutilisation des livres et de reduire les couts scolaires.
 
-L'application a ete realisee avec des technologies conformes au cahier des charges :
-
-- `PHP` pour la logique serveur
-- `PDO` pour l'acces a la base de donnees
-- `POO` pour organiser le code
-- `MVC` pour structurer l'application
-- `HTML`, `CSS` et `JavaScript` pour l'interface et l'interactivite
+L'application repose sur une architecture claire, avec une separation entre la logique metier, l'acces aux donnees et les interfaces utilisateur.
 
 Cette partie est directement liee a la base de donnees du projet, puisque toutes les operations importantes de l'application reposent sur les tables `USERS`, `BOOKS`, `REQUESTS`, `EXCHANGES` et `NOTIFICATIONS`.
 
@@ -117,7 +111,7 @@ L'application permet aux utilisateurs de creer un compte grace a un formulaire d
 Une fois inscrit, l'utilisateur peut se connecter grace a son email et son mot de passe.  
 La verification des identifiants est effectuee cote serveur.
 
-Cette fonctionnalite repond a l'exigence du cahier des charges qui demande au moins deux types d'acteurs, a savoir :
+Cette fonctionnalite distingue clairement au moins deux types d'acteurs :
 
 - administrateur
 - utilisateur standard
@@ -258,25 +252,12 @@ Parmi les statistiques affichees, on trouve :
 
 Ces statistiques sont obtenues a partir de requetes SQL d'agregation et sont affichees dans les tableaux de bord.
 
-## 9. Conformite avec le cahier des charges
+## 9. Cohérence generale de la solution
 
-La solution developpee repond aux principales exigences du module Web 2 :
-
-- utilisation de `PHP`
-- utilisation de `PDO`
-- utilisation de la `POO`
-- organisation en `MVC`
-- exploitation d'une base de donnees avec plus de 5 tables
-- gestion de plusieurs types d'acteurs
-- affichage et recherche accessibles au public
-- operations CRUD
-- generation de statistiques
-
-L'application est donc en coherence avec les attentes pedagogiques du projet.
+La solution propose une organisation claire de l'application, une base de donnees exploitee sur plusieurs tables, une separation entre les roles utilisateurs et un ensemble de fonctionnalites couvrant l'affichage, la recherche, l'ajout, le suivi des demandes et les statistiques.
 
 ## Conclusion
 
 La partie Programmation Web 2 a permis de developper une application fonctionnelle, claire et structuree autour du projet BookCycle Tunisia.  
-Grace a l'utilisation conjointe de `PHP`, `PDO`, `POO`, `MVC`, `HTML`, `CSS` et `JavaScript`, il a ete possible de construire une solution Web complete reliee a la base de donnees du projet.  
+Grace a une organisation claire du code et a l'integration directe avec la base de donnees, il a ete possible de construire une solution Web complete reliee aux traitements du projet.  
 Cette partie valorise a la fois les competences techniques en developpement Web et l'integration des traitements metier definis dans la partie base de donnees.
-

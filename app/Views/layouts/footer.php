@@ -6,8 +6,7 @@
                 <p>Plateforme d'echange et de reutilisation des livres scolaires.</p>
             </div>
             <div>
-                <p>Technologies conformes au cahier des charges:</p>
-                <p>PHP, PDO, POO, MVC, HTML, CSS, JavaScript, SQL.</p>
+                <p>Mettre en relation les proprietaires de livres et les utilisateurs qui en ont besoin.</p>
             </div>
         </div>
     </footer>

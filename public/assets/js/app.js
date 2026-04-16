@@ -19,12 +19,13 @@ const BookCycle = (() => {
     };
 
     const bookLevel = (book) => book.level_label || book.level || '';
+    const bookClass = (book) => book.class_label || book.class_name || '';
 
     const createBookCard = (book, showButton = true) => `
         <article class="book-card">
             <span class="badge">${bookLevel(book)}</span>
-            <h3>${book.title}</h3>
-            <p class="meta">${book.subject}</p>
+            <h3>${book.subject}</h3>
+            <p class="meta">Classe: ${bookClass(book)}</p>
             <p class="meta">Proprietaire: ${book.owner_name}</p>
             <div class="hero-actions">
                 <span class="badge badge-alt">${book.condition_label}</span>
@@ -79,9 +80,9 @@ const BookCycle = (() => {
 
         content.innerHTML = `
             <p class="eyebrow">Fiche livre</p>
-            <h2>${book.title}</h2>
-            <p class="meta">${book.subject} | ${bookLevel(book)}</p>
-            <p>${book.description || 'Aucune description fournie.'}</p>
+            <h2>${book.subject}</h2>
+            <p class="meta">Niveau: ${bookLevel(book)}</p>
+            <p class="meta">Classe: ${bookClass(book)}</p>
             <p class="meta">Proprietaire: ${book.owner_name}</p>
             <div class="hero-actions">
                 <span class="badge">${book.status}</span>
@@ -268,8 +269,9 @@ const BookCycle = (() => {
             }
 
             section.innerHTML = books.map((book) => renderDashboardCard(`
-                <h3>${book.title}</h3>
-                <p class="meta">${book.subject} | ${bookLevel(book)}</p>
+                <h3>${book.subject}</h3>
+                <p class="meta">Classe: ${bookClass(book)}</p>
+                <p class="meta">Niveau: ${bookLevel(book)}</p>
                 <span class="badge">${book.status}</span>
             `)).join('');
         };
@@ -283,7 +285,9 @@ const BookCycle = (() => {
             }
 
             section.innerHTML = requests.map((request) => renderDashboardCard(`
-                <h3>${request.title}</h3>
+                <h3>${request.subject}</h3>
+                <p class="meta">Classe: ${bookClass(request)}</p>
+                <p class="meta">Niveau: ${bookLevel(request)}</p>
                 <p class="meta">Demandeur: ${request.requester_name}</p>
                 <div class="field">
                     <label for="note-${request.id}">Note de rendez-vous</label>
@@ -325,7 +329,9 @@ const BookCycle = (() => {
             }
 
             section.innerHTML = requests.map((request) => renderDashboardCard(`
-                <h3>${request.title}</h3>
+                <h3>${request.subject}</h3>
+                <p class="meta">Classe: ${bookClass(request)}</p>
+                <p class="meta">Niveau: ${bookLevel(request)}</p>
                 <p class="meta">Proprietaire: ${request.owner_name}</p>
                 <p class="meta">Statut: ${request.status}</p>
                 ${request.meeting_note ? `<p>${request.meeting_note}</p>` : ''}
@@ -372,9 +378,9 @@ const BookCycle = (() => {
 
         table.innerHTML = books.slice(0, 10).map((book) => `
             <tr>
-                <td>${book.title}</td>
+                <td>${book.subject}</td>
                 <td>${book.owner_name}</td>
-                <td>${bookLevel(book)}</td>
+                <td>${bookClass(book)} - ${bookLevel(book)}</td>
                 <td>${book.condition_label}</td>
                 <td>${book.status}</td>
             </tr>

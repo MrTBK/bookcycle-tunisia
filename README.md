@@ -1,12 +1,6 @@
 # BookCycle Tunisia
 
-Application Web 2 conforme au cahier des charges du projet integre:
-
-- `PHP` sans framework
-- `PDO` pour l'acces a la base Oracle
-- `POO` et organisation `MVC`
-- `HTML`, `CSS`, `JavaScript` natif
-- `Oracle / PL-SQL` pour la partie base de donnees
+Application de gestion et de reutilisation de livres scolaires.
 
 ## Structure
 

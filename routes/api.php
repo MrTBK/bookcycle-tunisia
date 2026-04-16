@@ -22,6 +22,6 @@ $router->post('/api/requests', [RequestController::class, 'store']);
 $router->get('/api/my-requests', [RequestController::class, 'mine']);
 $router->get('/api/received-requests', [RequestController::class, 'received']);
 $router->post('/api/accept-request', [RequestController::class, 'accept']);
+$router->post('/api/reject-request', [RequestController::class, 'reject']);
 
 $router->get('/api/admin-stats', [AdminController::class, 'stats']);
-

@@ -20,6 +20,25 @@
             <div class="panel" style="border-color:#2d7a46;color:#1f5c33;"><?= htmlspecialchars($flashSuccess) ?></div>
         <?php endif; ?>
 
+        <div class="stats-panel">
+            <div class="stat-card">
+                <span>Livres recus</span>
+                <strong><?= htmlspecialchars((string) ($dashboardStats['booksReceived'] ?? 0)) ?></strong>
+            </div>
+            <div class="stat-card">
+                <span>Livres donnes</span>
+                <strong><?= htmlspecialchars((string) ($dashboardStats['booksGiven'] ?? 0)) ?></strong>
+            </div>
+            <div class="stat-card">
+                <span>Argent economise</span>
+                <strong><?= htmlspecialchars((string) ($dashboardStats['moneySaved'] ?? 0)) ?> DT</strong>
+            </div>
+            <div class="stat-card">
+                <span>Argent fait economiser</span>
+                <strong><?= htmlspecialchars((string) ($dashboardStats['moneySavedForOthers'] ?? 0)) ?> DT</strong>
+            </div>
+        </div>
+
         <section class="section">
             <div class="section-head">
                 <div>
@@ -33,8 +52,10 @@
                 <?php else: ?>
                     <?php foreach ($myBooks as $book): ?>
                         <article class="dashboard-card">
-                            <h3><?= htmlspecialchars((string) $book['title']) ?></h3>
-                            <p class="meta"><?= htmlspecialchars((string) $book['subject']) ?> | <?= htmlspecialchars((string) ($book['level_label'] ?? '')) ?></p>
+                            <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>
+                            <p class="meta">Classe: <?= htmlspecialchars((string) ($book['class_label'] ?? '')) ?></p>
+                            <p class="meta">Niveau: <?= htmlspecialchars((string) ($book['level_label'] ?? '')) ?></p>
+                            <p class="meta">Prix estime: <?= htmlspecialchars((string) ($book['estimated_price'] ?? 0)) ?> DT</p>
                             <span class="badge"><?= htmlspecialchars((string) $book['status']) ?></span>
                         </article>
                     <?php endforeach; ?>
@@ -55,14 +76,24 @@
                 <?php else: ?>
                     <?php foreach ($receivedRequests as $request): ?>
                         <article class="dashboard-card">
-                            <h3><?= htmlspecialchars((string) $request['title']) ?></h3>
+                            <h3><?= htmlspecialchars((string) $request['subject']) ?></h3>
+                            <p class="meta">Classe: <?= htmlspecialchars((string) ($request['class_label'] ?? '')) ?></p>
+                            <p class="meta">Niveau: <?= htmlspecialchars((string) ($request['level_label'] ?? '')) ?></p>
+                            <p class="meta">Prix estime: <?= htmlspecialchars((string) ($request['estimated_price'] ?? 0)) ?> DT</p>
                             <p class="meta">Demandeur: <?= htmlspecialchars((string) $request['requester_name']) ?></p>
+                            <p class="meta">Email: <?= htmlspecialchars((string) ($request['requester_email'] ?? '')) ?></p>
+                            <p class="meta">Telephone: <?= htmlspecialchars((string) ($request['requester_phone'] ?? '')) ?></p>
                             <form method="post" action="<?= htmlspecialchars($basePath) ?>/accept-request?id=<?= urlencode((string) $request['id']) ?>">
                                 <div class="field">
                                     <label for="note-<?= htmlspecialchars((string) $request['id']) ?>">Note de rendez-vous</label>
                                     <textarea id="note-<?= htmlspecialchars((string) $request['id']) ?>" name="meetingNote" rows="3" required></textarea>
                                 </div>
-                                <button class="button button-small" type="submit">Accepter</button>
+                                <div class="hero-actions request-actions">
+                                    <button class="button button-small" type="submit">Accepter</button>
+                                    <button class="button button-small button-danger" type="submit" form="reject-request-<?= htmlspecialchars((string) $request['id']) ?>">Refuser</button>
+                                </div>
+                            </form>
+                            <form id="reject-request-<?= htmlspecialchars((string) $request['id']) ?>" method="post" action="<?= htmlspecialchars($basePath) ?>/reject-request?id=<?= urlencode((string) $request['id']) ?>">
                             </form>
                         </article>
                     <?php endforeach; ?>
@@ -83,9 +114,16 @@
                 <?php else: ?>
                     <?php foreach ($sentRequests as $request): ?>
                         <article class="dashboard-card">
-                            <h3><?= htmlspecialchars((string) $request['title']) ?></h3>
+                            <h3><?= htmlspecialchars((string) $request['subject']) ?></h3>
+                            <p class="meta">Classe: <?= htmlspecialchars((string) ($request['class_label'] ?? '')) ?></p>
+                            <p class="meta">Niveau: <?= htmlspecialchars((string) ($request['level_label'] ?? '')) ?></p>
+                            <p class="meta">Prix estime: <?= htmlspecialchars((string) ($request['estimated_price'] ?? 0)) ?> DT</p>
                             <p class="meta">Proprietaire: <?= htmlspecialchars((string) $request['owner_name']) ?></p>
                             <p class="meta">Statut: <?= htmlspecialchars((string) $request['status']) ?></p>
+                            <?php if (($request['status'] ?? '') === 'accepted'): ?>
+                                <p class="meta">Email proprietaire: <?= htmlspecialchars((string) ($request['owner_email'] ?? '')) ?></p>
+                                <p class="meta">Telephone proprietaire: <?= htmlspecialchars((string) ($request['owner_phone'] ?? '')) ?></p>
+                            <?php endif; ?>
                             <?php if (!empty($request['meeting_note'])): ?>
                                 <p><?= htmlspecialchars((string) $request['meeting_note']) ?></p>
                             <?php endif; ?>

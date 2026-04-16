@@ -1,11 +1,11 @@
 <section class="hero">
     <div class="container hero-grid">
         <div>
-            <p class="eyebrow">Projet Web 2 sans framework</p>
+            <p class="eyebrow">Plateforme collaborative</p>
             <h1>Gerer le don et la reutilisation des livres scolaires en Tunisie.</h1>
             <p class="lead">
-                Cette version du projet utilise une architecture simple en PHP MVC avec PDO, des pages HTML servies en PHP
-                et un JavaScript natif pour l'interactivite.
+                Une experience simple pour publier, consulter et demander des livres scolaires selon le niveau, la classe,
+                la matiere et l'etat.
             </p>
             <div class="hero-actions">
                 <a class="button" href="<?= htmlspecialchars($basePath) ?>/catalog">Parcourir les livres</a>
@@ -15,15 +15,15 @@
         <div class="stats-panel">
             <div class="stat-card">
                 <span>Livres actifs</span>
-                <strong id="stat-books">0</strong>
+                <strong id="stat-books"><?= htmlspecialchars((string) ($homeStats['totalBooks'] ?? 0)) ?></strong>
             </div>
             <div class="stat-card">
                 <span>Echanges valides</span>
-                <strong id="stat-exchanges">0</strong>
+                <strong id="stat-exchanges"><?= htmlspecialchars((string) ($homeStats['totalExchanges'] ?? 0)) ?></strong>
             </div>
             <div class="stat-card">
                 <span>Economie estimee</span>
-                <strong id="stat-money">0 DT</strong>
+                <strong id="stat-money"><?= htmlspecialchars((string) ($homeStats['moneySaved'] ?? 0)) ?> DT</strong>
             </div>
         </div>
     </div>
@@ -42,8 +42,9 @@
             <?php foreach (($featuredBooks ?? []) as $book): ?>
                 <article class="book-card">
                     <span class="badge"><?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></span>
-                    <h3><?= htmlspecialchars((string) $book['title']) ?></h3>
-                    <p class="meta"><?= htmlspecialchars((string) $book['subject']) ?></p>
+                    <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>
+                    <p class="meta">Classe: <?= htmlspecialchars((string) ($book['class_label'] ?? '')) ?></p>
+                    <p class="meta">Prix estime: <?= htmlspecialchars((string) ($book['estimated_price'] ?? 0)) ?> DT</p>
                     <p class="meta">Proprietaire: <?= htmlspecialchars((string) ($book['owner_name'] ?? '')) ?></p>
                     <div class="hero-actions">
                         <span class="badge badge-alt"><?= htmlspecialchars((string) $book['condition_label']) ?></span>

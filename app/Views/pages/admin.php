@@ -40,19 +40,21 @@
                             <th>Titre</th>
                             <th>Proprietaire</th>
                             <th>Niveau</th>
+                            <th>Prix</th>
                             <th>Etat</th>
                             <th>Statut</th>
                         </tr>
                     </thead>
                     <tbody id="admin-books-table">
                         <?php if (empty($adminBooks)): ?>
-                            <tr><td colspan="5">Aucun livre disponible.</td></tr>
+                            <tr><td colspan="6">Aucun livre disponible.</td></tr>
                         <?php else: ?>
                             <?php foreach ($adminBooks as $book): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars((string) $book['title']) ?></td>
+                                    <td><?= htmlspecialchars((string) $book['subject']) ?></td>
                                     <td><?= htmlspecialchars((string) ($book['owner_name'] ?? '')) ?></td>
-                                    <td><?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></td>
+                                    <td><?= htmlspecialchars((string) ($book['class_label'] ?? '')) ?> - <?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></td>
+                                    <td><?= htmlspecialchars((string) ($book['estimated_price'] ?? 0)) ?> DT</td>
                                     <td><?= htmlspecialchars((string) $book['condition_label']) ?></td>
                                     <td><?= htmlspecialchars((string) $book['status']) ?></td>
                                 </tr>
