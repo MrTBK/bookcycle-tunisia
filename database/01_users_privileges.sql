@@ -4,6 +4,8 @@
 */
 
 -- Suppression optionnelle si les utilisateurs existent deja.
+-- EXECUTE IMMEDIATE permet d'executer une instruction DDL stockee sous forme de texte.
+-- Le bloc EXCEPTION evite l'arret du script si l'utilisateur n'existe pas encore.
 BEGIN
     EXECUTE IMMEDIATE 'DROP USER bookcycle_app CASCADE';
 EXCEPTION

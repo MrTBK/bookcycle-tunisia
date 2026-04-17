@@ -1,23 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\User;
 
-final class AuthController extends Controller
+class AuthController extends Controller
 {
-    private User $users;
+    private $users;
 
     public function __construct()
     {
         $this->users = new User();
     }
 
-    public function register(): void
+    public function register()
     {
         $payload = $this->requestData();
 
@@ -42,13 +40,29 @@ final class AuthController extends Controller
         $this->redirect('/login');
     }
 
-    public function login(): void
+    public function login()
     {
         $payload = $this->requestData();
-        $user = $this->users->findByEmail($payload['email'] ?? '');
+        $email = '';
 
-        if (!$user || !password_verify((string) ($payload['password'] ?? ''), $user['password'])) {
+        if (isset($payload['email'])) {
+            $email = $payload['email'];
+        }
+
+        $user = $this->users->findByEmail($email);
+
+        $password = '';
+        if (isset($payload['password'])) {
+            $password = (string) $payload['password'];
+        }
+
+        if (!$user || !password_verify($password, $user['password'])) {
             $this->respondError('Email ou mot de passe invalide.', '/login', 401);
+            return;
+        }
+
+        if (isset($user['is_active']) && (int) $user['is_active'] === 0) {
+            $this->respondError('Votre compte est desactive. Contactez l administrateur.', '/login', 403);
             return;
         }
 
@@ -65,7 +79,7 @@ final class AuthController extends Controller
         $this->redirect('/dashboard');
     }
 
-    public function logout(): void
+    public function logout()
     {
         Auth::logout();
 
@@ -77,7 +91,7 @@ final class AuthController extends Controller
         $this->redirect('/');
     }
 
-    public function me(): void
+    public function me()
     {
         $this->json([
             'loggedIn' => Auth::check(),
@@ -85,7 +99,7 @@ final class AuthController extends Controller
         ]);
     }
 
-    private function requestData(): array
+    private function requestData()
     {
         $raw = file_get_contents('php://input');
         if ($raw) {
@@ -98,12 +112,18 @@ final class AuthController extends Controller
         return $_POST;
     }
 
-    private function isApiRequest(): bool
+    private function isApiRequest()
     {
-        return str_contains($_SERVER['REQUEST_URI'] ?? '', '/api/');
+        $requestUri = '';
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $requestUri = $_SERVER['REQUEST_URI'];
+        }
+
+        return str_contains($requestUri, '/api/');
     }
 
-    private function respondError(string $message, string $redirectPath, int $statusCode): void
+    private function respondError($message, $redirectPath, $statusCode)
     {
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
@@ -114,9 +134,14 @@ final class AuthController extends Controller
         $this->redirect($redirectPath);
     }
 
-    private function redirect(string $path): void
+    private function redirect($path)
     {
-        header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . $path);
+        $basePath = '';
+        if (isset($_SERVER['APP_BASE_PATH'])) {
+            $basePath = $_SERVER['APP_BASE_PATH'];
+        }
+
+        header('Location: ' . $basePath . $path);
         exit;
     }
 }

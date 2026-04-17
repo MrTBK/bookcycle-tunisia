@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controllers;
 
 use App\Core\Auth;
@@ -11,12 +9,12 @@ use App\Models\BookRequest;
 use App\Models\Notification;
 use App\Models\User;
 
-final class RequestController extends Controller
+class RequestController extends Controller
 {
-    private BookRequest $requests;
-    private Book $books;
-    private Notification $notifications;
-    private User $users;
+    private $requests;
+    private $books;
+    private $notifications;
+    private $users;
 
     public function __construct()
     {
@@ -26,14 +24,17 @@ final class RequestController extends Controller
         $this->users = new User();
     }
 
-    public function store(): void
+    public function store()
     {
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
-        $payload = json_decode((string) file_get_contents('php://input'), true) ?? $_POST;
+        $payload = json_decode((string) file_get_contents('php://input'), true);
+        if (!is_array($payload)) {
+            $payload = $_POST;
+        }
         $bookId = (int) ($payload['bookId'] ?? 0);
         $userId = (int) Auth::id();
         $book = $this->books->find($bookId);
@@ -54,7 +55,11 @@ final class RequestController extends Controller
         }
 
         $this->requests->create($bookId, $userId);
-        $this->notifications->create((int) $book['owner_id'], 'Nouvelle demande pour le livre "' . $book['title'] . '".');
+        $this->notifications->create(
+            (int) $book['owner_id'],
+            'Nouvelle demande pour le livre "' . $book['title'] . '".',
+            (string) (Auth::user()['name'] ?? 'Utilisateur')
+        );
 
         if ($this->isApiRequest()) {
             $this->json(['success' => true]);
@@ -65,7 +70,7 @@ final class RequestController extends Controller
         $this->redirect('/dashboard');
     }
 
-    public function mine(): void
+    public function mine()
     {
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
@@ -75,7 +80,7 @@ final class RequestController extends Controller
         $this->json($this->requests->mine((int) Auth::id()));
     }
 
-    public function received(): void
+    public function received()
     {
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
@@ -85,7 +90,7 @@ final class RequestController extends Controller
         $this->json($this->requests->received((int) Auth::id()));
     }
 
-    public function accept(): void
+    public function accept()
     {
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
@@ -93,7 +98,10 @@ final class RequestController extends Controller
         }
 
         $requestId = (int) ($_GET['id'] ?? 0);
-        $payload = json_decode((string) file_get_contents('php://input'), true) ?? $_POST;
+        $payload = json_decode((string) file_get_contents('php://input'), true);
+        if (!is_array($payload)) {
+            $payload = $_POST;
+        }
         $meetingNote = trim((string) ($payload['meetingNote'] ?? ''));
         $request = $this->requests->find($requestId);
 
@@ -122,12 +130,14 @@ final class RequestController extends Controller
             $this->notifications->create(
                 (int) $request['requester_id'],
                 'Votre demande pour "' . $book['title'] . '" a ete acceptee. Contact du proprietaire: '
-                . $owner['name'] . ' | Email: ' . $owner['email'] . ' | Telephone: ' . $owner['phone']
+                . $owner['name'] . ' | Email: ' . $owner['email'] . ' | Telephone: ' . $owner['phone'],
+                (string) $owner['name']
             );
             $this->notifications->create(
                 (int) $book['owner_id'],
                 'Demande acceptee pour "' . $book['title'] . '". Contact du demandeur: '
-                . $requester['name'] . ' | Email: ' . $requester['email'] . ' | Telephone: ' . $requester['phone']
+                . $requester['name'] . ' | Email: ' . $requester['email'] . ' | Telephone: ' . $requester['phone'],
+                (string) $requester['name']
             );
         }
 
@@ -147,7 +157,7 @@ final class RequestController extends Controller
         $this->redirect('/dashboard');
     }
 
-    public function reject(): void
+    public function reject()
     {
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
@@ -169,7 +179,11 @@ final class RequestController extends Controller
         }
 
         $this->requests->reject($requestId);
-        $this->notifications->create((int) $request['requester_id'], 'Votre demande pour "' . $book['title'] . '" a ete refusee.');
+        $this->notifications->create(
+            (int) $request['requester_id'],
+            'Votre demande pour "' . $book['title'] . '" a ete refusee.',
+            (string) (Auth::user()['name'] ?? 'Utilisateur')
+        );
 
         if ($this->isApiRequest()) {
             $this->json(['success' => true]);
@@ -180,12 +194,18 @@ final class RequestController extends Controller
         $this->redirect('/dashboard');
     }
 
-    private function isApiRequest(): bool
+    private function isApiRequest()
     {
-        return str_contains($_SERVER['REQUEST_URI'] ?? '', '/api/');
+        $requestUri = '';
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $requestUri = $_SERVER['REQUEST_URI'];
+        }
+
+        return str_contains($requestUri, '/api/');
     }
 
-    private function respondError(string $message, string $redirectPath, int $statusCode): void
+    private function respondError($message, $redirectPath, $statusCode)
     {
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
@@ -196,9 +216,14 @@ final class RequestController extends Controller
         $this->redirect($redirectPath);
     }
 
-    private function redirect(string $path): void
+    private function redirect($path)
     {
-        header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . $path);
+        $basePath = '';
+        if (isset($_SERVER['APP_BASE_PATH'])) {
+            $basePath = $_SERVER['APP_BASE_PATH'];
+        }
+
+        header('Location: ' . $basePath . $path);
         exit;
     }
 }

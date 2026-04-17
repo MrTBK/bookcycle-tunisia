@@ -1,32 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Core;
 
-final class Auth
+class Auth
 {
-    public static function user(): ?array
+    public static function user()
     {
-        return $_SESSION['user'] ?? null;
+        if (isset($_SESSION['user'])) {
+            return $_SESSION['user'];
+        }
+
+        return null;
     }
 
-    public static function id(): ?int
+    public static function id()
     {
         return isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : null;
     }
 
-    public static function check(): bool
+    public static function check()
     {
         return self::user() !== null;
     }
 
-    public static function isAdmin(): bool
+    public static function isAdmin()
     {
-        return (self::user()['role'] ?? '') === 'admin';
+        $user = self::user();
+        $role = '';
+
+        if (is_array($user) && isset($user['role'])) {
+            $role = $user['role'];
+        }
+
+        return $role === 'admin';
     }
 
-    public static function login(array $user): void
+    public static function login($user)
     {
         $_SESSION['user'] = [
             'id' => (int) $user['id'],
@@ -36,10 +45,9 @@ final class Auth
         ];
     }
 
-    public static function logout(): void
+    public static function logout()
     {
         unset($_SESSION['user']);
         session_regenerate_id(true);
     }
 }
-

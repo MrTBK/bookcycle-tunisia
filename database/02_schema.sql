@@ -11,8 +11,10 @@ CREATE TABLE users (
     password VARCHAR2(255) NOT NULL,
     phone VARCHAR2(30) NOT NULL,
     role VARCHAR2(20) DEFAULT 'user' NOT NULL,
+    is_active NUMBER(1) DEFAULT 1 NOT NULL,
     created_at DATE DEFAULT SYSDATE NOT NULL,
-    CONSTRAINT chk_users_role CHECK (role IN ('admin', 'user'))
+    CONSTRAINT chk_users_role CHECK (role IN ('admin', 'user')),
+    CONSTRAINT chk_users_active CHECK (is_active IN (0, 1))
 );
 
 -- TABLE BOOKS : stocke les livres publies par les utilisateurs.
@@ -65,6 +67,7 @@ CREATE TABLE exchanges (
 CREATE TABLE notifications (
     id NUMBER PRIMARY KEY,
     user_id NUMBER NOT NULL,
+    sender_name VARCHAR2(120) DEFAULT 'Systeme' NOT NULL,
     message VARCHAR2(1000) NOT NULL,
     is_read NUMBER(1) DEFAULT 0 NOT NULL,
     created_at DATE DEFAULT SYSDATE NOT NULL,
@@ -73,6 +76,8 @@ CREATE TABLE notifications (
 );
 
 -- Sequences 11g pour remplacer les identity columns.
+-- Dans Oracle XE / 11g, on utilise souvent une sequence + un trigger
+-- pour generer automatiquement l'identifiant primaire.
 CREATE SEQUENCE seq_users START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_books START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_requests START WITH 1 INCREMENT BY 1 NOCACHE;
@@ -139,6 +144,7 @@ CREATE INDEX idx_requests_requester ON requests(requester_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 
 -- Vue utile pour le reporting et les requetes multi-tables.
+-- Une vue est une requete enregistree que l'on peut reutiliser comme table logique.
 CREATE OR REPLACE VIEW v_book_overview AS
 SELECT
     b.id AS book_id,

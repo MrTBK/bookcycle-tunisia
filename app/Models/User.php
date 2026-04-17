@@ -1,25 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
 use App\Core\Database;
 use PDO;
 
-final class User
+class User
 {
-    private PDO $db;
+    private $db;
 
     public function __construct()
     {
         $this->db = Database::connection();
     }
 
-    public function create(array $data): int
+    public function create($data)
     {
         $statement = $this->db->prepare(
-            'INSERT INTO users (name, email, password, phone, role) VALUES (:name, :email, :password, :phone, :role)'
+            'INSERT INTO users (name, email, password, phone, role, is_active) VALUES (:name, :email, :password, :phone, :role, :is_active)'
         );
 
         $statement->execute([
@@ -27,15 +25,20 @@ final class User
             'email' => $data['email'],
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             'phone' => $data['phone'],
-            'role' => $data['role'] ?? 'user',
+            'role' => isset($data['role']) ? $data['role'] : 'user',
+            'is_active' => 1,
         ]);
 
         $createdUser = $this->findByEmail($data['email']);
 
-        return (int) ($createdUser['id'] ?? 0);
+        if (isset($createdUser['id'])) {
+            return (int) $createdUser['id'];
+        }
+
+        return 0;
     }
 
-    public function findByEmail(string $email): ?array
+    public function findByEmail($email)
     {
         $statement = $this->db->prepare(
             'SELECT * FROM (
@@ -48,7 +51,7 @@ final class User
         return $user ?: null;
     }
 
-    public function findById(int $id): ?array
+    public function findById($id)
     {
         $statement = $this->db->prepare(
             'SELECT * FROM (
@@ -61,8 +64,50 @@ final class User
         return $user ?: null;
     }
 
-    public function countAll(): int
+    public function countAll()
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM users')->fetchColumn();
+    }
+
+    public function all($search = '')
+    {
+        $sql = 'SELECT id, name, email, phone, role, created_at, NVL(is_active, 1) AS is_active
+                FROM users
+                WHERE 1 = 1';
+        $params = [];
+
+        if ($search !== '') {
+            $sql .= ' AND (LOWER(name) LIKE :search OR LOWER(email) LIKE :search)';
+            $params['search'] = '%' . strtolower($search) . '%';
+        }
+
+        $sql .= ' ORDER BY created_at DESC';
+
+        $statement = $this->db->prepare($sql);
+        $statement->execute($params);
+
+        return $statement->fetchAll();
+    }
+
+    public function countInactive()
+    {
+        $statement = $this->db->prepare('SELECT COUNT(*) FROM users WHERE NVL(is_active, 1) = 0');
+        $statement->execute();
+
+        return (int) $statement->fetchColumn();
+    }
+
+    public function setActive($userId, $isActive)
+    {
+        $statement = $this->db->prepare(
+            'UPDATE users
+             SET is_active = :is_active
+             WHERE id = :id'
+        );
+
+        $statement->execute([
+            'is_active' => $isActive ? 1 : 0,
+            'id' => (int) $userId,
+        ]);
     }
 }

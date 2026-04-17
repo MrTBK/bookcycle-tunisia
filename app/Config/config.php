@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     'app_name' => 'BookCycle Tunisia',
     'base_url' => getenv('APP_URL') ?: 'http://localhost/bookcycle-tunisia/public',

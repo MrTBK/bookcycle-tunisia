@@ -3,6 +3,10 @@
     Tous les commentaires peuvent etre repris dans le rapport.
 */
 
+-- Remarque :
+-- %TYPE permet de reutiliser le type d'une colonne Oracle.
+-- Cela evite d'ecrire manuellement NUMBER, VARCHAR2, etc.
+
 -- Procedure 1 : ajouter une notification pour un utilisateur donne.
 CREATE OR REPLACE PROCEDURE add_notification (
     p_user_id IN users.id%TYPE,
@@ -132,6 +136,7 @@ END;
 /*
     Bloc PL/SQL 1 : exemple de curseur implicite.
     SQL%ROWCOUNT permet de savoir combien de lignes ont ete modifiees.
+    DBMS_OUTPUT.PUT_LINE affiche un message dans la console SQL Developer.
 */
 BEGIN
     UPDATE notifications
@@ -146,6 +151,7 @@ END;
 
 /*
     Bloc PL/SQL 2 : exemple de curseur explicite pour parcourir les livres disponibles.
+    %ROWTYPE cree une variable ayant la meme structure qu'une ligne du curseur.
 */
 DECLARE
     CURSOR c_available_books IS

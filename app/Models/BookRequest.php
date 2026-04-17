@@ -1,22 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
 use App\Core\Database;
 use PDO;
 
-final class BookRequest
+class BookRequest
 {
-    private PDO $db;
+    private $db;
 
     public function __construct()
     {
         $this->db = Database::connection();
     }
 
-    public function existsPending(int $bookId, int $requesterId): bool
+    public function existsPending($bookId, $requesterId)
     {
         $statement = $this->db->prepare(
             'SELECT COUNT(*) FROM requests WHERE book_id = :book_id AND requester_id = :requester_id AND status = :status'
@@ -30,7 +28,7 @@ final class BookRequest
         return (int) $statement->fetchColumn() > 0;
     }
 
-    public function create(int $bookId, int $requesterId): int
+    public function create($bookId, $requesterId)
     {
         $statement = $this->db->prepare(
             'INSERT INTO requests (book_id, requester_id, status) VALUES (:book_id, :requester_id, :status)'
@@ -56,7 +54,7 @@ final class BookRequest
         return isset($rows[0]['id']) ? (int) $rows[0]['id'] : 0;
     }
 
-    public function mine(int $requesterId): array
+    public function mine($requesterId)
     {
         $statement = $this->db->prepare(
             'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price,
@@ -72,7 +70,7 @@ final class BookRequest
         return $statement->fetchAll();
     }
 
-    public function received(int $ownerId): array
+    public function received($ownerId)
     {
         $statement = $this->db->prepare(
             'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price, b.owner_id,
@@ -91,7 +89,7 @@ final class BookRequest
         return $statement->fetchAll();
     }
 
-    public function find(int $requestId): ?array
+    public function find($requestId)
     {
         $statement = $this->db->prepare(
             'SELECT * FROM (
@@ -104,7 +102,7 @@ final class BookRequest
         return $request ?: null;
     }
 
-    public function accept(int $requestId, int $bookId, string $meetingNote): void
+    public function accept($requestId, $bookId, $meetingNote)
     {
         $this->db->beginTransaction();
 
@@ -130,7 +128,7 @@ final class BookRequest
         $this->db->commit();
     }
 
-    public function reject(int $requestId): void
+    public function reject($requestId)
     {
         $statement = $this->db->prepare(
             'UPDATE requests SET status = :status WHERE id = :id'
@@ -141,7 +139,7 @@ final class BookRequest
         ]);
     }
 
-    public function countAccepted(): int
+    public function countAccepted()
     {
         $statement = $this->db->prepare('SELECT COUNT(*) FROM requests WHERE status = :status');
         $statement->execute(['status' => 'accepted']);
@@ -149,7 +147,45 @@ final class BookRequest
         return (int) $statement->fetchColumn();
     }
 
-    public function countAcceptedForRequester(int $requesterId): int
+    public function allForAdmin($status = '')
+    {
+        $sql = 'SELECT r.id, r.book_id, r.requester_id, r.status, r.meeting_note, r.request_date,
+                       b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.owner_id,
+                       owner.name AS owner_name, requester.name AS requester_name, requester.email AS requester_email
+                FROM requests r
+                INNER JOIN books b ON b.id = r.book_id
+                INNER JOIN users owner ON owner.id = b.owner_id
+                INNER JOIN users requester ON requester.id = r.requester_id
+                WHERE 1 = 1';
+        $params = [];
+
+        if ($status !== '') {
+            $sql .= ' AND r.status = :status';
+            $params['status'] = $status;
+        }
+
+        $sql .= ' ORDER BY r.request_date DESC';
+
+        $statement = $this->db->prepare($sql);
+        $statement->execute($params);
+
+        return $statement->fetchAll();
+    }
+
+    public function cancelByAdmin($requestId)
+    {
+        $statement = $this->db->prepare(
+            'UPDATE requests
+             SET status = :status
+             WHERE id = :id'
+        );
+        $statement->execute([
+            'status' => 'rejected',
+            'id' => (int) $requestId,
+        ]);
+    }
+
+    public function countAcceptedForRequester($requesterId)
     {
         $statement = $this->db->prepare(
             'SELECT COUNT(*)
@@ -164,7 +200,7 @@ final class BookRequest
         return (int) $statement->fetchColumn();
     }
 
-    public function countAcceptedForOwner(int $ownerId): int
+    public function countAcceptedForOwner($ownerId)
     {
         $statement = $this->db->prepare(
             'SELECT COUNT(*)
@@ -180,7 +216,7 @@ final class BookRequest
         return (int) $statement->fetchColumn();
     }
 
-    public function sumAcceptedValueForRequester(int $requesterId): float
+    public function sumAcceptedValueForRequester($requesterId)
     {
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)
@@ -196,7 +232,7 @@ final class BookRequest
         return (float) $statement->fetchColumn();
     }
 
-    public function sumAcceptedValueForOwner(int $ownerId): float
+    public function sumAcceptedValueForOwner($ownerId)
     {
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)
@@ -212,7 +248,7 @@ final class BookRequest
         return (float) $statement->fetchColumn();
     }
 
-    public function sumAcceptedValueGlobal(): float
+    public function sumAcceptedValueGlobal()
     {
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)

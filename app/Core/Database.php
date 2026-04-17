@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Core;
 
 use PDO;
 use PDOException;
 
-final class Database
+class Database
 {
-    private static ?PDO $connection = null;
+    private static $connection = null;
 
-    public static function connection(): PDO
+    public static function connection()
     {
         if (self::$connection instanceof PDO) {
             return self::$connection;

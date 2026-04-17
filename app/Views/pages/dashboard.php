@@ -42,6 +42,44 @@
         <section class="section">
             <div class="section-head">
                 <div>
+                    <p class="eyebrow">Notifications</p>
+                    <h2>Messages recus</h2>
+                </div>
+            </div>
+            <div class="dashboard-section" id="section-notifications">
+                <?php if (empty($notifications)): ?>
+                    <div class="panel muted">Aucune notification pour le moment.</div>
+                <?php else: ?>
+                    <?php foreach ($notifications as $notification): ?>
+                        <article class="dashboard-card">
+                            <div class="notification-meta">
+                                <div class="hero-actions">
+                                    <span class="badge notification-sender">
+                                        <?= htmlspecialchars((string) ($notification['sender_name'] ?? 'Systeme')) ?>
+                                    </span>
+                                    <span class="badge <?= ((int) ($notification['is_read'] ?? 0) === 0) ? '' : 'badge-alt' ?>">
+                                        <?= ((int) ($notification['is_read'] ?? 0) === 0) ? 'Non lue' : 'Lue' ?>
+                                    </span>
+                                </div>
+                                <span class="meta"><?= htmlspecialchars((string) ($notification['created_at'] ?? '')) ?></span>
+                            </div>
+                            <p><?= htmlspecialchars((string) ($notification['message'] ?? '')) ?></p>
+                            <?php if ((int) ($notification['is_read'] ?? 0) === 0): ?>
+                                <p>
+                                    <a class="button button-secondary button-small" href="<?= htmlspecialchars($basePath) ?>/notifications/read?id=<?= urlencode((string) $notification['id']) ?>&redirect=<?= urlencode('/dashboard#section-notifications') ?>">
+                                        Marquer comme lue
+                                    </a>
+                                </p>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <div>
                     <p class="eyebrow">Mes livres</p>
                     <h2>Livres ajoutes</h2>
                 </div>

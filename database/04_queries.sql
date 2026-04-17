@@ -102,5 +102,6 @@ SELECT COUNT(*) AS total_exchanges,
        COUNT(*) * 25 AS money_saved_dt
 FROM exchanges;
 
+-- ROLLBACK annule les modifications de demonstration pour pouvoir
+-- rejouer le script pendant le TP ou la soutenance.
 ROLLBACK;
-

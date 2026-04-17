@@ -3,17 +3,17 @@
     A executer connecte en tant que BOOKCYCLE_APP.
 */
 
-INSERT INTO users (name, email, password, phone, role)
-VALUES ('Administrateur', 'admin@bookcycle.tn', '$2y$10$ejRkCqICFke3GUQ/eDtqQ.PidaEXSfj2MIt9a8TCHQo2ry/Uf8oRm', '00000000', 'admin');
+INSERT INTO users (name, email, password, phone, role, is_active)
+VALUES ('Administrateur', 'admin@bookcycle.tn', '$2y$10$ejRkCqICFke3GUQ/eDtqQ.PidaEXSfj2MIt9a8TCHQo2ry/Uf8oRm', '00000000', 'admin', 1);
 
-INSERT INTO users (name, email, password, phone, role)
-VALUES ('Ahmed Ben Salem', 'ahmed@bookcycle.tn', '$2y$10$eHXcPxUFSHoHsVhGf12v9OsIxPcWEnPb6LRHTTnay9dw329avsr3e', '22111222', 'user');
+INSERT INTO users (name, email, password, phone, role, is_active)
+VALUES ('Ahmed Ben Salem', 'ahmed@bookcycle.tn', '$2y$10$eHXcPxUFSHoHsVhGf12v9OsIxPcWEnPb6LRHTTnay9dw329avsr3e', '22111222', 'user', 1);
 
-INSERT INTO users (name, email, password, phone, role)
-VALUES ('Sarra Trabelsi', 'sarra@bookcycle.tn', '$2y$10$8NCFh6eMdQ.T9OFQaCtY5eOrRFglwyWrViDmCIzbeTgVk1k18Vy.q', '55111333', 'user');
+INSERT INTO users (name, email, password, phone, role, is_active)
+VALUES ('Sarra Trabelsi', 'sarra@bookcycle.tn', '$2y$10$8NCFh6eMdQ.T9OFQaCtY5eOrRFglwyWrViDmCIzbeTgVk1k18Vy.q', '55111333', 'user', 1);
 
-INSERT INTO users (name, email, password, phone, role)
-VALUES ('Youssef Hamdi', 'youssef@bookcycle.tn', '$2y$10$6wBxyuNDL1CkBuldMDMnKuF91Bs8cuCDs9K6IC4Uw8HMy2Z3tUf.u', '99111444', 'user');
+INSERT INTO users (name, email, password, phone, role, is_active)
+VALUES ('Youssef Hamdi', 'youssef@bookcycle.tn', '$2y$10$6wBxyuNDL1CkBuldMDMnKuF91Bs8cuCDs9K6IC4Uw8HMy2Z3tUf.u', '99111444', 'user', 1);
 
 INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
 VALUES ('Mathematiques - 9eme - College', 'Mathematiques', '9eme', 'College', 'Bon', 28, 'Livre propre et complet.', 2, 'available', 1);
@@ -39,10 +39,10 @@ VALUES (4, 3, 'rejected', 'Livre deja donne.', SYSDATE - 9);
 INSERT INTO exchanges (book_id, owner_id, receiver_id, exchange_date, status)
 VALUES (4, 4, 3, SYSDATE - 8, 'completed');
 
-INSERT INTO notifications (user_id, message, is_read, created_at)
-VALUES (2, 'Vous avez recu une nouvelle demande pour le livre Mathematiques 9eme.', 0, SYSDATE - 2);
+INSERT INTO notifications (user_id, sender_name, message, is_read, created_at)
+VALUES (2, 'Sarra Trabelsi', 'Vous avez recu une nouvelle demande pour le livre Mathematiques 9eme.', 0, SYSDATE - 2);
 
-INSERT INTO notifications (user_id, message, is_read, created_at)
-VALUES (3, 'Votre demande pour Arabe 6eme a ete acceptee.', 1, SYSDATE - 4);
+INSERT INTO notifications (user_id, sender_name, message, is_read, created_at)
+VALUES (3, 'Ahmed Ben Salem', 'Votre demande pour Arabe 6eme a ete acceptee.', 1, SYSDATE - 4);
 
 COMMIT;

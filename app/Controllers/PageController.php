@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\Book;
 use App\Models\BookRequest;
+use App\Models\Notification;
 use App\Models\User;
 
-final class PageController extends Controller
+class PageController extends Controller
 {
-    public function home(): void
+    public function home()
     {
         $bookModel = new Book();
         $requestModel = new BookRequest();
@@ -30,7 +29,7 @@ final class PageController extends Controller
         ]);
     }
 
-    public function catalog(): void
+    public function catalog()
     {
         $filters = [
             'level' => $_GET['level'] ?? null,
@@ -47,7 +46,7 @@ final class PageController extends Controller
         ]);
     }
 
-    public function login(): void
+    public function login()
     {
         $this->render('login', [
             'pageTitle' => 'Connexion',
@@ -57,7 +56,7 @@ final class PageController extends Controller
         ]);
     }
 
-    public function register(): void
+    public function register()
     {
         $this->render('register', [
             'pageTitle' => 'Inscription',
@@ -67,15 +66,22 @@ final class PageController extends Controller
         ]);
     }
 
-    public function dashboard(): void
+    public function dashboard()
     {
         if (!Auth::check()) {
-            header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . '/login');
+            $basePath = '';
+            if (isset($_SERVER['APP_BASE_PATH'])) {
+                $basePath = $_SERVER['APP_BASE_PATH'];
+            }
+
+            header('Location: ' . $basePath . '/login');
             exit;
         }
 
         $requests = new BookRequest();
         $bookModel = new Book();
+        $notificationModel = new Notification();
+        $notifications = $notificationModel->latestForUser((int) Auth::id(), 10);
         $booksReceived = $requests->countAcceptedForRequester((int) Auth::id());
         $booksGiven = $requests->countAcceptedForOwner((int) Auth::id());
         $moneySaved = $requests->sumAcceptedValueForRequester((int) Auth::id());
@@ -87,6 +93,7 @@ final class PageController extends Controller
             'myBooks' => $bookModel->mine((int) Auth::id()),
             'receivedRequests' => $requests->received((int) Auth::id()),
             'sentRequests' => $requests->mine((int) Auth::id()),
+            'notifications' => $notifications,
             'dashboardStats' => [
                 'booksReceived' => $booksReceived,
                 'booksGiven' => $booksGiven,
@@ -98,10 +105,15 @@ final class PageController extends Controller
         ]);
     }
 
-    public function addBook(): void
+    public function addBook()
     {
         if (!Auth::check()) {
-            header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . '/login');
+            $basePath = '';
+            if (isset($_SERVER['APP_BASE_PATH'])) {
+                $basePath = $_SERVER['APP_BASE_PATH'];
+            }
+
+            header('Location: ' . $basePath . '/login');
             exit;
         }
 
@@ -114,39 +126,60 @@ final class PageController extends Controller
         ]);
     }
 
-    public function admin(): void
+    public function admin()
     {
         if (!Auth::isAdmin()) {
-            header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . '/dashboard');
+            $basePath = '';
+            if (isset($_SERVER['APP_BASE_PATH'])) {
+                $basePath = $_SERVER['APP_BASE_PATH'];
+            }
+
+            header('Location: ' . $basePath . '/dashboard');
             exit;
         }
 
         $bookModel = new Book();
         $requestModel = new BookRequest();
+        $userModel = new User();
         $acceptedCount = $requestModel->countAccepted();
+        $userSearch = isset($_GET['user_search']) ? trim($_GET['user_search']) : '';
+        $requestStatus = isset($_GET['request_status']) ? trim($_GET['request_status']) : '';
 
         $this->render('admin', [
             'pageTitle' => 'Administration',
             'currentUser' => Auth::user(),
             'adminStats' => [
-                'totalUsers' => (new User())->countAll(),
+                'totalUsers' => $userModel->countAll(),
                 'totalBooks' => $bookModel->countActive(),
                 'totalExchanges' => $acceptedCount,
                 'moneySaved' => $requestModel->sumAcceptedValueGlobal(),
+                'inactiveBooks' => $bookModel->countInactive(),
+                'inactiveUsers' => $userModel->countInactive(),
+                'booksByLevel' => $bookModel->countByLevel(),
             ],
-            'adminBooks' => array_slice($bookModel->all(['status' => 'all']), 0, 10),
+            'adminBooks' => $bookModel->adminAll(),
+            'adminUsers' => $userModel->all($userSearch),
+            'notifyUsers' => $userModel->all(),
+            'adminRequests' => $requestModel->allForAdmin($requestStatus),
+            'adminRequestedSubjects' => $bookModel->mostRequestedSubjects(5),
+            'flashError' => $this->pullFlash('flash_error'),
+            'flashSuccess' => $this->pullFlash('flash_success'),
         ]);
     }
 
-    private function pullFlash(string $key): ?string
+    private function pullFlash($key)
     {
-        $value = $_SESSION[$key] ?? null;
+        $value = null;
+        if (isset($_SESSION[$key])) {
+            $value = $_SESSION[$key];
+        }
+
         unset($_SESSION[$key]);
 
         return is_string($value) ? $value : null;
     }
 
-    private function classOptions(): array
+    private function classOptions()
     {
         return [
             'Primaire' => [

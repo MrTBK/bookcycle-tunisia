@@ -1,27 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Core;
 
-final class Router
+class Router
 {
-    private array $routes = [];
+    private $routes = [];
 
-    public function get(string $path, array $handler): void
+    public function get($path, $handler)
     {
         $this->map('GET', $path, $handler);
     }
 
-    public function post(string $path, array $handler): void
+    public function post($path, $handler)
     {
         $this->map('POST', $path, $handler);
     }
 
-    public function dispatch(string $method, string $path): void
+    public function dispatch($method, $path)
     {
         $normalizedPath = $this->normalizePath($path);
-        $handler = $this->routes[$method][$normalizedPath] ?? null;
+        $handler = null;
+
+        if (isset($this->routes[$method]) && isset($this->routes[$method][$normalizedPath])) {
+            $handler = $this->routes[$method][$normalizedPath];
+        }
 
         if ($handler === null) {
             http_response_code(404);
@@ -29,17 +31,18 @@ final class Router
             return;
         }
 
-        [$controllerClass, $action] = $handler;
+        $controllerClass = $handler[0];
+        $action = $handler[1];
         $controller = new $controllerClass();
         $controller->$action();
     }
 
-    private function map(string $method, string $path, array $handler): void
+    private function map($method, $path, $handler)
     {
         $this->routes[$method][$this->normalizePath($path)] = $handler;
     }
 
-    private function normalizePath(string $path): string
+    private function normalizePath($path)
     {
         if ($path === '') {
             return '/';
@@ -50,4 +53,3 @@ final class Router
         return $path === '/index.php' ? '/' : $path;
     }
 }
-

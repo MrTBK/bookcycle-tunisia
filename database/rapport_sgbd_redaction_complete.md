@@ -285,7 +285,7 @@ Ce trigger met automatiquement a jour la date de modification d'un livre a chaqu
 Ce trigger empeche un utilisateur de faire une demande sur son propre livre.  
 Ainsi, une regle de gestion est directement imposee au niveau de la base.
 
-### Trigger `TRG_CREATE_EXCHANGE_AFTER_BOOK_EXCHANGE`
+### Trigger `TRG_BOOK_EXCHANGE_LOG`
 
 Ce trigger cree automatiquement un enregistrement dans la table `EXCHANGES` lorsqu'un livre passe a l'etat `exchanged`, a condition qu'une demande acceptee existe deja.
 
@@ -305,9 +305,20 @@ Dans l'annexe du rapport, il est possible d'afficher :
 
 Pour cela, des requetes sur les vues systeme ont ete preparees afin de consulter facilement les objets crees dans le schema.
 
+## 11. Elements Oracle specifiques conserves
+
+Certains elements presents dans les scripts sont propres a Oracle et ont ete conserves car ils sont utiles pour la soutenance technique et pour respecter le travail demande.
+
+- `EXECUTE IMMEDIATE` : permet d'executer une instruction SQL construite sous forme de texte, ici pour supprimer un utilisateur avant recreation.
+- `sequence + trigger` : dans Oracle XE / 11g, cette combinaison remplace l'auto-increment.
+- `%TYPE` : reutilise directement le type d'une colonne dans les procedures et fonctions.
+- `%ROWTYPE` : cree une variable ayant la meme structure qu'une ligne retournee.
+- `SQL%ROWCOUNT` : indique le nombre de lignes affectees par une requete SQL.
+- `DBMS_OUTPUT.PUT_LINE` : affiche des messages dans la console de SQL Developer.
+- `ALL_USERS` et `USER_OBJECTS` : vues systeme Oracle utilisees pour afficher les utilisateurs et les objets de l'annexe.
+
 ## Conclusion
 
 La partie SGBD du projet a permis de mettre en place une base de donnees complete et cohere nte pour la gestion de la plateforme BookCycle Tunisia.  
 Le schema relationnel assure la structuration des informations, les requetes SQL permettent l'exploitation des donnees, et les objets PL/SQL ajoutent une couche d'automatisation et de securisation des traitements.  
 Cette partie constitue une base solide pour le developpement de l'application Web et pour la demonstration technique lors de la soutenance.
-

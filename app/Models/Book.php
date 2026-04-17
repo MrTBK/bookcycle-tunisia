@@ -1,22 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
 use App\Core\Database;
 use PDO;
 
-final class Book
+class Book
 {
-    private PDO $db;
+    private $db;
 
     public function __construct()
     {
         $this->db = Database::connection();
     }
 
-    public function latest(int $limit = 4): array
+    public function latest($limit = 4)
     {
         $safeLimit = max(1, (int) $limit);
 
@@ -36,7 +34,7 @@ final class Book
         return $statement->fetchAll();
     }
 
-    public function all(array $filters = []): array
+    public function all($filters = [])
     {
         $sql = 'SELECT b.id, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.condition_label, b.estimated_price, b.description,
                        b.owner_id, b.status, b.is_active, b.created_at, b.updated_at, u.name AS owner_name
@@ -60,9 +58,14 @@ final class Book
             $params['id'] = (int) $filters['id'];
         }
 
-        if (($filters['status'] ?? '') !== 'all') {
+        $status = 'available';
+        if (isset($filters['status'])) {
+            $status = $filters['status'];
+        }
+
+        if ($status !== 'all') {
             $sql .= ' AND b.status = :status';
-            $params['status'] = $filters['status'] ?? 'available';
+            $params['status'] = $status;
         }
 
         $sql .= ' ORDER BY b.created_at DESC';
@@ -73,7 +76,7 @@ final class Book
         return $statement->fetchAll();
     }
 
-    public function create(array $data): int
+    public function create($data)
     {
         $statement = $this->db->prepare(
             'INSERT INTO books (title, subject, class_name, school_level, condition_label, estimated_price, description, owner_id, status, is_active)
@@ -87,7 +90,7 @@ final class Book
             'school_level' => $data['level'],
             'book_condition' => $data['condition'],
             'estimated_price' => (float) $data['estimated_price'],
-            'description' => $data['description'] ?: null,
+            'description' => !empty($data['description']) ? $data['description'] : null,
             'owner_id' => (int) $data['owner_id'],
             'status' => 'available',
             'is_active' => 1,
@@ -105,7 +108,7 @@ final class Book
         return isset($rows[0]['id']) ? (int) $rows[0]['id'] : 0;
     }
 
-    public function mine(int $ownerId): array
+    public function mine($ownerId)
     {
         $statement = $this->db->prepare(
             'SELECT id, title, subject, class_name AS class_label, school_level AS level_label, condition_label, estimated_price, description,
@@ -119,7 +122,7 @@ final class Book
         return $statement->fetchAll();
     }
 
-    public function find(int $bookId): ?array
+    public function find($bookId)
     {
         $statement = $this->db->prepare(
             'SELECT * FROM (
@@ -136,12 +139,97 @@ final class Book
         return $book ?: null;
     }
 
-    public function countActive(): int
+    public function countActive()
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM books WHERE is_active = 1')->fetchColumn();
     }
 
-    public function sumEstimatedPricesForOwner(int $ownerId): float
+    public function countInactive()
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM books WHERE is_active = 0')->fetchColumn();
+    }
+
+    public function adminAll()
+    {
+        $statement = $this->db->prepare(
+            'SELECT b.id, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.condition_label,
+                    b.estimated_price, b.description, b.owner_id, b.status, b.is_active, b.created_at, b.updated_at,
+                    u.name AS owner_name, u.email AS owner_email
+             FROM books b
+             INNER JOIN users u ON u.id = b.owner_id
+             ORDER BY b.created_at DESC'
+        );
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function deactivate($bookId)
+    {
+        $statement = $this->db->prepare(
+            'UPDATE books
+             SET is_active = 0,
+                 updated_at = SYSDATE
+             WHERE id = :id'
+        );
+        $statement->execute(['id' => (int) $bookId]);
+    }
+
+    public function reactivate($bookId)
+    {
+        $statement = $this->db->prepare(
+            'UPDATE books
+             SET is_active = 1,
+                 updated_at = SYSDATE
+             WHERE id = :id'
+        );
+        $statement->execute(['id' => (int) $bookId]);
+    }
+
+    public function countByLevel()
+    {
+        $statement = $this->db->prepare(
+            'SELECT school_level, COUNT(*) AS total_books
+             FROM books
+             WHERE is_active = 1
+             GROUP BY school_level'
+        );
+        $statement->execute();
+
+        $rows = $statement->fetchAll();
+        $counts = [
+            'Primaire' => 0,
+            'College' => 0,
+            'Lycee' => 0,
+        ];
+
+        foreach ($rows as $row) {
+            if (isset($counts[$row['school_level']])) {
+                $counts[$row['school_level']] = (int) $row['total_books'];
+            }
+        }
+
+        return $counts;
+    }
+
+    public function mostRequestedSubjects($limit = 5)
+    {
+        $safeLimit = max(1, (int) $limit);
+        $statement = $this->db->prepare(
+            'SELECT * FROM (
+                SELECT b.subject, COUNT(r.id) AS total_requests
+                FROM books b
+                LEFT JOIN requests r ON r.book_id = b.id
+                GROUP BY b.subject
+                ORDER BY COUNT(r.id) DESC, b.subject ASC
+             ) WHERE ROWNUM <= ' . $safeLimit
+        );
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function sumEstimatedPricesForOwner($ownerId)
     {
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(estimated_price), 0)
@@ -153,7 +241,7 @@ final class Book
         return (float) $statement->fetchColumn();
     }
 
-    public function updateStatus(int $bookId, string $status): void
+    public function updateStatus($bookId, $status)
     {
         $statement = $this->db->prepare('UPDATE books SET status = :status, updated_at = SYSDATE WHERE id = :id');
         $statement->execute([

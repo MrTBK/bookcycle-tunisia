@@ -43,7 +43,7 @@ Relations:
 - Fonction `CALCULATE_MONEY_SAVED`
 - Trigger `TRG_BOOKS_UPDATED_AT`
 - Trigger `TRG_PREVENT_SELF_REQUEST`
-- Trigger `TRG_CREATE_EXCHANGE_AFTER_BOOK_EXCHANGE`
+- Trigger `TRG_BOOK_EXCHANGE_LOG`
 
 ## 4. Requetes a montrer en soutenance
 
@@ -64,3 +64,4 @@ Dans le rapport, vous pouvez expliquer que:
 - Le schema a ete derive du diagramme de classes de l'application BookCycle Tunisia.
 - Les tables couvrent l'inscription, la publication des livres, les demandes, les echanges et les notifications.
 - Le code PL/SQL automatise une partie des traitements metier et securise certaines operations.
+- Certains elements sont specifiques a Oracle et sont gardes volontairement : `EXECUTE IMMEDIATE`, `sequence + trigger`, `%TYPE`, `%ROWTYPE`, `SQL%ROWCOUNT`, `DBMS_OUTPUT`, `ALL_USERS`, `USER_OBJECTS`.

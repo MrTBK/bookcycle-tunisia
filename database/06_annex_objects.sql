@@ -3,11 +3,14 @@
     Permet d'afficher les utilisateurs et tous les objets de la base.
 */
 
+-- ALL_USERS est une vue systeme Oracle qui liste les utilisateurs connus.
 -- Afficher les utilisateurs Oracle lies au projet.
 SELECT username, created
 FROM all_users
 WHERE username IN ('BOOKCYCLE_APP', 'BOOKCYCLE_REPORT');
 
+-- USER_OBJECTS est une vue systeme Oracle qui liste les objets de
+-- l'utilisateur actuellement connecte.
 -- Afficher les tables du schema applicatif.
 SELECT object_name, object_type, status
 FROM user_objects

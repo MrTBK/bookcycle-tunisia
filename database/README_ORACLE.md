@@ -20,7 +20,7 @@ Ce projet est prepare pour une utilisation avec Oracle et PL/SQL.
 
 Dans `app/Config/config.php`, l'application vise par defaut :
 
-- DSN : `oci:dbname=//localhost:1521/XEPDB1;charset=AL32UTF8`
+- DSN : `oci:dbname=//localhost:1521/XE;charset=AL32UTF8`
 - user : `bookcycle_app`
 - password : `BookCycle2026`
 
@@ -38,3 +38,12 @@ Pour que l'application PHP fonctionne avec Oracle sous XAMPP, il faut :
 - activer `oci8` et `pdo_oci` dans `C:\xampp\php\php.ini`
 
 Sans cela, les scripts PL/SQL peuvent etre executes dans SQL Developer, mais l'application PHP ne pourra pas se connecter a Oracle.
+
+## Elements Oracle specifiques gardes dans les scripts
+
+- `EXECUTE IMMEDIATE` : utile pour supprimer un utilisateur par script avant recreation.
+- `sequence + trigger` : remplace l'auto-increment dans Oracle XE / 11g.
+- `%TYPE` et `%ROWTYPE` : recuperent automatiquement le type d'une colonne ou d'une ligne.
+- `SQL%ROWCOUNT` : donne le nombre de lignes touchees par une instruction SQL.
+- `DBMS_OUTPUT.PUT_LINE` : affiche des messages dans SQL Developer.
+- `ALL_USERS` et `USER_OBJECTS` : vues systeme Oracle pour l'annexe du rapport.

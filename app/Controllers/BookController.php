@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controllers;
 
 use App\Core\Auth;
@@ -9,10 +7,10 @@ use App\Core\Controller;
 use App\Models\Book;
 use App\Models\BookRequest;
 
-final class BookController extends Controller
+class BookController extends Controller
 {
-    private Book $books;
-    private BookRequest $requests;
+    private $books;
+    private $requests;
 
     public function __construct()
     {
@@ -20,12 +18,12 @@ final class BookController extends Controller
         $this->requests = new BookRequest();
     }
 
-    public function latest(): void
+    public function latest()
     {
         $this->json($this->books->latest(4));
     }
 
-    public function index(): void
+    public function index()
     {
         $filters = [
             'level' => $_GET['level'] ?? null,
@@ -37,14 +35,17 @@ final class BookController extends Controller
         $this->json($this->books->all($filters));
     }
 
-    public function store(): void
+    public function store()
     {
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
-        $payload = json_decode((string) file_get_contents('php://input'), true) ?? $_POST;
+        $payload = json_decode((string) file_get_contents('php://input'), true);
+        if (!is_array($payload)) {
+            $payload = $_POST;
+        }
 
         foreach (['subject', 'level', 'class_name', 'condition', 'estimated_price'] as $field) {
             if (empty($payload[$field])) {
@@ -72,7 +73,7 @@ final class BookController extends Controller
         $this->redirect('/dashboard');
     }
 
-    public function mine(): void
+    public function mine()
     {
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
@@ -82,7 +83,7 @@ final class BookController extends Controller
         $this->json($this->books->mine((int) Auth::id()));
     }
 
-    public function stats(): void
+    public function stats()
     {
         $this->json([
             'totalBooks' => $this->books->countActive(),
@@ -91,12 +92,18 @@ final class BookController extends Controller
         ]);
     }
 
-    private function isApiRequest(): bool
+    private function isApiRequest()
     {
-        return str_contains($_SERVER['REQUEST_URI'] ?? '', '/api/');
+        $requestUri = '';
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $requestUri = $_SERVER['REQUEST_URI'];
+        }
+
+        return str_contains($requestUri, '/api/');
     }
 
-    private function respondError(string $message, string $redirectPath, int $statusCode): void
+    private function respondError($message, $redirectPath, $statusCode)
     {
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
@@ -107,22 +114,31 @@ final class BookController extends Controller
         $this->redirect($redirectPath);
     }
 
-    private function redirect(string $path): void
+    private function redirect($path)
     {
-        header('Location: ' . ($_SERVER['APP_BASE_PATH'] ?? '') . $path);
+        $basePath = '';
+        if (isset($_SERVER['APP_BASE_PATH'])) {
+            $basePath = $_SERVER['APP_BASE_PATH'];
+        }
+
+        header('Location: ' . $basePath . $path);
         exit;
     }
 
-    private function buildBookTitle(array $payload): string
+    private function buildBookTitle($payload)
     {
-        return trim((string) ($payload['subject'] ?? ''))
+        $subject = isset($payload['subject']) ? trim((string) $payload['subject']) : '';
+        $className = isset($payload['class_name']) ? trim((string) $payload['class_name']) : '';
+        $level = isset($payload['level']) ? trim((string) $payload['level']) : '';
+
+        return $subject
             . ' - '
-            . trim((string) ($payload['class_name'] ?? ''))
+            . $className
             . ' - '
-            . trim((string) ($payload['level'] ?? ''));
+            . $level;
     }
 
-    private function isValidClassForLevel(string $level, string $className): bool
+    private function isValidClassForLevel($level, $className)
     {
         $options = [
             'Primaire' => [
@@ -159,6 +175,11 @@ final class BookController extends Controller
             ],
         ];
 
-        return in_array($className, $options[$level] ?? [], true);
+        $classes = [];
+        if (isset($options[$level])) {
+            $classes = $options[$level];
+        }
+
+        return in_array($className, $classes, true);
     }
 }

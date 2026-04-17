@@ -1,8 +1,14 @@
 <?php
 
-declare(strict_types=1);
+$requestUri = '/';
+if (isset($_SERVER['REQUEST_URI'])) {
+    $requestUri = $_SERVER['REQUEST_URI'];
+}
 
-$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$uri = parse_url($requestUri, PHP_URL_PATH);
+if (!$uri) {
+    $uri = '/';
+}
 $file = __DIR__ . '/public' . $uri;
 
 if ($uri !== '/' && is_file($file)) {

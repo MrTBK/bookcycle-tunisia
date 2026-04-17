@@ -79,12 +79,110 @@ textarea {
     flex-wrap: wrap;
 }
 
+.main-nav > a,
+.nav-dropdown summary {
+    display: inline-flex;
+    align-items: center;
+}
+
 .brand {
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
     font-weight: 700;
     color: var(--text);
+}
+
+.nav-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    margin-left: 0.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown summary {
+    gap: 0.35rem;
+    cursor: pointer;
+    list-style: none;
+    color: var(--accent);
+}
+
+.nav-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.7rem);
+    right: 0;
+    width: min(360px, 88vw);
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    z-index: 20;
+}
+
+.nav-dropdown-head {
+    margin-bottom: 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-dark);
+}
+
+.nav-empty {
+    margin: 0 0 1rem;
+    color: var(--muted);
+}
+
+.nav-notification-item {
+    display: block;
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--line);
+    color: var(--text);
+}
+
+.nav-notification-item:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.nav-notification-item:hover,
+.nav-notification-item:focus-visible {
+    opacity: 1;
+}
+
+.nav-notification-item p {
+    margin: 0.55rem 0 0;
+    font-size: 0.94rem;
+}
+
+.nav-notification-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.nav-dropdown-link {
+    margin-top: 0.8rem;
+    width: 100%;
 }
 
 .brand-mark {
@@ -410,6 +508,22 @@ textarea:focus {
     gap: 1rem;
 }
 
+.notification-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.notification-sender {
+    background: #e2ece8;
+    color: #184f3d;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
 .request-actions {
     gap: 0.75rem;
     align-items: center;
@@ -498,5 +612,10 @@ td {
     .footer-grid {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .nav-dropdown-menu {
+        left: 0;
+        right: auto;
     }
 }
