@@ -12,7 +12,14 @@
             <div class="form-grid">
                 <div class="field">
                     <label for="book-subject">Matiere</label>
-                    <input id="book-subject" name="subject" type="text" required>
+                    <select id="book-subject" name="subject" required>
+                        <option value="">Choisir une matiere</option>
+                        <?php foreach (($subjectOptions ?? []) as $subjectOption): ?>
+                            <option value="<?= htmlspecialchars($subjectOption) ?>">
+                                <?= htmlspecialchars($subjectOption) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="field">
                     <label for="book-level">Niveau</label>

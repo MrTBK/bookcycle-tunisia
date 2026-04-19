@@ -14,7 +14,7 @@
 - RPA
 
 **Titre du projet :** `BookCycle Tunisia`  
-**Theme :** Plateforme de gestion, de don et de reutilisation des livres scolaires
+**Theme :** Plateforme de don, d'echange et de reutilisation des livres scolaires en Tunisie
 
 **Realise par :**
 - A completer
@@ -26,20 +26,27 @@
 
 ## Remerciements
 
-Nous tenons a remercier l'ensemble des enseignants ayant assure l'encadrement pedagogique des modules du projet integre, ainsi que toute personne ayant contribue a la realisation de ce travail.  
-Nous remercions egalement l'administration de l'Ecole Superieure d'Economie Numerique pour le cadre de formation mis a notre disposition.
+Nous adressons nos remerciements aux enseignants des modules **AGL**, **SGBD**, **Programmation Web 2** et **RPA** pour l'accompagnement pedagogique assure tout au long de ce projet.  
+Nous remercions egalement l'Ecole Superieure d'Economie Numerique pour le cadre de travail mis a disposition.
 
 ---
 
 ## Resume
 
-Le projet **BookCycle Tunisia** est une application de gestion de livres scolaires permettant aux utilisateurs de publier, consulter, demander et reutiliser des livres selon le niveau scolaire, la classe, la matiere et l'etat du livre.  
-L'objectif principal est de reduire le cout des fournitures scolaires et de faciliter l'echange entre proprietaires de livres et utilisateurs interesses.
+Le projet **BookCycle Tunisia** propose une plateforme web permettant de reutiliser les livres scolaires au lieu de les laisser inutilises apres chaque annee scolaire.  
+L'application met en relation des proprietaires de livres et des utilisateurs interesses via un catalogue filtre, un systeme de demandes, des notifications et un espace d'administration.
 
-Le projet repose sur une base de donnees relationnelle Oracle, des traitements PL/SQL, une application Web developpee en PHP sans framework, et une organisation claire de type MVC.  
-La solution proposee couvre l'inscription, l'authentification, la consultation publique du catalogue, la gestion des demandes, les notifications, les statistiques et l'administration.
+La solution est developpee en **PHP** selon une architecture **MVC sans framework**, avec une base de donnees **Oracle XE** exploitee via **PDO_OCI** et completee par plusieurs objets **PL/SQL**.  
+Le projet couvre a la fois la modelisation, le schema relationnel, les traitements metier, l'interface web et une reflexion de reingenierie des processus.
 
-**Mots cles :** `PHP`, `Oracle`, `PL/SQL`, `MVC`, `PDO`, `application web`, `base de donnees`, `livres scolaires`
+Les ameliorations recentes integrees dans cette version incluent :
+- l'ajout de pages publiques `About`, `Contact` et `Privacy Policy`
+- la transformation de la `Matiere` en liste controlee au lieu d'un champ libre
+- l'ajout d'un filtre `Classe` dans le catalogue
+- l'adaptation du filtre `Classe` au `Niveau` selectionne
+- l'enrichissement du tableau de bord administrateur avec statistiques et moderation
+
+**Mots cles :** `Oracle`, `PL/SQL`, `PHP`, `MVC`, `PDO`, `catalogue`, `livres scolaires`, `administration`
 
 ---
 
@@ -51,7 +58,7 @@ La solution proposee couvre l'inscription, l'authentification, la consultation p
 4. Partie SGBD  
 5. Partie Programmation Web 2  
 6. Tests et validation  
-7. Difficultes rencontrees et ameliorations  
+7. Difficultes, limites et ameliorations  
 8. Conclusion generale  
 9. Annexes
 
@@ -59,16 +66,20 @@ La solution proposee couvre l'inscription, l'authentification, la consultation p
 
 ## 1. Introduction Generale
 
-Dans le cadre du projet integre commun aux modules **AGL**, **SGBD**, **RPA** et **Programmation Web 2**, il nous a ete demande de concevoir et realiser une solution informatique complete repondant a un besoin reel.  
-Le projet retenu porte sur la reutilisation et la circulation des livres scolaires en Tunisie a travers une plateforme web simple, claire et orientee utilisateurs.
+Dans le cadre du projet integre commun aux modules **AGL**, **SGBD**, **RPA** et **Programmation Web 2**, il nous a ete demande de concevoir une solution complete repondant a un besoin concret.  
+Le sujet choisi traite la reutilisation des livres scolaires, un probleme a la fois social, economique et environnemental.
 
-Le choix de ce sujet se justifie par plusieurs constats :
-- le cout eleve des livres scolaires pour de nombreuses familles
-- la disponibilite de nombreux livres deja utilises mais encore exploitables
-- le besoin d'une plateforme de mise en relation entre offreurs et demandeurs
-- l'interet pedagogique du sujet pour manipuler les notions de modelisation, de base de donnees et de developpement Web
+En Tunisie, de nombreuses familles supportent chaque annee des depenses importantes liees a l'achat des livres scolaires.  
+Parallelement, beaucoup de livres restent encore utilisables apres usage.  
+Le projet **BookCycle Tunisia** vise donc a faciliter la circulation de ces livres entre utilisateurs, dans une logique d'entraide et d'economie circulaire.
 
-L'objectif de ce rapport est de presenter les differentes etapes de realisation du projet, les choix techniques adoptes, les fonctionnalites developpees, la structure de la base de donnees et l'architecture generale de la solution.
+Ce rapport presente :
+- le contexte et la problematique
+- l'analyse fonctionnelle et technique
+- le schema Oracle et les objets PL/SQL
+- l'architecture et les fonctionnalites web implementees
+- les tests de validation
+- les pistes d'amelioration
 
 ---
 
@@ -76,54 +87,66 @@ L'objectif de ce rapport est de presenter les differentes etapes de realisation 
 
 ### 2.1 Contexte
 
-Le projet **BookCycle Tunisia** vise a fournir un espace numerique permettant aux utilisateurs :
-- de consulter des livres scolaires disponibles
-- de publier leurs propres livres
-- d'envoyer des demandes pour obtenir un livre
-- de suivre les demandes recues et envoyees
-- de recevoir des notifications
-- de beneficier d'un espace administrateur pour le suivi global de la plateforme
+Le projet consiste a creer une plateforme web simple permettant :
+- de publier des livres scolaires disponibles
+- de consulter un catalogue filtre par niveau, classe et matiere
+- d'envoyer une demande pour obtenir un livre
+- de suivre les demandes et notifications
+- d'administrer la plateforme via un espace dedie
 
 ### 2.2 Problematique
 
-De nombreux livres scolaires deviennent inutilises apres la fin d'une annee scolaire alors qu'ils restent en bon etat.  
-En meme temps, d'autres eleves ou familles ont besoin de ces livres, parfois a un cout difficile a supporter.  
-Il existe donc un besoin de centraliser la publication, la recherche et le suivi des demandes dans une solution simple d'utilisation.
+Le besoin de depart peut etre formule ainsi :
+
+> Comment mettre en relation, de maniere simple et fiable, les proprietaires de livres scolaires et les personnes qui recherchent ces livres, tout en assurant un suivi des demandes, des echanges et des notifications ?
+
+Les limites des solutions informelles actuelles sont nombreuses :
+- informations dispersees
+- absence de suivi des demandes
+- manque de moderation
+- difficulte a trouver un livre adapte a une classe precise
 
 ### 2.3 Objectifs
 
-Les objectifs principaux du projet sont :
-- concevoir une application web de partage et de reutilisation de livres scolaires
-- construire une base de donnees relationnelle coherente a partir du domaine etudie
-- exploiter SQL et PL/SQL dans le cadre du module SGBD
-- developper une application Web 2 connectee a la base de donnees
-- appliquer les principes de la programmation orientee objet et du modele MVC
-- produire des statistiques utiles pour les utilisateurs et les administrateurs
+Les objectifs du projet sont :
+- modeliser le domaine de reutilisation des livres scolaires
+- construire une base Oracle relationnelle coherente
+- exploiter SQL et PL/SQL dans un cas reel
+- developper une application web MVC connectee a Oracle
+- fournir une interface claire pour visiteurs, utilisateurs et administrateur
+- mettre a disposition des statistiques utiles pour le pilotage
 
 ### 2.4 Public Cible
 
-La plateforme vise principalement :
+La plateforme vise :
 - les eleves
-- les etudiants
 - les parents
-- les proprietaires de livres souhaitant en faire don ou les reutiliser
+- les etudiants
+- les proprietaires de livres
 - l'administrateur de la plateforme
+
+### 2.5 Valeur Ajoutee
+
+La valeur du projet repose sur :
+- la reduction des depenses liees aux livres
+- la promotion de la reutilisation
+- la structuration d'un service simple d'utilisation
+- la combinaison de plusieurs modules académiques dans une meme application
 
 ---
 
 ## 3. Analyse Et Genie Logiciel
 
-### 3.1 Etude des acteurs
-
-Les principaux acteurs identifies dans le systeme sont :
+### 3.1 Acteurs
 
 #### Visiteur
 
-Le visiteur n'est pas authentifie. Il peut :
+Le visiteur non authentifie peut :
 - consulter la page d'accueil
-- rechercher des livres dans le catalogue
-- voir les details d'un livre
-- acceder aux pages de connexion et d'inscription
+- voir le catalogue
+- filtrer les livres par niveau, classe et matiere
+- consulter les pages `About`, `Contact` et `Privacy Policy`
+- acceder a l'inscription et a la connexion
 
 #### Utilisateur
 
@@ -132,63 +155,69 @@ L'utilisateur authentifie peut :
 - se connecter
 - ajouter un livre
 - consulter ses livres
-- envoyer une demande de livre
-- consulter ses demandes envoyees et recues
-- lire ses notifications
+- envoyer une demande sur un livre
+- accepter ou refuser des demandes recues s'il est proprietaire
+- consulter ses notifications
+- voir ses statistiques personnelles
 
 #### Administrateur
 
-L'administrateur possede tous les droits d'un utilisateur classique, avec des privileges supplementaires :
+L'administrateur peut en plus :
 - consulter les statistiques globales
-- voir tous les utilisateurs
-- desactiver ou reactiver un utilisateur
-- voir tous les livres
+- rechercher un utilisateur
+- activer ou desactiver un compte
 - masquer ou reactiver un livre
-- consulter toutes les demandes
 - filtrer les demandes par statut
-- annuler une demande en cas de probleme
-- envoyer des notifications globales ou individuelles
+- annuler une demande
+- envoyer des notifications a tous les utilisateurs ou a un utilisateur precis
 
-### 3.2 Besoins fonctionnels
+### 3.2 Besoins Fonctionnels
 
-Les principaux besoins fonctionnels retenus sont :
-- inscription d'un utilisateur
-- authentification
-- gestion du profil utilisateur via session
-- ajout d'un livre
-- recherche et filtrage du catalogue
-- affichage des details d'un livre
-- envoi d'une demande de livre
+Les besoins fonctionnels principaux sont :
+- inscription et authentification
+- gestion de session
+- publication d'un livre
+- generation automatique d'un titre de livre a partir de la matiere, de la classe et du niveau
+- filtrage du catalogue
+- affichage detaille d'un livre
+- creation d'une demande
+- prevention des demandes sur son propre livre
+- prevention des doublons de demandes en attente
 - acceptation ou refus d'une demande
-- notification des utilisateurs
-- affichage des statistiques
-- administration globale de la plateforme
+- envoi de notifications
+- suivi des livres, demandes et economies realisees
+- administration et moderation
 
-### 3.3 Besoins non fonctionnels
+### 3.3 Besoins Non Fonctionnels
 
-Les besoins non fonctionnels du projet sont :
-- interface simple et intuitive
-- separation claire entre la logique et l'affichage
-- securisation minimale des acces via session
-- validation des entrees cote serveur
-- code lisible et organise
-- compatibilite avec Oracle XE pour la base de donnees
+Les besoins non fonctionnels retenus sont :
+- interface simple et claire
+- organisation MVC
+- validation cote serveur
+- compatibilite Oracle XE
+- code lisible et modulaire
+- utilisation de PDO pour l'acces aux donnees
+- execution locale simple via `start_oracle_app.bat`
 
-### 3.4 Diagrammes UML
+### 3.4 Architecture Logique
 
-Dans le cadre du module AGL, les diagrammes suivants doivent etre integres dans la version finale du rapport si vous les avez deja realises dans un autre document :
-- diagramme de cas d'utilisation
-- diagramme de classes
-- eventuellement diagramme de sequences
+L'application suit une architecture **MVC** :
 
-**Zone a completer manuellement si necessaire :**
-- Inserer le diagramme de cas d'utilisation
-- Inserer le diagramme de classes
-- Inserer les captures ou schemas UML du module AGL
+- `app/Controllers` : controle des requetes HTTP
+- `app/Models` : acces Oracle via PDO
+- `app/Views` : rendu HTML
+- `public/index.php` : front controller
+- `routes/web.php` : routes pages
+- `routes/api.php` : routes API
 
-### 3.5 Description textuelle du diagramme de classes
+Cette architecture permet de separer :
+- la logique metier
+- l'acces aux donnees
+- la presentation
 
-Le domaine du projet conduit a identifier les classes metier principales suivantes :
+### 3.5 Description Des Entites Metier
+
+Les principales entites sont :
 - `User`
 - `Book`
 - `BookRequest`
@@ -196,36 +225,65 @@ Le domaine du projet conduit a identifier les classes metier principales suivant
 - `Exchange`
 
 Relations principales :
-- un utilisateur peut publier plusieurs livres
-- un livre appartient a un seul proprietaire
-- un utilisateur peut envoyer plusieurs demandes
-- une demande concerne un seul livre
-- un utilisateur peut recevoir plusieurs notifications
-- un echange finalise relie un proprietaire, un receveur et un livre
+- un `User` peut publier plusieurs `Book`
+- un `Book` appartient a un seul `User`
+- un `User` peut creer plusieurs `BookRequest`
+- un `BookRequest` concerne un seul `Book`
+- un `User` recoit plusieurs `Notification`
+- un `Exchange` historise un echange finalise
+
+### 3.6 Scenarios Principaux
+
+#### Scenario 1 : publication d'un livre
+1. L'utilisateur se connecte.
+2. Il ouvre la page `Ajouter un livre`.
+3. Il choisit un niveau, une classe et une matiere dans des listes controlees.
+4. L'application valide la coherence `niveau / classe`.
+5. Le livre est enregistre avec le statut `available`.
+
+#### Scenario 2 : demande d'un livre
+1. L'utilisateur consulte le catalogue.
+2. Il filtre les resultats.
+3. Il ouvre la fiche detail d'un livre.
+4. Il envoie une demande.
+5. Le proprietaire recoit une notification.
+
+#### Scenario 3 : traitement d'une demande
+1. Le proprietaire ouvre son tableau de bord.
+2. Il consulte les demandes recues.
+3. Il accepte ou refuse la demande.
+4. Le statut de la demande et du livre est mis a jour.
+5. Les notifications sont envoyees aux acteurs concernes.
 
 ---
 
 ## 4. Partie SGBD
 
-### 4.1 Choix du SGBD
+### 4.1 Choix Du SGBD
 
-Le systeme de gestion de base de donnees retenu est **Oracle XE**, conformement a la recommandation de l'enonce.  
-L'editeur recommande pour l'execution des scripts est **Oracle SQL Developer**.
+Le SGBD choisi est **Oracle XE**, en coherence avec les objectifs du module **SGBD** et la volonte d'exploiter des objets Oracle specifiques :
+- sequences
+- triggers
+- procedures stockees
+- fonctions
+- curseurs
+- vues
 
-### 4.2 Schema relationnel
+### 4.2 Scripts Fournis
 
-Le schema relationnel realise comprend les tables suivantes :
-- `USERS`
-- `BOOKS`
-- `REQUESTS`
-- `EXCHANGES`
-- `NOTIFICATIONS`
+Les scripts Oracle du projet sont a executer dans l'ordre suivant :
+1. `01_users_privileges.sql`
+2. `02_schema.sql`
+3. `03_sample_data.sql`
+4. `05_plsql_objects.sql`
+5. `04_queries.sql`
+6. `06_annex_objects.sql`
 
-Description resumee :
+### 4.3 Schema Relationnel
+
+Le schema comprend cinq tables principales :
 
 #### Table `USERS`
-
-Cette table stocke les informations relatives aux utilisateurs :
 - `id`
 - `name`
 - `email`
@@ -236,8 +294,6 @@ Cette table stocke les informations relatives aux utilisateurs :
 - `created_at`
 
 #### Table `BOOKS`
-
-Cette table represente les livres publies :
 - `id`
 - `title`
 - `subject`
@@ -253,8 +309,6 @@ Cette table represente les livres publies :
 - `updated_at`
 
 #### Table `REQUESTS`
-
-Cette table memorise les demandes effectuees sur les livres :
 - `id`
 - `book_id`
 - `requester_id`
@@ -263,8 +317,6 @@ Cette table memorise les demandes effectuees sur les livres :
 - `request_date`
 
 #### Table `EXCHANGES`
-
-Cette table historise les echanges finalises :
 - `id`
 - `book_id`
 - `owner_id`
@@ -273,8 +325,6 @@ Cette table historise les echanges finalises :
 - `status`
 
 #### Table `NOTIFICATIONS`
-
-Cette table stocke les notifications applicatives :
 - `id`
 - `user_id`
 - `sender_name`
@@ -282,486 +332,346 @@ Cette table stocke les notifications applicatives :
 - `is_read`
 - `created_at`
 
-### 4.3 Contraintes et integrite
+### 4.4 Contraintes Et Integrite
 
-Pour assurer la coherence des donnees, plusieurs contraintes ont ete mises en place :
-- cles primaires sur toutes les tables
-- cles etrangeres entre utilisateurs, livres, demandes, echanges et notifications
-- contraintes `CHECK` sur les roles et les statuts
-- contrainte `UNIQUE` sur l'email utilisateur
+Le schema integre :
+- des cles primaires sur chaque table
+- des cles etrangeres entre tables metier
+- des contraintes `CHECK` sur les champs `role`, `status`, `is_active`, `is_read`
+- une contrainte d'unicite sur `users.email`
 
-### 4.4 Creation des utilisateurs et privileges
+Exemples de valeurs controlees :
+- `users.role` : `admin` ou `user`
+- `books.status` : `available`, `reserved`, `exchanged`
+- `requests.status` : `pending`, `accepted`, `rejected`
 
-Deux utilisateurs Oracle ont ete prevus :
-- `BOOKCYCLE_APP` : proprietaire des objets applicatifs
-- `BOOKCYCLE_REPORT` : utilisateur secondaire dedie a la consultation
+### 4.5 Sequences, Triggers Et Vue
 
-Privileges principaux accordes a `BOOKCYCLE_APP` :
-- `CREATE SESSION`
-- `CREATE TABLE`
-- `CREATE VIEW`
-- `CREATE PROCEDURE`
-- `CREATE TRIGGER`
-- `CREATE SEQUENCE`
+Pour rester compatible avec Oracle XE / 11g, les identifiants sont geres via :
+- `seq_users`
+- `seq_books`
+- `seq_requests`
+- `seq_exchanges`
+- `seq_notifications`
 
-Privileges de `BOOKCYCLE_REPORT` :
-- `CREATE SESSION`
-- `SELECT` sur les tables et la vue de synthese
+Ces sequences sont utilisees par les triggers :
+- `trg_users_pk`
+- `trg_books_pk`
+- `trg_requests_pk`
+- `trg_exchanges_pk`
+- `trg_notifications_pk`
 
-Le script correspondant est :
-- [database/01_users_privileges.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/01_users_privileges.sql)
+Une vue de reporting est aussi definie :
+- `v_book_overview`
 
-### 4.5 Scripts SQL et PL/SQL realises
+Cette vue facilite les requetes multi-tables entre `books` et `users`.
 
-Les scripts fournis dans le projet sont :
-- [database/01_users_privileges.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/01_users_privileges.sql)
-- [database/02_schema.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/02_schema.sql)
-- [database/03_sample_data.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/03_sample_data.sql)
-- [database/04_queries.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/04_queries.sql)
-- [database/05_plsql_objects.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/05_plsql_objects.sql)
-- [database/06_annex_objects.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/06_annex_objects.sql)
+### 4.6 Index
 
-### 4.6 Requetes d'interrogation et de modification
+Des index ont ete ajoutes pour accelerer les recherches les plus courantes :
+- `idx_books_owner`
+- `idx_books_subject`
+- `idx_books_level`
+- `idx_requests_book`
+- `idx_requests_requester`
+- `idx_notifications_user`
 
-Conformement au travail demande, plusieurs types de requetes SQL ont ete prepares :
-- selection simple
-- projection
-- selection avec condition
-- recherche multicritere
-- tri
-- jointures
-- aggregation avec `COUNT`
-- `GROUP BY`
-- `HAVING`
-- sous-requetes
-- `UPDATE`
-- `DELETE`
-- suppression logique
+### 4.7 Objets PL/SQL Realises
 
-Exemples presentes dans le script :
-- affichage des utilisateurs
-- affichage des livres disponibles
-- jointure livres et proprietaires
-- statistiques par niveau scolaire
-- mise a jour du statut d'un livre
-- suppression des notifications lues
-
-### 4.7 Objets PL/SQL
-
-Les objets PL/SQL implementes sont :
+Le script `05_plsql_objects.sql` contient :
 
 #### Procedures
-- `ADD_NOTIFICATION`
-- `ACCEPT_REQUEST`
+- `add_notification(p_user_id, p_message)`
+- `accept_request(p_request_id, p_meeting_note)`
 
 #### Fonctions
-- `COUNT_BOOKS_BY_USER`
-- `CALCULATE_MONEY_SAVED`
+- `count_books_by_user(p_user_id)`
+- `calculate_money_saved()`
 
-#### Triggers
-- `TRG_USERS_PK`
-- `TRG_BOOKS_PK`
-- `TRG_REQUESTS_PK`
-- `TRG_EXCHANGES_PK`
-- `TRG_NOTIFICATIONS_PK`
-- `TRG_BOOKS_UPDATED_AT`
-- `TRG_PREVENT_SELF_REQUEST`
-- `TRG_BOOK_EXCHANGE_LOG`
+#### Triggers metier
+- `trg_books_updated_at`
+- `trg_prevent_self_request`
+- `trg_book_exchange_log`
 
-#### Curseurs et blocs PL/SQL
-- exemple de curseur implicite avec `SQL%ROWCOUNT`
-- exemple de curseur explicite avec `FETCH`
-- utilisation de `DBMS_OUTPUT.PUT_LINE`
+#### Blocs PL/SQL de demonstration
+- exemple de `SQL%ROWCOUNT`
+- exemple de curseur explicite
+- exemple d'execution de procedure et fonction
 
-### 4.8 Elements Oracle specifiques conserves
+### 4.8 Apport De PL/SQL
 
-Certains elements ont ete gardes volontairement car ils sont adaptes a Oracle :
-- `EXECUTE IMMEDIATE`
-- `sequence + trigger`
-- `%TYPE`
-- `%ROWTYPE`
-- `SQL%ROWCOUNT`
-- `DBMS_OUTPUT.PUT_LINE`
-- `ALL_USERS`
-- `USER_OBJECTS`
-
-### 4.9 Annexe des objets BD
-
-Pour l'annexe du rapport, le projet contient deja les requetes permettant d'afficher :
-- les utilisateurs Oracle lies au projet
-- les tables
-- les vues
-- les procedures
-- les fonctions
-- les triggers
-- les index
-
-Le script correspondant est :
-- [database/06_annex_objects.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/06_annex_objects.sql)
-
-### 4.10 Conclusion de la partie SGBD
-
-La partie SGBD a permis de construire une base relationnelle complete, exploitable par l'application Web et conforme aux attentes du module.  
-Elle couvre la creation des schemas, la gestion des acces, les requetes SQL, les procedures, les fonctions, les triggers et les annexes demandees.
+PL/SQL renforce le projet en apportant :
+- des traitements metier proches des donnees
+- une meilleure reutilisation de certaines operations
+- un controle supplementaire d'integrite
+- des exemples concrets de programmation procedurale sur Oracle
 
 ---
 
 ## 5. Partie Programmation Web 2
 
-### 5.1 Technologies utilisees
+### 5.1 Technologies Utilisees
 
-L'application Web 2 a ete developpee avec :
-- `PHP` sans framework
-- `HTML`
+La partie web repose sur :
+- `PHP 7.4`
+- `HTML5`
 - `CSS`
-- `JavaScript` natif
-- `PDO` pour la connexion a Oracle
+- `JavaScript`
+- `PDO` avec `PDO_OCI`
+- Oracle Instant Client
 
-### 5.2 Architecture adoptee
+### 5.2 Lancement Du Projet
 
-Pour respecter les bonnes pratiques du module, le projet suit une architecture **MVC**.
+Le lancement local est prevu via :
+- `start_oracle_app.bat`
 
-#### Modeles
+Ou manuellement :
+- `C:\php74\php.exe -S localhost:8000 router.php`
 
-Les modeles se trouvent dans `app/Models` :
-- `User`
-- `Book`
-- `BookRequest`
-- `Notification`
+Le fichier `router.php` permet de servir correctement l'application en mode developpement.
 
-Ils sont responsables de l'acces a la base de donnees et de l'execution des requetes.
+### 5.3 Pages Web Realisees
 
-#### Controleurs
+#### Pages publiques
+- `/` : accueil
+- `/about` : presentation du projet
+- `/catalog` : catalogue et fiche detail
+- `/contact` : page de contact
+- `/privacy-policy` : politique de confidentialite
+- `/login` : connexion
+- `/register` : inscription
 
-Les controleurs se trouvent dans `app/Controllers` :
-- `PageController`
-- `AuthController`
-- `BookController`
-- `RequestController`
-- `AdminController`
-- `NotificationController`
+#### Pages privees
+- `/dashboard` : tableau de bord utilisateur
+- `/add-book` : ajout d'un livre
+- `/admin` : espace administrateur
 
-Ils assurent :
-- l'affichage des pages
-- l'authentification
-- le traitement des formulaires
-- l'administration
-- la lecture des notifications
+### 5.4 API Disponible
 
-#### Vues
+Le projet expose aussi plusieurs routes API :
 
-Les vues se trouvent dans `app/Views` et sont organisees entre :
-- `layouts`
-- `pages`
+#### Authentification
+- `GET /api/me`
+- `POST /api/register`
+- `POST /api/login`
+- `POST /api/logout`
 
-Les pages principales sont :
-- accueil
-- catalogue
-- inscription
+#### Livres
+- `GET /api/books`
+- `POST /api/books`
+- `GET /api/latest-books`
+- `GET /api/my-books`
+- `GET /api/stats`
+
+#### Demandes
+- `POST /api/requests`
+- `GET /api/my-requests`
+- `GET /api/received-requests`
+- `POST /api/accept-request`
+- `POST /api/reject-request`
+
+#### Administration
+- `GET /api/admin-stats`
+
+### 5.5 Fonctionnalites Implantees
+
+#### Authentification
+- creation de compte
 - connexion
-- ajout de livre
-- tableau de bord utilisateur
-- administration
+- deconnexion
+- maintien de session
 
-### 5.3 Structure du projet
+#### Catalogue
+- affichage des livres actifs
+- filtre par niveau
+- filtre par classe
+- filtre par matiere
+- consultation detaillee d'un livre
 
-La structure generale du projet est la suivante :
+#### Ajout de livre
+- choix du niveau dans une liste
+- choix de la classe dans une liste
+- choix de la matiere dans une liste controlee
+- validation de la coherence entre `niveau` et `classe`
+- creation automatique du titre
 
-- `app/Controllers`
-- `app/Models`
-- `app/Views`
-- `app/Core`
-- `routes`
-- `public`
-- `database`
+#### Gestion des demandes
+- envoi d'une demande
+- refus de demande sur son propre livre
+- blocage des doublons en attente
+- acceptation avec note de rendez-vous obligatoire
+- refus de demande
+- notifications des utilisateurs concernes
 
-Le fichier `public/index.php` joue le role de point d'entree principal.  
-Le fichier `router.php` permet d'utiliser le serveur PHP integre en environnement local.
+#### Tableau de bord
+- liste des livres de l'utilisateur
+- demandes recues
+- demandes envoyees
+- notifications recentes
+- statistiques personnelles
 
-### 5.4 Fonctionnalites realisees
+#### Administration
+- statistiques globales
+- livres par niveau
+- matieres les plus demandees
+- recherche d'utilisateurs
+- activation et desactivation des comptes
+- moderation des livres
+- annulation de demandes
+- envoi de notifications
 
-#### 5.4.1 Page d'accueil
+### 5.6 Choix D'Interface
 
-La page d'accueil presente :
-- une introduction a la plateforme
-- les statistiques principales
-- les derniers livres ajoutes
+L'interface est volontairement simple et orientee usage.  
+Les evolutions recentes ont renforce la coherence fonctionnelle :
+- ajout des pages d'information publique
+- filtrage plus guide dans le catalogue
+- suppression des saisies libres inutiles pour la matiere
+- meilleure structuration de l'administration
 
-#### 5.4.2 Inscription
+### 5.7 Securite Et Validation
 
-La page d'inscription permet de creer un compte a partir des champs :
-- nom complet
-- email
-- telephone
-- mot de passe
+La securite implementee reste academique mais fonctionnelle :
+- verification d'authentification avant actions protegees
+- restriction de l'administration au role `admin`
+- validation des champs cote serveur
+- echappement HTML dans les vues via `htmlspecialchars`
+- usage de requetes preparees PDO
 
-Une verification est realisee cote serveur pour refuser les champs vides et les adresses email deja existantes.
-
-#### 5.4.3 Connexion
-
-La page de connexion permet l'authentification via :
-- email
-- mot de passe
-
-La verification du mot de passe est effectuee avec `password_verify`.
-
-#### 5.4.4 Catalogue public
-
-Le catalogue est accessible sans authentification.  
-Il permet :
-- l'affichage des livres disponibles
-- la recherche par matiere
-- le filtrage par niveau
-- l'affichage des details d'un livre
-
-#### 5.4.5 Ajout d'un livre
-
-Un utilisateur connecte peut publier un livre en renseignant :
-- la matiere
-- le niveau
-- la classe
-- l'etat
-- le prix estime
-
-Les donnees sont inserees dans la table `BOOKS`.
-
-#### 5.4.6 Gestion des demandes
-
-Un utilisateur connecte peut envoyer une demande sur un livre qui ne lui appartient pas.  
-Le proprietaire peut ensuite :
-- consulter les demandes recues
-- accepter une demande
-- refuser une demande
-
-Lors de l'acceptation :
-- la demande choisie devient `accepted`
-- les autres demandes deviennent `rejected`
-- le livre devient `reserved`
-- une notification est envoyee
-
-#### 5.4.7 Tableau de bord utilisateur
-
-Le tableau de bord utilisateur affiche :
-- les statistiques personnelles
-- les livres publies
-- les demandes recues
-- les demandes envoyees
-- les notifications
-
-Les notifications affichent :
-- l'expediteur
-- le message
-- la date
-- l'etat lue/non lue
-
-#### 5.4.8 Notifications
-
-Le systeme de notifications permet :
-- l'ajout de notifications lors de certaines actions metier
-- l'affichage des notifications dans le tableau de bord
-- l'affichage du nombre de notifications non lues dans la barre de navigation
-- un menu deroulant dans la barre de navigation
-- le marquage individuel comme lue lors du clic sur une notification
-
-#### 5.4.9 Administration
-
-La partie administrateur propose des fonctionnalites plus avancees que celles d'un utilisateur standard.
-
-L'administrateur peut :
-- consulter les statistiques globales
-- voir tous les utilisateurs
-- desactiver ou reactiver un utilisateur
-- voir tous les livres
-- masquer un livre inapproprie
-- reactiver un livre masque
-- voir qui a poste chaque livre
-- consulter toutes les demandes du systeme
-- filtrer les demandes par statut
-- annuler une demande en cas de probleme
-- envoyer une notification a un seul utilisateur
-- envoyer une notification globale a tous les utilisateurs actifs
-
-### 5.5 Connexion avec la base de donnees
-
-L'application utilise `PDO` pour interagir avec Oracle via la classe :
-- `app/Core/Database.php`
-
-Le projet a ete configure pour fonctionner avec :
-- Oracle XE
-- Instant Client
-- `pdo_oci`
-- `oci8`
-
-Le lancement local prevu est documente dans :
-- [README.md](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/README.md)
-- [database/README_ORACLE.md](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/README_ORACLE.md)
-
-### 5.6 Programmation orientee objet
-
-L'application suit une logique orientee objet simple :
-- les responsabilites sont separees
-- les modeles encapsulent les traitements lies aux donnees
-- les controleurs gerent la logique applicative
-- les vues affichent les informations
-
-Cette organisation rend le code plus :
-- lisible
-- maintenable
-- reutilisable
-
-### 5.7 Captures d'ecran a inserer
-
-Pour la version finale du rapport, il est recommande d'ajouter les captures suivantes :
-- page d'accueil
-- page de connexion
-- page d'inscription
-- catalogue
-- formulaire d'ajout de livre
-- tableau de bord utilisateur
-- espace administrateur
-- notifications dans la barre de navigation
-
-**Zone a completer manuellement :**
-- Inserer capture de la page d'accueil
-- Inserer capture du catalogue
-- Inserer capture de l'inscription
-- Inserer capture du tableau de bord
-- Inserer capture de l'administration
-
-### 5.8 Conclusion de la partie Web 2
-
-La partie Web 2 a permis de realiser une application fonctionnelle, structurée et directement reliee a la base de donnees.  
-Elle respecte les exigences principales du module a travers l'utilisation de PHP, du modele MVC, des formulaires, des traitements serveur et de l'acces aux donnees via PDO.
+Des validations metier importantes sont aussi presentes :
+- impossibilite de demander son propre livre
+- impossibilite d'envoyer une deuxieme demande pending
+- coherence entre `school_level` et `class_name`
+- verification d'une matiere autorisee
 
 ---
 
 ## 6. Tests Et Validation
 
-### 6.1 Tests fonctionnels realises
+### 6.1 Tests Fonctionnels
 
-Les tests fonctionnels principaux portent sur :
-- l'inscription d'un utilisateur
-- la connexion
-- la consultation du catalogue
-- l'ajout d'un livre
-- l'envoi d'une demande
-- l'acceptation et le refus d'une demande
-- l'affichage des notifications
-- les actions administratives
+Les tests manuels principaux realises portent sur :
+- inscription d'un nouvel utilisateur
+- connexion avec compte utilisateur et compte admin
+- ajout d'un livre
+- affichage du catalogue
+- filtre par niveau, matiere et classe
+- demande d'un livre
+- acceptation d'une demande avec note de rendez-vous
+- refus d'une demande
+- consultation des notifications
+- actions d'administration
 
-### 6.2 Jeux de donnees
+### 6.2 Cas De Test Representatifs
 
-Des donnees de demonstration ont ete ajoutees dans :
-- [database/03_sample_data.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/03_sample_data.sql)
+| Cas de test | Entree | Resultat attendu |
+|---|---|---|
+| Inscription | nom, email, telephone, mot de passe | compte cree |
+| Connexion | email + mot de passe valides | ouverture du dashboard |
+| Ajout livre | niveau + classe coherente + matiere valide | livre ajoute |
+| Ajout livre invalide | classe ne correspondant pas au niveau | message d'erreur |
+| Demande sur son propre livre | proprietaire = demandeur | action refusee |
+| Demande duplicate | demande pending existante | action refusee |
+| Acceptation | note de rendez-vous fournie | demande acceptee, livre reserve |
+| Admin toggle user | action admin | utilisateur active ou desactive |
 
-Comptes utiles :
-- administrateur : `admin@bookcycle.tn / admin123`
-- utilisateur de test : `ahmed@bookcycle.tn / user123`
+### 6.3 Validation Technique
 
-### 6.3 Verification syntaxique
-
-Au cours du developpement, une verification syntaxique des fichiers PHP a ete effectuee avec `php -l`, ce qui a permis de confirmer l'absence d'erreurs de syntaxe dans les fichiers modifies.
-
-### 6.4 Soutenance technique
-
-Lors de la soutenance technique, il sera pertinent de montrer :
-- l'execution des scripts Oracle
-- la creation de la base
-- l'insertion des donnees d'exemple
-- l'affichage des requetes SQL
-- l'execution des procedures et fonctions PL/SQL
-- le fonctionnement de l'application Web
-- la gestion des roles utilisateur et administrateur
+La validation technique comprend :
+- execution des scripts Oracle
+- verification de la connexion Oracle via PDO
+- execution locale par `start_oracle_app.bat`
+- verification des routes pages et API
+- controle visuel du rendu des vues principales
 
 ---
 
-## 7. Difficultes Rencontrees Et Ameliorations
+## 7. Difficultes, Limites Et Ameliorations
 
-### 7.1 Difficultes rencontrees
+### 7.1 Difficultes Rencontrees
 
-Parmi les principales difficultes rencontrees :
-- la configuration de la connexion PHP avec Oracle
-- la gestion des sessions et des redirections
-- la coordination entre logique metier, vues et base de donnees
-- la mise en place des notifications
-- la gestion des droits specifiques de l'administrateur
+Les principales difficultes du projet ont ete :
+- configuration de `PDO_OCI` et d'Oracle Instant Client
+- adaptation a Oracle XE et a ses contraintes
+- gestion des objets Oracle comme les sequences et triggers
+- synchronisation entre logique metier PHP et traitements PL/SQL
+- construction d'une interface simple mais complete
 
-### 7.2 Ameliorations possibles
+### 7.2 Limites Actuelles
 
-Des ameliorations futures peuvent etre envisagees :
-- ajout d'une gestion plus complete du profil utilisateur
-- ajout d'un systeme de recherche avancee
-- ajout d'un historique des actions administratives
-- ajout de pagination dans le catalogue
-- ajout de pièces jointes ou images pour les livres
-- ajout d'une messagerie directe entre utilisateurs
-- ajout d'une vraie gestion de rapports ou signalements
+Cette version comporte encore certaines limites :
+- absence d'upload d'images pour les livres
+- securisation perfectible des formulaires
+- ergonomie mobile encore ameliorable
+- pas de moteur de recommandation avance
+- pas de workflow automatise complet cote RPA
 
-### 7.3 Partie RPA
+### 7.3 Ameliorations Proposees
 
-Le sujet global cite egalement le module RPA.  
-Dans la version actuelle du depot, aucune implementation RPA autonome n'apparait explicitement dans les fichiers disponibles.  
-Si une partie RPA a ete realisee en dehors de ce depot, il faudra l'ajouter a la version finale du rapport.
-
-**Zone a completer manuellement si necessaire :**
-- objectif de la partie RPA
-- outil utilise
-- scenario automatise
-- captures d'execution
+Les ameliorations envisageables sont :
+- ajout de CSRF token sur tous les formulaires
+- ajout d'un profil utilisateur editable
+- gestion d'images de livres
+- passage a un systeme de notifications plus riche
+- tableaux de bord plus detailles
+- moteur de recommandation des livres
+- automatisation partielle du tri des demandes
 
 ---
 
 ## 8. Conclusion Generale
 
-Le projet **BookCycle Tunisia** a permis de concevoir une solution complete combinant analyse, base de donnees et developpement Web autour d'un besoin concret.  
-Le systeme mis en place facilite la reutilisation des livres scolaires et propose une plateforme claire reposant sur :
-- une base de donnees Oracle structuree
-- des scripts SQL et PL/SQL conformes aux attentes du module SGBD
-- une application Web developpee en PHP suivant une architecture MVC
-- une interface utilisateur simple avec un espace administrateur
+Le projet **BookCycle Tunisia** a permis de concretiser un cas d'usage realiste autour de la reutilisation des livres scolaires, en mobilisant les competences des modules **SGBD**, **Programmation Web 2**, **AGL** et **RPA**.
 
-Le projet constitue ainsi une application integree coherente, pedagogiquement riche, et presentable lors de la soutenance technique.
+Sur le plan technique, le projet aboutit a une application web fonctionnelle connectee a une base **Oracle XE**, structuree selon une architecture **MVC**, et enrichie par des objets **PL/SQL** pertinents.  
+Sur le plan fonctionnel, la plateforme couvre les besoins essentiels de consultation, publication, demande, notification et administration.
+
+Cette version du rapport reflete l'etat reel du projet Oracle tel qu'il est implemente actuellement, avec les ameliorations recentes du catalogue, des pages publiques et des controles de validation.
 
 ---
 
 ## 9. Annexes
 
-### 9.1 Fichiers principaux du projet
+### 9.1 Arborescence Simplifiee
 
-- [README.md](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/README.md)
-- [app/Controllers](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/app/Controllers)
-- [app/Models](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/app/Models)
-- [app/Views](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/app/Views)
-- [routes/web.php](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/routes/web.php)
-- [routes/api.php](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/routes/api.php)
+```text
+bookcycle-tunisia/
+  app/
+    Config/
+    Controllers/
+    Core/
+    Models/
+    Views/
+  database/
+  public/
+    assets/
+  routes/
+  router.php
+  start_oracle_app.bat
+```
 
-### 9.2 Scripts base de donnees
+### 9.2 Fichiers Importants
 
-- [database/01_users_privileges.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/01_users_privileges.sql)
-- [database/02_schema.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/02_schema.sql)
-- [database/03_sample_data.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/03_sample_data.sql)
-- [database/04_queries.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/04_queries.sql)
-- [database/05_plsql_objects.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/05_plsql_objects.sql)
-- [database/06_annex_objects.sql](C:/Users/Mega-Pc/Desktop/bookcycle-tunisia/database/06_annex_objects.sql)
+- `app/Config/config.php`
+- `app/Core/Database.php`
+- `app/Controllers/PageController.php`
+- `app/Controllers/BookController.php`
+- `app/Controllers/RequestController.php`
+- `app/Controllers/AdminController.php`
+- `app/Models/Book.php`
+- `database/02_schema.sql`
+- `database/05_plsql_objects.sql`
 
-### 9.3 Ordre d'execution Oracle
+### 9.3 Comptes De Demonstration
 
-Depuis Oracle SQL Developer :
+- administrateur : `admin@bookcycle.tn` / `admin123`
+- utilisateur : `ahmed@bookcycle.tn` / `user123`
 
-1. Se connecter avec `SYSTEM`
-2. Executer `01_users_privileges.sql`
-3. Se connecter avec `BOOKCYCLE_APP`
-4. Executer `02_schema.sql`
-5. Executer `03_sample_data.sql`
-6. Executer `05_plsql_objects.sql`
-7. Executer `04_queries.sql`
-8. Executer `06_annex_objects.sql`
+### 9.4 Scripts Oracle
 
-### 9.4 Notes finales de personnalisation
-
-Avant la remise finale du rapport, il est recommande de personnaliser les elements suivants :
-- noms des etudiants
-- nom de l'encadrant
-- captures d'ecran
-- diagrammes UML
-- toute section RPA realisee en dehors du depot
+- `01_users_privileges.sql`
+- `02_schema.sql`
+- `03_sample_data.sql`
+- `04_queries.sql`
+- `05_plsql_objects.sql`
+- `06_annex_objects.sql`

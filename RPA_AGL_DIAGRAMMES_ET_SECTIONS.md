@@ -1,481 +1,457 @@
 # Partie RPA Et AGL
 
-Ce document complete le rapport principal du projet **BookCycle Tunisia** en couvrant :
-- la partie reingenierie des processus d'affaires / RPA
-- la partie atelier genie logiciel / AGL
-- les diagrammes UML et les elements Scrum demandes dans l'enonce
+Ce document complete le rapport principal du projet **BookCycle Tunisia**.  
+Il couvre :
+- la partie **RPA / reingenierie des processus d'affaires**
+- la partie **AGL**
+- les descriptions de diagrammes, backlog et elements d'organisation projet
 
 ---
 
-## 1. Partie Reingenierie Des Processus D'Affaires
+## 1. Partie RPA - Reingenierie Des Processus D'Affaires
 
-### 1.1 Entreprise Et Contexte
+### 1.1 Organisation Et Contexte
 
-L'entreprise choisie est la plateforme **BookCycle Tunisia**, un systeme d'information social qui facilite la reutilisation des livres scolaires entre utilisateurs.  
-Ce projet repond principalement a un objectif de developpement durable lie :
-- a l'acces a l'education
-- a la consommation responsable
-- a la reduction des couts scolaires
+Le projet **BookCycle Tunisia** peut etre assimile a une plateforme de service numerique a vocation sociale.  
+Son objectif est de faciliter la circulation des livres scolaires entre utilisateurs afin de reduire les couts et le gaspillage.
 
-### 1.2 Cartographie Des Processus Metiers
+Le systeme repond a plusieurs finalites :
+- acces plus simple aux livres scolaires
+- reduction des depenses pour les familles
+- reutilisation des ressources existantes
+- centralisation des interactions entre proprietaires et demandeurs
 
-Les processus de l'entreprise peuvent etre classes en trois categories :
+### 1.2 Cartographie Des Processus
+
+Les processus metiers du projet peuvent etre classes en trois familles.
 
 #### Processus coeur
 - publication d'un livre
-- recherche d'un livre
+- consultation et filtrage du catalogue
 - envoi d'une demande
 - traitement d'une demande
-- concretisation d'un echange
+- finalisation d'un echange
 
 #### Processus support
-- gestion des comptes utilisateurs
+- gestion des comptes
+- authentification
 - gestion des notifications
-- gestion de la base de donnees
-- supervision technique de la plateforme
+- gestion de la base de donnees Oracle
+- maintenance de l'application
 
 #### Processus de management
-- administration globale
+- administration de la plateforme
 - suivi des statistiques
-- moderation des contenus
-- pilotage de la performance
+- moderation des livres
+- supervision des demandes
 
-### 1.3 Diagramme De Cartographie Des Processus
+### 1.3 Diagramme De Cartographie
 
 ```mermaid
 flowchart LR
     A["Management"] --> A1["Pilotage de la plateforme"]
-    A --> A2["Suivi des KPI"]
+    A --> A2["Suivi des statistiques"]
     A --> A3["Moderation et administration"]
 
-    B["Processus coeur"] --> B1["Publication d'un livre"]
-    B --> B2["Recherche et consultation"]
-    B --> B3["Envoi d'une demande"]
-    B --> B4["Traitement d'une demande"]
-    B --> B5["Echange du livre"]
+    B["Processus coeur"] --> B1["Publier un livre"]
+    B --> B2["Rechercher un livre"]
+    B --> B3["Envoyer une demande"]
+    B --> B4["Traiter une demande"]
+    B --> B5["Finaliser un echange"]
 
     C["Processus support"] --> C1["Gestion des comptes"]
     C --> C2["Notifications"]
-    C --> C3["Base de donnees"]
+    C --> C3["Base Oracle"]
     C --> C4["Support technique"]
 ```
 
-### 1.4 Evaluation As-Is Des Processus
+### 1.4 Evaluation As-Is
 
-| Processus | SLA cible | KPI principal | Etat actuel As-Is |
+L'etat actuel de la plateforme montre que le processus le plus sensible reste le traitement des demandes.
+
+| Processus | SLA cible | KPI principal | Evaluation As-Is |
 |---|---|---|---|
-| Publication d'un livre | moins de 3 min | temps moyen de publication | acceptable |
-| Recherche d'un livre | moins de 10 sec | temps de recherche | acceptable |
-| Envoi d'une demande | moins de 1 min | temps de creation de demande | acceptable |
-| Traitement d'une demande | moins de 24 h | delai moyen de reponse | insuffisant |
-| Notification utilisateur | moins de 5 sec | delai d'affichage de notification | moyen |
-| Moderation admin | moins de 2 min par action | temps de traitement admin | moyen |
+| Publication d'un livre | moins de 3 min | temps de publication | satisfaisant |
+| Recherche d'un livre | moins de 10 sec | temps de reponse catalogue | satisfaisant |
+| Envoi d'une demande | moins de 1 min | temps de creation | satisfaisant |
+| Traitement d'une demande | moins de 24 h | delai de reponse proprietaire | moyen |
+| Notification | moins de 5 sec | delai de notification | correct |
+| Moderation admin | moins de 2 min | temps d'action admin | correct |
 
 ### 1.5 Processus Choisi Pour Le BPR
 
-Le processus retenu pour la reingenierie est :
+Le processus choisi pour la reingenierie est :
 - **le traitement d'une demande de livre**
 
 Ce choix est justifie par :
-- son impact direct sur la satisfaction des utilisateurs
-- la multiplicite des interventions manuelles
-- le risque de lenteur, d'oubli ou d'incoherence dans les reponses
-- son fort potentiel d'amelioration en delai et en qualite
+- son importance dans la satisfaction utilisateur
+- la presence d'actions repetitives
+- la possibilite d'automatiser certaines decisions et notifications
+- son impact direct sur la qualite globale du service
 
 ### 1.6 Processus As-Is
 
 ```mermaid
 flowchart TD
-    A["Utilisateur envoie une demande"] --> B["Le proprietaire ouvre son tableau de bord"]
-    B --> C["Le proprietaire lit manuellement la demande"]
-    C --> D["Le proprietaire compare les demandes une par une"]
-    D --> E["Le proprietaire decide d'accepter ou refuser"]
-    E --> F["Mise a jour manuelle du statut"]
-    F --> G["Notification du demandeur"]
+    A["Le demandeur envoie une demande"] --> B["Le proprietaire consulte son dashboard"]
+    B --> C["Le proprietaire analyse les demandes recues"]
+    C --> D["Il decide manuellement d'accepter ou refuser"]
+    D --> E["Le statut de la demande est mis a jour"]
+    E --> F["Le livre passe a reserved si besoin"]
+    F --> G["Des notifications sont envoyees"]
 ```
 
 ### 1.7 Analyse SWOT As-Is
 
 #### Forces
-- processus simple a comprendre
-- faible cout de mise en oeuvre initial
-- facilite d'appropriation par les utilisateurs
+- processus facile a comprendre
+- application deja fonctionnelle
+- logique metier centralisee
 
 #### Faiblesses
-- traitement tres manuel
-- delai de reponse variable
-- risque d'oublier des demandes
-- manque d'aide a la decision
+- dependance a l'action manuelle du proprietaire
+- delai variable de reponse
+- manque de priorisation des demandes
 
 #### Opportunites
-- automatiser les taches repetitives
-- introduire de l'intelligence artificielle pour prioriser les demandes
-- offrir une meilleure experience utilisateur
+- automatisation de notifications
+- aide a la decision
+- exploitation des statistiques historiques
 
 #### Menaces
-- resistance au changement
-- dependance aux donnees disponibles
-- erreurs de decision ou traitement incomplet
+- retard de traitement
+- risque d'oublier une demande
+- experience utilisateur inegale
 
-### 1.8 Methodologie De Refonte BPR
+### 1.8 Methodologie BPR Retenue
 
 La methodologie retenue est une :
-- **reingenierie progressive mais radicale**
+- **refonte progressive avec forte automatisation ciblee**
 
-Justification :
-- il existe deja un processus fonctionnel qu'il faut garder compréhensible
-- une approche Greenfield totale serait plus risquee pour un projet academique
-- une refonte progressive permet d'introduire des briques modernes tout en gardant la coherence avec le systeme actuel
+Cette approche est adaptee car :
+- le processus existe deja et fonctionne
+- il faut l'ameliorer sans casser l'application
+- un projet academique doit rester maitrisable
 
-### 1.9 Solution Cible To-Be
+### 1.9 Solution To-Be
 
-La solution cible proposee integre obligatoirement :
-- **IA** pour l'aide a la decision
-- **RPA** pour les taches repetitives
-- **workflow moderne** pour l'orchestration
-- **interface unifiee** pour le proprietaire et l'administrateur
+La solution cible proposee combine :
+- **workflow**
+- **RPA**
+- **aide a la decision**
 
-#### Role de l'IA
+#### Ce qui reste humain
+- validation finale d'acceptation ou de refus
+- choix du contact et du rendez-vous
+- moderation complexe
 
-L'IA peut produire un score de priorite d'une demande selon :
-- la rapidite de reponse
-- l'historique des interactions
-- la disponibilite du livre
-- la coherence des informations du demandeur
-
-#### Role du RPA
-
-L'automatisation peut prendre en charge :
-- la mise a jour automatique des statuts
-- le rejet automatique des autres demandes si une demande est acceptee
-- l'envoi de notifications
-- la preparation de rapports statistiques
-
-#### Role du workflow
-
-Le workflow orchestre les etapes :
-- reception de la demande
-- priorisation
-- validation
-- notification
-- mise a jour de la base
-
-#### Interface unifiee
-
-Une interface unifiee doit permettre :
-- de voir les demandes prioritaires
-- de voir les recommandations
-- de lancer les actions sans changer d'ecran
+#### Ce qui peut etre automatise
+- tri des demandes par priorite
+- relance des demandes en attente
+- notification automatique apres chaque changement d'etat
+- preparation des statistiques admin
+- suggestion de la meilleure demande a traiter
 
 ### 1.10 Diagramme To-Be
 
 ```mermaid
 flowchart TD
-    A["Nouvelle demande"] --> B["Workflow central"]
-    B --> C["IA : scoring et priorisation"]
-    B --> D["RPA : verification et pre-remplissage"]
-    C --> E["Interface unifiee proprietaire"]
+    A["Nouvelle demande"] --> B["Workflow de traitement"]
+    B --> C["Verification des regles metier"]
+    B --> D["Priorisation automatique"]
+    C --> E["Interface proprietaire"]
     D --> E
-    E --> F{"Decision"}
-    F -->|Accepter| G["RPA : mise a jour statuts + notifications"]
+    E --> F{"Decision humaine"}
+    F -->|Accepter| G["RPA : mise a jour + notifications + rejet des autres demandes"]
     F -->|Refuser| H["RPA : notification de refus"]
-    G --> I["Dashboard et statistiques"]
+    G --> I["Statistiques et suivi"]
     H --> I
 ```
 
-### 1.11 Gain De Performance Attendu
-
-La refonte vise un saut de performance d'au moins 50%.
+### 1.11 Gains Attendus
 
 | Critere | As-Is | To-Be | Gain estime |
 |---|---|---|---|
-| Temps moyen de traitement | 24 h | 6 h | 75% |
-| Risque d'oubli de demande | eleve | faible | amelioration forte |
-| Coherence des mises a jour | moyenne | elevee | amelioration forte |
+| Temps de traitement | 24 h | 6 h | 75% |
+| Oubli de demande | moyen | faible | amelioration forte |
+| Qualite du suivi | correcte | elevee | amelioration nette |
 | Satisfaction utilisateur | moyenne | elevee | amelioration forte |
 
-### 1.12 Analyse SWOT To-Be
+### 1.12 Scenarios D'Automatisation RPA
 
-#### Forces
-- processus plus rapide
-- meilleure traçabilite
-- meilleure aide a la decision
-- automatisation des taches repetitives
+Les scenarios RPA proposes pour le projet sont :
 
-#### Faiblesses
-- besoin de donnees fiables
-- besoin d'un minimum de configuration technique
+#### Scenario 1 : relance automatique
+- detecter les demandes `pending` depuis plus de 48 heures
+- notifier le proprietaire
+- remonter ces demandes dans le dashboard
 
-#### Opportunites
-- extension future vers un vrai moteur de recommandation
-- exploitation de statistiques plus avancees
-- meilleure qualite de service pour les utilisateurs
+#### Scenario 2 : cloture automatique
+- lorsqu'une demande est acceptee, rejeter automatiquement les autres demandes `pending` du meme livre
+- notifier chaque demandeur concerne
 
-#### Menaces
-- biais algorithmique dans le scoring
-- dependance au workflow et a l'automatisation
-- risque de mauvaise adoption si l'interface est mal expliquee
+#### Scenario 3 : reporting automatique
+- generer un resume des KPI admin
+- mettre en avant les matieres les plus demandees
+- suivre les livres inactifs ou comptes inactifs
 
-### 1.13 Comparaison As-Is / To-Be
+### 1.13 KPI Cibles
 
-Le passage de As-Is a To-Be permet :
-- de transformer une faiblesse de lenteur en force de reactivite
-- de transformer une faiblesse de gestion manuelle en opportunite d'automatisation
-- de transformer l'absence d'aide a la decision en un processus plus intelligent
+Les indicateurs les plus pertinents sont :
+- nombre total de livres actifs
+- nombre total d'echanges
+- economie totale estimee
+- matieres les plus demandees
+- taux de demandes acceptees
+- delai moyen de reponse proprietaire
 
-Les nouveaux risques introduits concernent principalement :
-- la qualite des donnees
-- la dependance aux regles automatiques
-- l'acceptation du changement par les utilisateurs
+### 1.14 Conclusion RPA
+
+L'analyse montre que **BookCycle Tunisia** est deja structure autour d'un flux clair, mais que le traitement des demandes peut etre davantage automatise.  
+La partie RPA ne remplace pas la decision metier, elle l'assiste par :
+- des relances
+- des mises a jour automatiques
+- une meilleure visibilite des priorites
 
 ---
 
-## 2. Partie Atelier Genie Logiciel
+## 2. Partie AGL
 
-### 2.1 Application Du Framework Scrum
+### 2.1 Demarche De Genie Logiciel
 
-Le projet est gere selon le cadre Scrum avec :
+Le projet suit une logique de developpement incremental :
+- analyse du besoin
+- modelisation
+- implementation du schema Oracle
+- developpement MVC
+- enrichissement iteratif des fonctionnalites
+- tests et corrections
+
+### 2.2 Choix D'Organisation
+
+L'organisation du projet peut etre assimilee a une gestion de type **Scrum simplifiee** avec :
 - un product backlog
-- un sprint backlog
-- un suivi done / doing / to do
-- une demonstration finale
+- une planification par blocs fonctionnels
+- des livraisons iteratives
 
-### 2.2 Product Backlog
+### 2.3 Product Backlog
 
-| ID | Product backlog item | Priorite | Estimation |
+| ID | User story | Priorite | Estimation |
 |---|---|---|---|
-| PB1 | En tant que visiteur, je veux consulter le catalogue des livres | Haute | 2 jours |
-| PB2 | En tant qu'utilisateur, je veux creer un compte | Haute | 1 jour |
+| PB1 | En tant que visiteur, je veux consulter le catalogue | Haute | 2 jours |
+| PB2 | En tant qu'utilisateur, je veux m'inscrire | Haute | 1 jour |
 | PB3 | En tant qu'utilisateur, je veux me connecter | Haute | 1 jour |
 | PB4 | En tant qu'utilisateur, je veux ajouter un livre | Haute | 2 jours |
-| PB5 | En tant qu'utilisateur, je veux envoyer une demande sur un livre | Haute | 2 jours |
+| PB5 | En tant qu'utilisateur, je veux envoyer une demande | Haute | 2 jours |
 | PB6 | En tant que proprietaire, je veux accepter ou refuser une demande | Haute | 2 jours |
 | PB7 | En tant qu'utilisateur, je veux voir mes notifications | Moyenne | 1 jour |
-| PB8 | En tant qu'admin, je veux voir les statistiques globales | Haute | 2 jours |
+| PB8 | En tant qu'admin, je veux consulter les statistiques | Haute | 2 jours |
 | PB9 | En tant qu'admin, je veux gerer les utilisateurs | Haute | 2 jours |
 | PB10 | En tant qu'admin, je veux moderer les livres | Haute | 2 jours |
-| PB11 | En tant qu'admin, je veux gerer les demandes | Moyenne | 2 jours |
+| PB11 | En tant qu'admin, je veux filtrer les demandes | Moyenne | 1 jour |
 | PB12 | En tant qu'admin, je veux envoyer des notifications | Moyenne | 1 jour |
+| PB13 | En tant que visiteur, je veux voir les pages About, Contact et Privacy Policy | Moyenne | 1 jour |
+| PB14 | En tant qu'utilisateur, je veux choisir la matiere depuis une liste | Haute | 1 jour |
+| PB15 | En tant que visiteur, je veux filtrer aussi par classe | Haute | 1 jour |
 
-### 2.3 Sprint 1
+### 2.4 Proposition De Sprint Planning
 
-#### Objectif du sprint
-
-Mettre en place les fonctionnalites essentielles :
+#### Sprint 1 : socle technique
+- schema Oracle
 - architecture MVC
-- connexion a la base
-- inscription
-- connexion
-- affichage public du catalogue
+- auth utilisateur
+- page d'accueil
+
+#### Sprint 2 : coeur metier
 - ajout de livre
+- catalogue
+- detail livre
+- demandes
+- notifications
 
-#### Sprint backlog
+#### Sprint 3 : administration et finalisation
+- dashboard admin
+- statistiques
+- moderation
+- pages publiques
+- filtres avances
 
-| Element | Etat |
-|---|---|
-| Initialisation du projet MVC | done |
-| Connexion PDO Oracle | done |
-| Inscription | done |
-| Connexion | done |
-| Catalogue public | done |
-| Ajout d'un livre | done |
-| Gestion avancee des demandes | doing |
-| Notifications | doing |
-| Administration complete | to do au debut du sprint puis done dans la suite du projet |
+### 2.5 Definition Of Done
 
-### 2.4 Diagramme De Cas D'Utilisation
+Une fonctionnalite est consideree terminee si :
+- la logique metier est implemente
+- la route est accessible
+- la vue fonctionne
+- les entrees sont validees
+- le rendu ne casse pas les autres pages
+- le comportement a ete teste manuellement
 
-```mermaid
-flowchart LR
-    V["Visiteur"] --> UC1["Consulter l'accueil"]
-    V --> UC2["Rechercher des livres"]
-    V --> UC3["Voir les details d'un livre"]
-    V --> UC4["S'inscrire"]
-    V --> UC5["Se connecter"]
+---
 
-    U["Utilisateur"] --> UC6["Ajouter un livre"]
-    U --> UC7["Envoyer une demande"]
-    U --> UC8["Consulter ses demandes"]
-    U --> UC9["Lire ses notifications"]
-    U --> UC10["Marquer une notification comme lue"]
+## 3. Diagrammes UML Et Descriptions
 
-    A["Administrateur"] --> UC11["Consulter les statistiques"]
-    A --> UC12["Gerer les utilisateurs"]
-    A --> UC13["Moderer les livres"]
-    A --> UC14["Gerer les demandes"]
-    A --> UC15["Envoyer des notifications"]
-```
+### 3.1 Diagramme De Cas D'Utilisation - Description Textuelle
 
-### 2.5 Diagramme De Classes
+#### Acteur : Visiteur
+- consulter l'accueil
+- consulter le catalogue
+- filtrer les livres
+- consulter les pages d'information
+- s'inscrire
+- se connecter
 
-Ce diagramme respecte les contraintes de l'enonce :
-- au moins cinq classes persistantes
-- une association un a plusieurs
-- une association plusieurs a plusieurs porteuse de donnees
-- une generalisation
+#### Acteur : Utilisateur
+- publier un livre
+- voir son tableau de bord
+- envoyer une demande
+- consulter les notifications
+- accepter ou refuser une demande recue
 
-```mermaid
-classDiagram
-    class Utilisateur {
-        +id : int
-        +name : string
-        +email : string
-        +password : string
-        +phone : string
-        +isActive : bool
-        +createdAt : date
-    }
+#### Acteur : Administrateur
+- consulter l'administration
+- gerer les utilisateurs
+- moderer les livres
+- gerer les demandes
+- envoyer des notifications
 
-    class Administrateur {
-        +envoyerNotification()
-        +desactiverUtilisateur()
-        +modererLivre()
-    }
+### 3.2 Diagramme De Classes - Description Textuelle
 
-    class Membre {
-        +ajouterLivre()
-        +envoyerDemande()
-        +consulterDashboard()
-    }
+#### Classe `User`
+Attributs :
+- id
+- name
+- email
+- password
+- phone
+- role
+- is_active
+- created_at
 
-    class Livre {
-        +id : int
-        +title : string
-        +subject : string
-        +className : string
-        +schoolLevel : string
-        +conditionLabel : string
-        +estimatedPrice : decimal
-        +status : string
-        +isActive : bool
-    }
+#### Classe `Book`
+Attributs :
+- id
+- title
+- subject
+- class_name
+- school_level
+- condition_label
+- estimated_price
+- description
+- owner_id
+- status
+- is_active
 
-    class Demande {
-        +id : int
-        +status : string
-        +meetingNote : string
-        +requestDate : date
-    }
+#### Classe `BookRequest`
+Attributs :
+- id
+- book_id
+- requester_id
+- status
+- meeting_note
+- request_date
 
-    class Notification {
-        +id : int
-        +senderName : string
-        +message : string
-        +isRead : bool
-        +createdAt : date
-    }
+#### Classe `Notification`
+Attributs :
+- id
+- user_id
+- sender_name
+- message
+- is_read
+- created_at
 
-    class Echange {
-        +id : int
-        +exchangeDate : date
-        +status : string
-    }
+#### Classe `Exchange`
+Attributs :
+- id
+- book_id
+- owner_id
+- receiver_id
+- exchange_date
+- status
 
-    Utilisateur <|-- Administrateur
-    Utilisateur <|-- Membre
-
-    Utilisateur "1" --> "0..*" Livre : publie
-    Utilisateur "1" --> "0..*" Notification : recoit
-    Livre "1" --> "0..*" Demande : concerne
-    Utilisateur "1" --> "0..*" Demande : effectue
-    Livre "1" --> "0..1" Echange : donneLieuA
-    Utilisateur "1" --> "0..*" Echange : proprietaire
-    Utilisateur "1" --> "0..*" Echange : receveur
-```
-
-### 2.6 Justification De L'Association Plusieurs A Plusieurs Porteuse De Donnees
-
-Conceptuellement, la relation entre :
-- un utilisateur demandeur
-- un livre
-
-est une relation plusieurs a plusieurs.  
-Cette relation est materialisee par la classe associative `Demande`, qui porte des donnees supplementaires :
-- `status`
-- `meetingNote`
-- `requestDate`
-
-Cette modélisation est conforme a l'exigence de l'enonce.
-
-### 2.7 Diagramme De Sequence
-
-Exemple : scenario d'envoi puis de traitement d'une demande
+### 3.3 Diagramme De Sequence - Envoi D'Une Demande
 
 ```mermaid
 sequenceDiagram
-    actor U as Utilisateur
-    participant W as Interface Web
+    participant U as Utilisateur
+    participant V as Vue Catalogue
     participant C as RequestController
-    participant M as BookRequest
-    participant N as Notification
-    participant DB as Base de donnees
+    participant M as BookRequest Model
+    participant N as Notification Model
+    participant DB as Oracle DB
 
-    U->>W: Cliquer sur "Envoyer une demande"
-    W->>C: POST /request-book
-    C->>M: create(bookId, requesterId)
+    U->>V: Cliquer sur "Envoyer une demande"
+    V->>C: POST /request-book
+    C->>DB: verifier livre et regles metier
+    C->>M: creer la demande
     M->>DB: INSERT INTO requests
-    C->>N: create(ownerId, message, senderName)
+    C->>N: creer notification proprietaire
     N->>DB: INSERT INTO notifications
-    C-->>W: Redirection tableau de bord
+    C-->>U: confirmation / redirection dashboard
 ```
 
-### 2.8 Diagramme D'Activite
+### 3.4 Diagramme De Sequence - Acceptation D'Une Demande
 
 ```mermaid
-flowchart TD
-    A["Utilisateur connecte"] --> B["Choisir un livre"]
-    B --> C["Envoyer une demande"]
-    C --> D["Enregistrer la demande"]
-    D --> E["Notifier le proprietaire"]
-    E --> F["Le proprietaire consulte les demandes"]
-    F --> G{"Decision"}
-    G -->|Accepter| H["Mettre le livre en reserve"]
-    G -->|Refuser| I["Notifier le refus"]
-    H --> J["Notifier le demandeur"]
-    I --> K["Fin"]
-    J --> K
+sequenceDiagram
+    participant P as Proprietaire
+    participant D as Dashboard
+    participant C as RequestController
+    participant R as BookRequest Model
+    participant B as Book Model
+    participant N as Notification Model
+    participant DB as Oracle DB
+
+    P->>D: Accepter une demande
+    D->>C: POST /accept-request
+    C->>R: verifier la demande
+    C->>B: verifier la propriete du livre
+    C->>R: accepter la demande
+    R->>DB: UPDATE requests
+    C->>B: updateStatus(reserved)
+    B->>DB: UPDATE books
+    C->>N: notifier demandeur et proprietaire
+    N->>DB: INSERT notifications
+    C-->>P: message de succes
 ```
 
-### 2.9 Sprint Review Simulee
+---
 
-A la fin du sprint ou de la demonstration finale, il convient de presenter :
-- les interfaces deja fonctionnelles
-- les fonctionnalites done
-- l'etat du sprint backlog
-- les points a ameliorer
+## 4. Cohabitation Entre AGL, Web Et SGBD
 
-Fonctionnalites demonstrables dans BookCycle :
-- page d'accueil
-- inscription et connexion
-- catalogue public
-- ajout de livre
-- envoi de demande
-- traitement des demandes
-- administration
-- notifications
+Le projet illustre bien la complementarite entre modules :
+
+- **AGL** : analyse, acteurs, cas d'utilisation, backlog, architecture
+- **SGBD** : schema Oracle, contraintes, vue, index, PL/SQL
+- **Programmation Web 2** : MVC, routes, pages, API, formulaires
+- **RPA** : reingenierie et automatisation ciblee des processus
+
+Les evolutions recentes du projet confirment cette integration :
+- ajout des pages publiques dans l'application web
+- enrichissement du catalogue avec filtres structures
+- validation forte de la matiere et de la classe
+- mise en coherence entre front, controleurs et modele Oracle
 
 ---
 
-## 3. Conseils D'Insertion Dans Le Rapport Final
+## 5. Recommandations Pour La Version Finale
 
-Vous pouvez inserer ce document dans le rapport principal :
-- en ajoutant la section RPA avant la partie SGBD
-- en ajoutant la section AGL avant ou apres la partie RPA
-- en gardant les diagrammes Mermaid comme base
-
-Si vous devez rendre le rapport en Word ou PDF, les diagrammes Mermaid peuvent etre :
-- recopies dans un outil de diagramme
-- exportes depuis un editeur compatible Mermaid
-- ou transformes en images
+Pour une remise finale plus solide, il est recommande d'ajouter :
+- captures d'ecran des principales pages
+- vrais diagrammes UML exportes depuis un outil
+- captures SQL Developer montrant les objets Oracle
+- tableau des tests manuels
+- eventuelle maquette du processus To-Be pour la partie RPA
 
 ---
 
-## 4. Elements A Completer Manuellement
+## 6. Conclusion
 
-Avant la remise finale, il faudra encore personnaliser :
-- les noms des etudiants
-- le nom de l'encadrant
-- les dates exactes des presentations intermediaires si elles vous ont ete communiquees
-- les captures d'ecran
-- toute partie RPA plus specifique si votre enseignant demande un outil ou un cas reel d'entreprise plus detaille
+Ce document RPA/AGL montre que le projet **BookCycle Tunisia** ne se limite pas a une application web.  
+Il s'agit d'une solution complete appuyee sur :
+- une analyse des besoins
+- un schema relationnel Oracle
+- des objets PL/SQL
+- une architecture MVC
+- une reflexion de reingenierie des processus
 
+La plateforme est deja fonctionnelle dans sa version Oracle et peut encore evoluer vers une automatisation plus poussee du traitement des demandes et du reporting.

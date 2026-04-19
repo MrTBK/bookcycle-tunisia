@@ -48,6 +48,11 @@ class Book
             $params['school_level_filter'] = $filters['level'];
         }
 
+        if (!empty($filters['class_name'])) {
+            $sql .= ' AND b.class_name = :class_name_filter';
+            $params['class_name_filter'] = $filters['class_name'];
+        }
+
         if (!empty($filters['subject'])) {
             $sql .= ' AND b.subject LIKE :subject';
             $params['subject'] = '%' . $filters['subject'] . '%';

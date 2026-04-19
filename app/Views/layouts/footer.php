@@ -7,6 +7,11 @@
             </div>
             <div>
                 <p>Mettre en relation les proprietaires de livres et les utilisateurs qui en ont besoin.</p>
+                <p>
+                    <a href="<?= htmlspecialchars($basePath) ?>/about">A propos</a> |
+                    <a href="<?= htmlspecialchars($basePath) ?>/contact">Contact</a> |
+                    <a href="<?= htmlspecialchars($basePath) ?>/privacy-policy">Politique de confidentialite</a>
+                </p>
             </div>
         </div>
     </footer>

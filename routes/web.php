@@ -8,9 +8,12 @@ use App\Controllers\PageController;
 use App\Controllers\RequestController;
 
 $router->get('/', [PageController::class, 'home']);
+$router->get('/about', [PageController::class, 'about']);
 $router->get('/catalog', [PageController::class, 'catalog']);
+$router->get('/contact', [PageController::class, 'contact']);
 $router->get('/login', [PageController::class, 'login']);
 $router->post('/login', [AuthController::class, 'login']);
+$router->get('/privacy-policy', [PageController::class, 'privacyPolicy']);
 $router->get('/register', [PageController::class, 'register']);
 $router->post('/register', [AuthController::class, 'register']);
 $router->get('/dashboard', [PageController::class, 'dashboard']);

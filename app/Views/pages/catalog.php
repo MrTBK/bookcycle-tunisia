@@ -15,7 +15,29 @@
                 </div>
                 <div class="field">
                     <label for="filter-subject">Matiere</label>
-                    <input id="filter-subject" name="subject" type="text" value="<?= htmlspecialchars((string) ($_GET['subject'] ?? '')) ?>" placeholder="Math, Physique, Arabe...">
+                    <select id="filter-subject" name="subject">
+                        <option value="">Toutes</option>
+                        <?php foreach (($subjectOptions ?? []) as $subjectOption): ?>
+                            <option value="<?= htmlspecialchars($subjectOption) ?>" <?= (($_GET['subject'] ?? '') === $subjectOption) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($subjectOption) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filter-class">Classe</label>
+                    <select id="filter-class" name="class_name">
+                        <option value="">Toutes</option>
+                        <?php foreach (($classOptions ?? []) as $groupLevel => $classes): ?>
+                            <optgroup label="<?= htmlspecialchars($groupLevel) ?>">
+                                <?php foreach ($classes as $className): ?>
+                                    <option value="<?= htmlspecialchars($className) ?>" data-level="<?= htmlspecialchars($groupLevel) ?>" <?= (($_GET['class_name'] ?? '') === $className) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($className) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <button class="button" type="submit" id="apply-filters">Appliquer</button>
             </form>
@@ -81,3 +103,40 @@
         </div>
     </section>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const levelSelect = document.getElementById('filter-level');
+    const classSelect = document.getElementById('filter-class');
+
+    if (!levelSelect || !classSelect) {
+        return;
+    }
+
+    const allOptions = Array.from(classSelect.querySelectorAll('option'));
+
+    const syncClasses = () => {
+        const selectedLevel = levelSelect.value;
+        const currentValue = classSelect.value;
+
+        allOptions.forEach((option) => {
+            if (!option.dataset.level) {
+                option.hidden = false;
+                return;
+            }
+
+            option.hidden = selectedLevel !== '' && option.dataset.level !== selectedLevel;
+        });
+
+        const visibleOptions = allOptions.filter((option) => !option.hidden);
+        const stillVisible = visibleOptions.some((option) => option.value === currentValue);
+
+        if (!stillVisible && visibleOptions.length > 0) {
+            classSelect.value = visibleOptions[0].value;
+        }
+    };
+
+    levelSelect.addEventListener('change', syncClasses);
+    syncClasses();
+});
+</script>

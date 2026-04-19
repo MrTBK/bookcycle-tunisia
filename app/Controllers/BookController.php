@@ -27,6 +27,7 @@ class BookController extends Controller
     {
         $filters = [
             'level' => $_GET['level'] ?? null,
+            'class_name' => $_GET['class_name'] ?? null,
             'subject' => $_GET['subject'] ?? null,
             'status' => $_GET['status'] ?? null,
             'id' => $_GET['id'] ?? null,
@@ -56,6 +57,11 @@ class BookController extends Controller
 
         if (!$this->isValidClassForLevel((string) $payload['level'], (string) $payload['class_name'])) {
             $this->respondError('La classe selectionnee ne correspond pas au niveau choisi.', '/add-book', 422);
+            return;
+        }
+
+        if (!$this->isValidSubject((string) $payload['subject'])) {
+            $this->respondError('Veuillez choisir une matiere valide dans la liste.', '/add-book', 422);
             return;
         }
 
@@ -181,5 +187,28 @@ class BookController extends Controller
         }
 
         return in_array($className, $classes, true);
+    }
+
+    private function isValidSubject($subject)
+    {
+        $subjects = [
+            'Arabe',
+            'Francais',
+            'Anglais',
+            'Mathematiques',
+            'Sciences',
+            'Physique',
+            'Chimie',
+            'Informatique',
+            'Histoire',
+            'Geographie',
+            'Education islamique',
+            'Philosophie',
+            'Economie',
+            'Gestion',
+            'Technique',
+        ];
+
+        return in_array(trim($subject), $subjects, true);
     }
 }

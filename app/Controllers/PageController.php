@@ -29,10 +29,19 @@ class PageController extends Controller
         ]);
     }
 
+    public function about()
+    {
+        $this->render('about', [
+            'pageTitle' => 'A propos',
+            'currentUser' => Auth::user(),
+        ]);
+    }
+
     public function catalog()
     {
         $filters = [
             'level' => $_GET['level'] ?? null,
+            'class_name' => $_GET['class_name'] ?? null,
             'subject' => $_GET['subject'] ?? null,
             'status' => $_GET['status'] ?? null,
             'id' => $_GET['id'] ?? null,
@@ -43,6 +52,16 @@ class PageController extends Controller
             'currentUser' => Auth::user(),
             'catalogBooks' => (new Book())->all($filters),
             'selectedBook' => !empty($filters['id']) ? (new Book())->find((int) $filters['id']) : null,
+            'classOptions' => $this->classOptions(),
+            'subjectOptions' => $this->subjectOptions(),
+        ]);
+    }
+
+    public function contact()
+    {
+        $this->render('contact', [
+            'pageTitle' => 'Contact',
+            'currentUser' => Auth::user(),
         ]);
     }
 
@@ -63,6 +82,14 @@ class PageController extends Controller
             'currentUser' => Auth::user(),
             'flashError' => $this->pullFlash('flash_error'),
             'flashSuccess' => $this->pullFlash('flash_success'),
+        ]);
+    }
+
+    public function privacyPolicy()
+    {
+        $this->render('privacy-policy', [
+            'pageTitle' => 'Politique de confidentialite',
+            'currentUser' => Auth::user(),
         ]);
     }
 
@@ -123,6 +150,7 @@ class PageController extends Controller
             'flashError' => $this->pullFlash('flash_error'),
             'flashSuccess' => $this->pullFlash('flash_success'),
             'classOptions' => $this->classOptions(),
+            'subjectOptions' => $this->subjectOptions(),
         ]);
     }
 
@@ -214,6 +242,27 @@ class PageController extends Controller
                 'bac lettre',
                 'bac eco',
             ],
+        ];
+    }
+
+    private function subjectOptions()
+    {
+        return [
+            'Arabe',
+            'Francais',
+            'Anglais',
+            'Mathematiques',
+            'Sciences',
+            'Physique',
+            'Chimie',
+            'Informatique',
+            'Histoire',
+            'Geographie',
+            'Education islamique',
+            'Philosophie',
+            'Economie',
+            'Gestion',
+            'Technique',
         ];
     }
 }

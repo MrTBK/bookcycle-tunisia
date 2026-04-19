@@ -20,6 +20,7 @@
             <nav class="main-nav">
                 <a href="<?= htmlspecialchars($basePath) ?>/">Accueil</a>
                 <a href="<?= htmlspecialchars($basePath) ?>/catalog">Catalogue</a>
+                <a href="<?= htmlspecialchars($basePath) ?>/contact">Contact</a>
                 <?php if ($currentUser): ?>
                     <a href="<?= htmlspecialchars($basePath) ?>/dashboard">
                         Tableau de bord
