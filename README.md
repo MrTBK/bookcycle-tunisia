@@ -1,72 +1,88 @@
 # BookCycle Tunisia
 
-BookCycle Tunisia est une application web de gestion, de don et de reutilisation des livres scolaires. Le projet repose sur une architecture MVC en PHP et une base de donnees Oracle, avec une partie SQL/PLSQL pour la modelisation, les traitements et le reporting.
+BookCycle Tunisia est une application web academique de don, d'echange et de reutilisation des livres scolaires en Tunisie.
 
-## Objectif du projet
+Le projet combine :
 
-L'application aide les utilisateurs a :
-- publier des livres scolaires qu'ils n'utilisent plus
-- rechercher des livres par niveau, classe et matiere
-- envoyer et suivre des demandes de recuperation
-- recevoir des notifications
-- administrer la plateforme via un espace dedie
+- une application web en `PHP`
+- une architecture `MVC`
+- une base de donnees `Oracle XE`
+- des scripts `SQL` et `PL/SQL`
+- des livrables pour `AGL`, `SGBD`, `Programmation Web 2` et `RPA`
 
-Le but principal est de reduire le cout des livres scolaires et de favoriser leur reutilisation.
+## Objectif
 
-## Fonctionnalites principales
+L'objectif de la plateforme est de permettre :
+
+- la publication de livres scolaires reutilisables
+- la consultation d'un catalogue public
+- l'envoi et le suivi de demandes
+- la reception de notifications
+- l'administration de la plateforme
+
+## Fonctionnalites Principales
 
 ### Visiteur
-- consulter la page d'accueil
-- parcourir le catalogue
+
+- consulter l'accueil
+- consulter le catalogue
 - filtrer les livres par niveau, classe et matiere
-- consulter les pages `About`, `Contact` et `Privacy Policy`
+- lire les pages `About`, `Contact` et `Privacy Policy`
 - acceder a l'inscription et a la connexion
 
-### Utilisateur connecte
-- creer un compte et se connecter
+### Utilisateur Connecte
+
+- creer un compte
+- se connecter
 - ajouter un livre
 - consulter ses livres
-- envoyer une demande sur un livre disponible
+- envoyer une demande pour un livre
 - consulter ses demandes envoyees et recues
-- voir ses notifications
-- suivre quelques statistiques personnelles
+- consulter ses notifications
 
 ### Administrateur
-- consulter les statistiques globales
-- rechercher des utilisateurs
-- activer ou desactiver un compte
-- masquer ou reactiver un livre
-- filtrer et annuler des demandes
-- envoyer des notifications globales ou ciblees
 
-## Stack technique
+- consulter les statistiques globales
+- gerer les utilisateurs
+- moderer les livres
+- annuler des demandes
+- envoyer des notifications
+
+## Stack Technique
 
 - `PHP 7.4`
 - `Oracle XE`
 - `PDO_OCI`
-- `HTML / CSS / JavaScript`
-- architecture `MVC` sans framework
+- `HTML`
+- `CSS`
+- `JavaScript`
+- architecture `MVC`
 
-## Structure du projet
+## Structure Du Projet
 
 ```text
 bookcycle-tunisia/
   app/
-    Config/         configuration application et base Oracle
-    Controllers/    logique HTTP des pages et API
-    Core/           noyau MVC (router, auth, controller, db)
-    Models/         acces aux donnees via PDO
-    Views/          layouts et pages PHP
-  database/         scripts SQL, PLSQL et documents SGBD
-  public/           point d'entree web et assets
-  routes/           declaration des routes web et api
-  router.php        routeur du serveur PHP local
+    Config/
+    Controllers/
+    Core/
+    Models/
+    Views/
+  public/
+    assets/
+  routes/
+  database/
+  rapports/
+  documents_aide/
+  router.php
   start_oracle_app.bat
+  README.md
 ```
 
-## Routes importantes
+## Routes Principales
 
-### Pages web
+### Pages Web
+
 - `/`
 - `/about`
 - `/catalog`
@@ -79,6 +95,7 @@ bookcycle-tunisia/
 - `/admin`
 
 ### API
+
 - `/api/me`
 - `/api/register`
 - `/api/login`
@@ -94,15 +111,27 @@ bookcycle-tunisia/
 - `/api/reject-request`
 - `/api/admin-stats`
 
-## Installation et lancement local
+## Base De Donnees
 
-### Prerequis
-- Oracle XE installe ou accessible
-- Oracle Instant Client
-- PHP 7.4 avec `pdo_oci` et `oci8`
-- SQL Developer conseille pour executer les scripts Oracle
+Le schema Oracle principal contient :
 
-### Lancement recommande
+- `users`
+- `books`
+- `requests`
+- `exchanges`
+- `notifications`
+
+Le projet utilise aussi :
+
+- des sequences
+- des triggers
+- des procedures
+- des fonctions
+- une vue de reporting `v_book_overview`
+
+## Lancement Local
+
+### Methode Recommandee
 
 Depuis la racine du projet :
 
@@ -110,15 +139,13 @@ Depuis la racine du projet :
 start_oracle_app.bat
 ```
 
-Ce lanceur configure automatiquement le `PATH` pour Oracle Instant Client et PHP, puis demarre le serveur local.
-
-### Lancement manuel
+### Methode Manuelle
 
 ```powershell
 C:\php74\php.exe -S localhost:8000 router.php
 ```
 
-Ensuite ouvrir :
+Puis ouvrir :
 
 ```text
 http://localhost:8000
@@ -126,18 +153,13 @@ http://localhost:8000
 
 ## Configuration Oracle
 
-Le projet utilise par defaut une configuration de ce type dans `app/Config/config.php` :
+Configuration par defaut attendue :
 
 - DSN : `oci:dbname=//localhost:1521/XE;charset=AL32UTF8`
-- utilisateur : `bookcycle_app`
-- mot de passe : `BookCycle2026`
+- user : `bookcycle_app`
+- password : `BookCycle2026`
 
-Le detail de la configuration Oracle est explique dans :
-- `database/README_ORACLE.md`
-
-## Scripts base de donnees
-
-Executer les scripts Oracle dans cet ordre :
+## Ordre Des Scripts Oracle
 
 1. `database/01_users_privileges.sql`
 2. `database/02_schema.sql`
@@ -146,57 +168,24 @@ Executer les scripts Oracle dans cet ordre :
 5. `database/04_queries.sql`
 6. `database/06_annex_objects.sql`
 
-## Objets Oracle importants
+## Comptes De Demonstration
 
-Le schema inclut :
-- tables `users`, `books`, `requests`, `exchanges`, `notifications`
-- sequences Oracle pour les cles primaires
-- triggers d'auto-generation des ids
-- vue `v_book_overview`
-- procedures et fonctions PLSQL
+### Admin
 
-Exemples d'objets metier :
-- `add_notification`
-- `accept_request`
-- `count_books_by_user`
-- `calculate_money_saved`
-- `trg_prevent_self_request`
-- `trg_book_exchange_log`
-
-## Comptes de demonstration
-
-### Administrateur
 - email : `admin@bookcycle.tn`
 - mot de passe : `admin123`
 
-### Utilisateur simple
+### Utilisateur
+
 - email : `ahmed@bookcycle.tn`
 - mot de passe : `user123`
 
-## Logique applicative importante
+## Dossiers Utiles
 
-- la `Matiere` est choisie depuis une liste controlee
-- la `Classe` depend du `Niveau` selectionne
-- un utilisateur ne peut pas demander son propre livre
-- une demande `pending` en double est refusee
-- l'acceptation d'une demande reserve le livre et rejette les autres demandes en attente
+- `rapports/` : versions propres des rapports finals
+- `documents_aide/` : guides d'explication, diagrammes et documents de revision
+- `database/` : scripts Oracle et documentation base de donnees
 
-## Fichiers cles
+## Resume
 
-- `public/index.php` : point d'entree unique
-- `app/bootstrap.php` : session, helpers, autoload
-- `app/Core/Router.php` : dispatch des routes
-- `app/Core/Database.php` : connexion PDO Oracle
-- `app/Controllers/PageController.php` : pages principales
-- `app/Controllers/BookController.php` : logique livres et statistiques
-- `app/Controllers/RequestController.php` : logique demandes
-- `app/Controllers/AdminController.php` : moderation et administration
-
-## Remarques
-
-Ce projet est une base academique solide, mais il peut encore etre ameliore avec :
-- une meilleure securisation des formulaires
-- une ergonomie mobile plus poussee
-- des images pour les livres
-- plus de tests automatises
-- un moteur de recommandation ou de priorisation des demandes
+BookCycle Tunisia est un projet integre complet qui relie analyse, base de donnees, developpement web et reflexion sur l'automatisation autour d'un cas concret : la reutilisation des livres scolaires.
