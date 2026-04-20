@@ -1,12 +1,15 @@
 const BookCycle = (() => {
+    // Read the optional subfolder prefix injected by PHP so the same JS works everywhere.
     const basePath = window.APP_BASE_PATH || '';
     const path = (value) => `${basePath}${value}`;
 
+    // Build API URLs in one place so every page talks to the backend the same way.
     const apiUrl = (action, params = {}) => {
         const query = new URLSearchParams(params).toString();
         return query ? path(`/api/${action}?${query}`) : path(`/api/${action}`);
     };
 
+    // Fetch JSON and convert backend errors into readable JavaScript errors for the UI.
     const fetchJson = async (url, options = {}) => {
         const response = await fetch(url, options);
         const data = await response.json();
@@ -21,6 +24,7 @@ const BookCycle = (() => {
     const bookLevel = (book) => book.level_label || book.level || '';
     const bookClass = (book) => book.class_label || book.class_name || '';
 
+    // Reuse one HTML template for books so home and catalog cards stay consistent.
     const createBookCard = (book, showButton = true) => `
         <article class="book-card">
             <span class="badge">${bookLevel(book)}</span>
@@ -40,6 +44,7 @@ const BookCycle = (() => {
 
     const showAlert = (message) => window.alert(message);
 
+    // The modal listeners only need to be attached once, even if pages re-render content.
     const bindModal = () => {
         const modal = document.getElementById('book-modal');
         const closeModal = document.getElementById('close-modal');
@@ -58,6 +63,7 @@ const BookCycle = (() => {
         modal.dataset.bound = '1';
     };
 
+    // Load one book, inspect the current user, then decide which action the modal should show.
     const showBookDetails = async (bookId) => {
         const books = await fetchJson(apiUrl('books', { id: bookId }));
         const book = books[0];
@@ -117,6 +123,7 @@ const BookCycle = (() => {
         });
     };
 
+    // Homepage stats come from the backend so the landing page always shows live numbers.
     const loadStats = async () => {
         const stats = await fetchJson(apiUrl('stats'));
         const books = document.getElementById('stat-books');
@@ -143,6 +150,7 @@ const BookCycle = (() => {
         bindBookCards(container);
     };
 
+    // The catalog page reloads the grid every time the user changes the active filters.
     const initCatalogPage = async () => {
         const grid = document.getElementById('book-grid');
         const count = document.getElementById('book-count');
@@ -175,6 +183,7 @@ const BookCycle = (() => {
         }
     };
 
+    // Login and registration pages submit with fetch so we can stay on the page for errors.
     const initLoginPage = () => {
         const form = document.getElementById('login-form');
         form.addEventListener('submit', async (event) => {
@@ -236,6 +245,7 @@ const BookCycle = (() => {
 
     const renderDashboardCard = (html) => `<article class="dashboard-card">${html}</article>`;
 
+    // Tabs work by hiding all dashboard sections except the one the user selected.
     const switchDashboardSection = (targetSection) => {
         document.querySelectorAll('.dashboard-section').forEach((section) => section.classList.add('hidden'));
         document.querySelectorAll('.tab-button').forEach((button) => {
@@ -260,6 +270,7 @@ const BookCycle = (() => {
             });
         }
 
+        // Each loader refreshes one dashboard area independently after user actions.
         const loadMyBooks = async () => {
             const section = document.getElementById('section-my-books');
             const books = await fetchJson(apiUrl('my-books'));
@@ -352,6 +363,7 @@ const BookCycle = (() => {
         await loadMyBooks();
     };
 
+    // The admin page double-checks the role in JS before showing management numbers and tables.
     const initAdminPage = async () => {
         const me = await fetchJson(apiUrl('me'));
         if (!me.loggedIn || me.user.role !== 'admin') {

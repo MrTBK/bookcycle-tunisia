@@ -1,3 +1,4 @@
+/* Global design tokens: changing these colors updates the whole public interface. */
 :root {
     --bg: #f4f1ea;
     --surface: #fffdf8;
@@ -13,10 +14,12 @@
     --shadow-press: 0 10px 22px rgba(30, 42, 35, 0.14);
 }
 
+/* A tiny reset keeps spacing and sizing more predictable across browsers. */
 * {
     box-sizing: border-box;
 }
 
+/* The base page uses a warm paper-like palette to match the book-exchange theme. */
 body {
     margin: 0;
     font-family: Georgia, "Times New Roman", serif;
@@ -24,6 +27,7 @@ body {
     color: var(--text);
 }
 
+/* Shared interactive defaults keep links and form controls feeling consistent. */
 a {
     color: var(--accent);
     text-decoration: none;
@@ -44,6 +48,7 @@ textarea {
     margin: 0 auto;
 }
 
+/* Header and navigation styles. */
 .site-header {
     position: sticky;
     top: 0;
@@ -195,6 +200,7 @@ textarea {
     color: #fff;
 }
 
+/* Main page sections use generous spacing so cards and forms can breathe. */
 .hero,
 .section {
     padding: 4.5rem 0;
@@ -327,6 +333,7 @@ a:focus-visible {
     outline-offset: 3px;
 }
 
+/* Panels, cards, and modals share one visual language so the UI feels cohesive. */
 .panel,
 .stat-card,
 .book-card,
@@ -508,6 +515,7 @@ textarea:focus {
     gap: 1rem;
 }
 
+/* Utility classes help JavaScript show and hide dynamic UI without extra inline styles. */
 .notification-meta {
     display: flex;
     align-items: center;
@@ -594,6 +602,7 @@ td {
     margin-top: 3rem;
 }
 
+/* On smaller screens we collapse multi-column layouts into one readable column. */
 @media (max-width: 860px) {
     .hero-grid,
     .layout-grid,

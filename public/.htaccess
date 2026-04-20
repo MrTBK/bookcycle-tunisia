@@ -1,6 +1,8 @@
 RewriteEngine On
 
+## If the request already points to a real file or folder, let Apache serve it directly.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
 
+## Everything else is sent to index.php so the PHP router can decide which page/API to run.
+RewriteRule ^ index.php [QSA,L]
