@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Core\Database;
 use PDO;
 
+// This model is the helper that speaks with the users table.
+// It creates users, finds users, counts users, and changes whether an account is active.
 class User
 {
     private $db;
@@ -23,12 +25,14 @@ class User
         $statement->execute([
             'name' => $data['name'],
             'email' => $data['email'],
+            // Passwords are always stored hashed before reaching the database.
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             'phone' => $data['phone'],
             'role' => isset($data['role']) ? $data['role'] : 'user',
             'is_active' => 1,
         ]);
 
+        // Reload the user to recover the generated Oracle id in a simple way.
         $createdUser = $this->findByEmail($data['email']);
 
         if (isset($createdUser['id'])) {
@@ -71,6 +75,7 @@ class User
 
     public function all($search = '')
     {
+        // Search is optional and matches both name and email for the admin screen.
         $sql = 'SELECT id, name, email, phone, role, created_at, NVL(is_active, 1) AS is_active
                 FROM users
                 WHERE 1 = 1';

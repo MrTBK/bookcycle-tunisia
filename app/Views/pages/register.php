@@ -1,14 +1,17 @@
+<!-- This page lets a new visitor create an account. -->
 <section class="section">
     <div class="container form-page">
         <form class="panel auth-form" id="register-form" method="post" action="<?= htmlspecialchars($basePath) ?>/register">
             <p class="eyebrow">Nouveau compte</p>
             <h1>Inscription</h1>
+            <!-- Flash messages explain success or failure after redirects. -->
             <?php if (!empty($flashError)): ?>
                 <div class="panel" style="border-color:#c0392b;color:#8e2b23;"><?= htmlspecialchars($flashError) ?></div>
             <?php endif; ?>
             <?php if (!empty($flashSuccess)): ?>
                 <div class="panel" style="border-color:#2d7a46;color:#1f5c33;"><?= htmlspecialchars($flashSuccess) ?></div>
             <?php endif; ?>
+            <!-- The form collects the basic information needed to create an account. -->
             <div class="form-stack">
                 <div class="field">
                     <label for="register-name">Nom complet</label>
@@ -35,6 +38,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Start any register-page JavaScript behavior from the global app script.
     BookCycle.initRegisterPage();
 });
 </script>

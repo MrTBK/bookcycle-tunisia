@@ -3,6 +3,13 @@
     A executer avec un compte administrateur (exemple : SYSTEM).
 */
 
+/*
+    This script prepares the Oracle side before the application schema exists.
+    In simple words, it creates:
+    - one Oracle user who owns the application tables
+    - one Oracle user who can read data for reporting
+*/
+
 -- Suppression optionnelle si les utilisateurs existent deja.
 -- EXECUTE IMMEDIATE permet d'executer une instruction DDL stockee sous forme de texte.
 -- Le bloc EXCEPTION evite l'arret du script si l'utilisateur n'existe pas encore.

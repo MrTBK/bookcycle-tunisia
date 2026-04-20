@@ -1,3 +1,5 @@
+<!-- This first section is the homepage hero:
+     it explains the app quickly and shows the main call-to-action buttons. -->
 <section class="hero">
     <div class="container hero-grid">
         <div>
@@ -12,6 +14,7 @@
                 <a class="button button-secondary" href="<?= htmlspecialchars($basePath) ?>/add-book">Ajouter un livre</a>
             </div>
         </div>
+        <!-- These number cards give a quick summary of the platform. -->
         <div class="stats-panel">
             <div class="stat-card">
                 <span>Livres actifs</span>
@@ -29,6 +32,7 @@
     </div>
 </section>
 
+<!-- This section shows the newest books added to the platform. -->
 <section class="section">
     <div class="container">
         <div class="section-head">
@@ -40,6 +44,7 @@
         </div>
         <div class="card-grid" id="featured-books">
             <?php foreach (($featuredBooks ?? []) as $book): ?>
+                <!-- Each card shows one featured book. -->
                 <article class="book-card">
                     <span class="badge"><?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></span>
                     <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>

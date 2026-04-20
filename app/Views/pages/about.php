@@ -1,3 +1,4 @@
+<!-- This is a simple information page that explains what the project is. -->
 <section class="section">
     <div class="container">
         <div class="panel">

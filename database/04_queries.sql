@@ -3,6 +3,17 @@
     Chaque bloc montre un type de requete a presenter en TP/Cours.
 */
 
+/*
+    This file is not used directly by the website.
+    It is a learning/report file that shows useful SQL examples:
+    - select
+    - join
+    - group by
+    - update
+    - delete
+    - reporting queries
+*/
+
 -- 1. Selection simple : afficher tous les utilisateurs.
 SELECT * FROM users;
 
@@ -104,4 +115,5 @@ FROM exchanges;
 
 -- ROLLBACK annule les modifications de demonstration pour pouvoir
 -- rejouer le script pendant le TP ou la soutenance.
+-- In simple words: "undo the test changes so the script can be run again safely."
 ROLLBACK;

@@ -3,7 +3,19 @@
     A executer connecte en tant que BOOKCYCLE_APP.
 */
 
+/*
+    This is the main database script.
+    It creates the real structure used by the app:
+    - tables
+    - constraints
+    - sequences
+    - triggers
+    - indexes
+    - one reporting view
+*/
+
 -- TABLE USERS : stocke les differents acteurs de la plateforme.
+-- This table stores the people who use the platform.
 CREATE TABLE users (
     id NUMBER PRIMARY KEY,
     name VARCHAR2(120) NOT NULL,
@@ -18,6 +30,7 @@ CREATE TABLE users (
 );
 
 -- TABLE BOOKS : stocke les livres publies par les utilisateurs.
+-- This table stores the books shared on the platform.
 CREATE TABLE books (
     id NUMBER PRIMARY KEY,
     title VARCHAR2(180) NOT NULL,
@@ -38,6 +51,7 @@ CREATE TABLE books (
 );
 
 -- TABLE REQUESTS : stocke les demandes de reservation des livres.
+-- This table stores who asked for which book.
 CREATE TABLE requests (
     id NUMBER PRIMARY KEY,
     book_id NUMBER NOT NULL,
@@ -51,6 +65,7 @@ CREATE TABLE requests (
 );
 
 -- TABLE EXCHANGES : historise les echanges finalises.
+-- This table stores completed exchanges for history and reporting.
 CREATE TABLE exchanges (
     id NUMBER PRIMARY KEY,
     book_id NUMBER NOT NULL,
@@ -64,6 +79,7 @@ CREATE TABLE exchanges (
 );
 
 -- TABLE NOTIFICATIONS : gere les notifications applicatives.
+-- This table stores in-app messages shown to users.
 CREATE TABLE notifications (
     id NUMBER PRIMARY KEY,
     user_id NUMBER NOT NULL,
@@ -78,6 +94,7 @@ CREATE TABLE notifications (
 -- Sequences 11g pour remplacer les identity columns.
 -- Dans Oracle XE / 11g, on utilise souvent une sequence + un trigger
 -- pour generer automatiquement l'identifiant primaire.
+-- Each sequence is like an automatic number generator.
 CREATE SEQUENCE seq_users START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_books START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_requests START WITH 1 INCREMENT BY 1 NOCACHE;
@@ -85,6 +102,7 @@ CREATE SEQUENCE seq_exchanges START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_notifications START WITH 1 INCREMENT BY 1 NOCACHE;
 
 -- Triggers d'auto-incrementation compatibles Oracle 11g XE.
+-- Each trigger takes the next number from its sequence before an INSERT.
 CREATE OR REPLACE TRIGGER trg_users_pk
 BEFORE INSERT ON users
 FOR EACH ROW
@@ -136,6 +154,7 @@ END;
 /
 
 -- INDEX utiles pour accelerer les recherches courantes.
+-- Indexes make frequent searches faster.
 CREATE INDEX idx_books_owner ON books(owner_id);
 CREATE INDEX idx_books_subject ON books(subject);
 CREATE INDEX idx_books_level ON books(school_level);
@@ -145,6 +164,7 @@ CREATE INDEX idx_notifications_user ON notifications(user_id);
 
 -- Vue utile pour le reporting et les requetes multi-tables.
 -- Une vue est une requete enregistree que l'on peut reutiliser comme table logique.
+-- This view combines book data and owner data into one easier reporting result.
 CREATE OR REPLACE VIEW v_book_overview AS
 SELECT
     b.id AS book_id,
@@ -164,6 +184,7 @@ JOIN users u ON u.id = b.owner_id;
 /*
     Privileges donnes a l'utilisateur de reporting.
 */
+-- The reporting user can read data but not modify it.
 GRANT SELECT ON users TO bookcycle_report;
 GRANT SELECT ON books TO bookcycle_report;
 GRANT SELECT ON requests TO bookcycle_report;

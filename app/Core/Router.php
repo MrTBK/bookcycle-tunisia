@@ -18,6 +18,7 @@ class Router
 
     public function dispatch($method, $path)
     {
+        // Normalize the incoming URL so route matching stays consistent.
         $normalizedPath = $this->normalizePath($path);
         $handler = null;
 

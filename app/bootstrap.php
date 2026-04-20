@@ -1,5 +1,6 @@
 <?php
 
+// Provide compatibility helpers when the project runs on PHP versions older than 8.
 if (!function_exists('str_starts_with')) {
     function str_starts_with($haystack, $needle)
     {
@@ -21,9 +22,11 @@ if (!function_exists('str_contains')) {
     }
 }
 
+// Store sessions inside the project so local development does not depend on system defaults.
 session_save_path(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'sessions');
 session_start();
 
+// Load application classes automatically from the App namespace.
 spl_autoload_register(function ($class) {
     $prefix = 'App\\';
     if (!str_starts_with($class, $prefix)) {

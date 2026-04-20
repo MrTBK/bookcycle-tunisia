@@ -1,3 +1,4 @@
+<!-- The dashboard is the private "my space" page for a connected user. -->
 <section class="section">
     <div class="container">
         <div class="section-head">
@@ -6,6 +7,7 @@
                 <h1>Tableau de bord</h1>
             </div>
             <div class="hero-actions">
+                <!-- Quick actions: add a book or log out. -->
                 <a class="button button-secondary" href="<?= htmlspecialchars($basePath) ?>/add-book">Ajouter un livre</a>
                 <form method="post" action="<?= htmlspecialchars($basePath) ?>/logout">
                     <button class="button button-danger" type="submit" id="logout-button">Deconnexion</button>
@@ -13,6 +15,7 @@
             </div>
         </div>
 
+        <!-- Flash messages show temporary success or error feedback after redirects. -->
         <?php if (!empty($flashError)): ?>
             <div class="panel" style="border-color:#c0392b;color:#8e2b23;"><?= htmlspecialchars($flashError) ?></div>
         <?php endif; ?>
@@ -20,6 +23,7 @@
             <div class="panel" style="border-color:#2d7a46;color:#1f5c33;"><?= htmlspecialchars($flashSuccess) ?></div>
         <?php endif; ?>
 
+        <!-- These cards summarize the user's activity and savings. -->
         <div class="stats-panel">
             <div class="stat-card">
                 <span>Livres recus</span>
@@ -39,6 +43,7 @@
             </div>
         </div>
 
+        <!-- Notification history for the current user. -->
         <section class="section">
             <div class="section-head">
                 <div>
@@ -51,6 +56,7 @@
                     <div class="panel muted">Aucune notification pour le moment.</div>
                 <?php else: ?>
                     <?php foreach ($notifications as $notification): ?>
+                        <!-- One notification card. -->
                         <article class="dashboard-card">
                             <div class="notification-meta">
                                 <div class="hero-actions">
@@ -77,6 +83,7 @@
             </div>
         </section>
 
+        <!-- Books created by the connected user. -->
         <section class="section">
             <div class="section-head">
                 <div>
@@ -101,6 +108,7 @@
             </div>
         </section>
 
+        <!-- Pending requests that other users sent for this user's books. -->
         <section class="section">
             <div class="section-head">
                 <div>
@@ -113,6 +121,7 @@
                     <div class="panel muted">Aucune demande recue.</div>
                 <?php else: ?>
                     <?php foreach ($receivedRequests as $request): ?>
+                        <!-- One received request card with accept/refuse actions. -->
                         <article class="dashboard-card">
                             <h3><?= htmlspecialchars((string) $request['subject']) ?></h3>
                             <p class="meta">Classe: <?= htmlspecialchars((string) ($request['class_label'] ?? '')) ?></p>
@@ -139,6 +148,7 @@
             </div>
         </section>
 
+        <!-- Requests the connected user has sent to other owners. -->
         <section class="section">
             <div class="section-head">
                 <div>
@@ -151,6 +161,7 @@
                     <div class="panel muted">Aucune demande envoyee.</div>
                 <?php else: ?>
                     <?php foreach ($sentRequests as $request): ?>
+                        <!-- One sent request card. -->
                         <article class="dashboard-card">
                             <h3><?= htmlspecialchars((string) $request['subject']) ?></h3>
                             <p class="meta">Classe: <?= htmlspecialchars((string) ($request['class_label'] ?? '')) ?></p>

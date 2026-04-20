@@ -1,3 +1,4 @@
+<!-- This page is the admin control panel. -->
 <section class="section">
     <div class="container">
         <div class="section-head">
@@ -6,12 +7,14 @@
                 <h1>Gestion de la plateforme</h1>
             </div>
             <div class="hero-actions">
+                <!-- Quick way for the admin to leave the session. -->
                 <form method="post" action="<?= htmlspecialchars($basePath) ?>/logout">
                     <button class="button button-danger" type="submit">Deconnexion</button>
                 </form>
             </div>
         </div>
 
+        <!-- Flash messages show the result of the admin's last action. -->
         <?php if (!empty($flashError)): ?>
             <div class="panel" style="border-color:#c0392b;color:#8e2b23;"><?= htmlspecialchars($flashError) ?></div>
         <?php endif; ?>
@@ -19,6 +22,7 @@
             <div class="panel" style="border-color:#2d7a46;color:#1f5c33;"><?= htmlspecialchars($flashSuccess) ?></div>
         <?php endif; ?>
 
+        <!-- Top summary cards with platform-wide numbers. -->
         <div class="stats-panel admin-stats">
             <div class="stat-card">
                 <span>Total utilisateurs</span>
@@ -38,6 +42,7 @@
             </div>
         </div>
 
+        <!-- Smaller cards with extra admin insights. -->
         <div class="card-grid" style="margin-bottom: 2rem;">
             <article class="dashboard-card">
                 <h3>Livres par niveau</h3>
@@ -74,6 +79,7 @@
                 </div>
             </div>
 
+            <!-- Admin can send a message to everyone or to one chosen user. -->
             <form class="form-stack" method="post" action="<?= htmlspecialchars($basePath) ?>/admin/notify">
                 <div class="form-grid">
                     <div class="field">
@@ -104,6 +110,7 @@
                 </div>
             </div>
 
+            <!-- This search helps the admin find users faster. -->
             <form class="form-stack" method="get" action="<?= htmlspecialchars($basePath) ?>/admin" style="margin-bottom: 1rem;">
                 <div class="field">
                     <label for="user-search">Recherche</label>
@@ -112,6 +119,7 @@
                 <button class="button button-secondary button-small" type="submit">Rechercher</button>
             </form>
 
+            <!-- This table shows users and lets the admin activate or deactivate them. -->
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -160,6 +168,7 @@
                 </div>
             </div>
 
+            <!-- This table helps the admin moderate posted books. -->
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -212,6 +221,7 @@
                 </div>
             </div>
 
+            <!-- This filter helps the admin view only pending, accepted, or rejected requests. -->
             <form class="form-stack" method="get" action="<?= htmlspecialchars($basePath) ?>/admin" style="margin-bottom: 1rem;">
                 <div class="field">
                     <label for="request-status">Filtrer par statut</label>
@@ -228,6 +238,7 @@
                 <button class="button button-secondary button-small" type="submit">Filtrer</button>
             </form>
 
+            <!-- This table shows all requests and lets the admin cancel them if needed. -->
             <div class="table-wrap">
                 <table>
                     <thead>

@@ -43,6 +43,7 @@ class BookController extends Controller
             return;
         }
 
+        // Accept both JSON API requests and classic HTML form submissions.
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;
@@ -65,6 +66,7 @@ class BookController extends Controller
             return;
         }
 
+        // Build a normalized title so books stay consistent even when users do not type one manually.
         $bookId = $this->books->create(array_merge($payload, [
             'title' => $this->buildBookTitle($payload),
             'owner_id' => Auth::id(),

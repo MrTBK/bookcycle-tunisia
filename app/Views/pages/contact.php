@@ -1,3 +1,4 @@
+<!-- This page tells the visitor how to contact the project owner. -->
 <section class="section">
     <div class="container">
         <div class="panel">

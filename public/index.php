@@ -10,6 +10,7 @@ if (isset($_SERVER['SCRIPT_NAME'])) {
 }
 $basePath = '';
 
+// Detect the application base path so links still work if the app is served from a subfolder.
 if ($scriptName !== '' && str_ends_with($scriptName, '/index.php')) {
     $basePath = rtrim(substr($scriptName, 0, -10), '/');
 }

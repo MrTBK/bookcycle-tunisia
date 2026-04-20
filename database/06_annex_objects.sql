@@ -3,6 +3,18 @@
     Permet d'afficher les utilisateurs et tous les objets de la base.
 */
 
+/*
+    This script is useful for the written report or oral presentation.
+    It helps show what really exists inside Oracle:
+    - users
+    - tables
+    - views
+    - procedures
+    - functions
+    - triggers
+    - indexes
+*/
+
 -- ALL_USERS est une vue systeme Oracle qui liste les utilisateurs connus.
 -- Afficher les utilisateurs Oracle lies au projet.
 SELECT username, created

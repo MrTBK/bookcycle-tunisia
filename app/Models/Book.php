@@ -5,17 +5,22 @@ namespace App\Models;
 use App\Core\Database;
 use PDO;
 
+// This model is the helper that speaks with the books table.
+// Think of it like a tiny librarian:
+// it can fetch books, create books, count books, hide books, and change book status.
 class Book
 {
     private $db;
 
     public function __construct()
     {
+        // Use the shared database connection for all book queries.
         $this->db = Database::connection();
     }
 
     public function latest($limit = 4)
     {
+        // Oracle 11g uses ROWNUM for top-N queries, so we wrap the ordered result set.
         $safeLimit = max(1, (int) $limit);
 
         $statement = $this->db->prepare(
@@ -36,6 +41,7 @@ class Book
 
     public function all($filters = [])
     {
+        // Build the query progressively so each catalogue filter stays optional.
         $sql = 'SELECT b.id, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.condition_label, b.estimated_price, b.description,
                        b.owner_id, b.status, b.is_active, b.created_at, b.updated_at, u.name AS owner_name
                 FROM books b
@@ -101,6 +107,7 @@ class Book
             'is_active' => 1,
         ]);
 
+        // Read back the latest inserted book for this owner because Oracle XE here does not use RETURNING INTO.
         $statement = $this->db->prepare(
             'SELECT id
              FROM books
@@ -115,6 +122,7 @@ class Book
 
     public function mine($ownerId)
     {
+        // Return only the active books owned by one person.
         $statement = $this->db->prepare(
             'SELECT id, title, subject, class_name AS class_label, school_level AS level_label, condition_label, estimated_price, description,
                     owner_id, status, is_active, created_at, updated_at
@@ -129,6 +137,7 @@ class Book
 
     public function find($bookId)
     {
+        // Limit to one row explicitly to stay compatible with Oracle's row limiting syntax.
         $statement = $this->db->prepare(
             'SELECT * FROM (
                 SELECT b.id, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.condition_label, b.estimated_price, b.description,
@@ -146,11 +155,13 @@ class Book
 
     public function countActive()
     {
+        // Count books that are still visible on the platform.
         return (int) $this->db->query('SELECT COUNT(*) FROM books WHERE is_active = 1')->fetchColumn();
     }
 
     public function countInactive()
     {
+        // Count books hidden by moderation or admin action.
         return (int) $this->db->query('SELECT COUNT(*) FROM books WHERE is_active = 0')->fetchColumn();
     }
 
@@ -193,6 +204,7 @@ class Book
 
     public function countByLevel()
     {
+        // This tells the admin how many active books belong to each school level.
         $statement = $this->db->prepare(
             'SELECT school_level, COUNT(*) AS total_books
              FROM books
@@ -202,6 +214,8 @@ class Book
         $statement->execute();
 
         $rows = $statement->fetchAll();
+
+        // Initialize every known school level so the admin dashboard always receives stable keys.
         $counts = [
             'Primaire' => 0,
             'College' => 0,
@@ -219,6 +233,7 @@ class Book
 
     public function mostRequestedSubjects($limit = 5)
     {
+        // Join books to requests so the admin can see which subjects attract the most demand.
         $safeLimit = max(1, (int) $limit);
         $statement = $this->db->prepare(
             'SELECT * FROM (

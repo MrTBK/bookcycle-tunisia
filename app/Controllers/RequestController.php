@@ -9,8 +9,11 @@ use App\Models\BookRequest;
 use App\Models\Notification;
 use App\Models\User;
 
+// This controller manages the "I want this book" flow.
+// It creates requests, shows requests, accepts requests, and rejects requests.
 class RequestController extends Controller
 {
+    // These helpers let this controller work with requests, books, notifications, and users.
     private $requests;
     private $books;
     private $notifications;
@@ -18,6 +21,7 @@ class RequestController extends Controller
 
     public function __construct()
     {
+        // Build all helper objects once so every method can reuse them.
         $this->requests = new BookRequest();
         $this->books = new Book();
         $this->notifications = new Notification();
@@ -26,15 +30,19 @@ class RequestController extends Controller
 
     public function store()
     {
+        // Only connected users can ask for a book.
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
+        // Accept both JSON payloads and regular form posts.
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;
         }
+
+        // Read the book id from what the user sent.
         $bookId = (int) ($payload['bookId'] ?? 0);
         $userId = (int) Auth::id();
         $book = $this->books->find($bookId);
@@ -44,16 +52,19 @@ class RequestController extends Controller
             return;
         }
 
+        // A user is not allowed to ask for their own book.
         if ((int) $book['owner_id'] === $userId) {
             $this->respondError('Vous ne pouvez pas demander votre propre livre.', '/catalog?id=' . $bookId, 422);
             return;
         }
 
+        // Also block duplicate pending requests for the same user and same book.
         if ($this->requests->existsPending($bookId, $userId)) {
             $this->respondError('Une demande en attente existe deja.', '/catalog?id=' . $bookId, 422);
             return;
         }
 
+        // Create the request first, then notify the book owner about the new interest.
         $this->requests->create($bookId, $userId);
         $this->notifications->create(
             (int) $book['owner_id'],
@@ -72,6 +83,7 @@ class RequestController extends Controller
 
     public function mine()
     {
+        // Return the requests sent by the connected user.
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
             return;
@@ -82,6 +94,7 @@ class RequestController extends Controller
 
     public function received()
     {
+        // Return the pending requests received on the connected user's books.
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
             return;
@@ -92,11 +105,13 @@ class RequestController extends Controller
 
     public function accept()
     {
+        // Only a connected user can accept a request.
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
+        // Read which request to accept and the meeting note sent by the owner.
         $requestId = (int) ($_GET['id'] ?? 0);
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
@@ -121,11 +136,13 @@ class RequestController extends Controller
             return;
         }
 
+        // Accept the chosen request, reject competing pending requests, and reserve the book.
         $this->requests->accept($requestId, (int) $request['book_id'], $meetingNote);
         $this->books->updateStatus((int) $request['book_id'], 'reserved');
         $owner = $this->users->findById((int) $book['owner_id']);
         $requester = $this->users->findById((int) $request['requester_id']);
 
+        // Send both sides the contact details they need to complete the handoff offline.
         if ($requester && $owner) {
             $this->notifications->create(
                 (int) $request['requester_id'],
@@ -159,11 +176,13 @@ class RequestController extends Controller
 
     public function reject()
     {
+        // Only a connected user can reject a request.
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
+        // Read the target request from the URL.
         $requestId = (int) ($_GET['id'] ?? 0);
         $request = $this->requests->find($requestId);
 
@@ -178,6 +197,7 @@ class RequestController extends Controller
             return;
         }
 
+        // A rejection only changes the target request and informs the requester.
         $this->requests->reject($requestId);
         $this->notifications->create(
             (int) $request['requester_id'],
@@ -196,6 +216,7 @@ class RequestController extends Controller
 
     private function isApiRequest()
     {
+        // If the URL contains /api/, respond like an API endpoint.
         $requestUri = '';
 
         if (isset($_SERVER['REQUEST_URI'])) {
@@ -207,17 +228,20 @@ class RequestController extends Controller
 
     private function respondError($message, $redirectPath, $statusCode)
     {
+        // APIs receive JSON errors.
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
             return;
         }
 
+        // Browser pages receive a flash message and a redirect.
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);
     }
 
     private function redirect($path)
     {
+        // Add the app base path before redirecting.
         $basePath = '';
         if (isset($_SERVER['APP_BASE_PATH'])) {
             $basePath = $_SERVER['APP_BASE_PATH'];

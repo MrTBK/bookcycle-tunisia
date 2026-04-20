@@ -5,17 +5,23 @@ namespace App\Models;
 use App\Core\Database;
 use PDO;
 
+// This model is the helper that speaks with the requests table.
+// It stores who asked for which book, what the current status is,
+// and it also helps calculate request-based statistics.
 class BookRequest
 {
     private $db;
 
     public function __construct()
     {
+        // Use the shared database connection for all request queries.
         $this->db = Database::connection();
     }
 
     public function existsPending($bookId, $requesterId)
     {
+        // This answers:
+        // "Does this user already have a waiting request for this same book?"
         $statement = $this->db->prepare(
             'SELECT COUNT(*) FROM requests WHERE book_id = :book_id AND requester_id = :requester_id AND status = :status'
         );
@@ -30,6 +36,7 @@ class BookRequest
 
     public function create($bookId, $requesterId)
     {
+        // Create a new pending request.
         $statement = $this->db->prepare(
             'INSERT INTO requests (book_id, requester_id, status) VALUES (:book_id, :requester_id, :status)'
         );
@@ -39,6 +46,7 @@ class BookRequest
             'status' => 'pending',
         ]);
 
+        // Read back the newest matching row so we can return its id.
         $statement = $this->db->prepare(
             'SELECT id
              FROM requests
@@ -56,6 +64,7 @@ class BookRequest
 
     public function mine($requesterId)
     {
+        // Return the requests sent by one user, with book and owner details attached.
         $statement = $this->db->prepare(
             'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price,
                     u.name AS owner_name, u.email AS owner_email, u.phone AS owner_phone
@@ -72,6 +81,7 @@ class BookRequest
 
     public function received($ownerId)
     {
+        // Return the pending requests received on one owner's books.
         $statement = $this->db->prepare(
             'SELECT r.*, b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.estimated_price, b.owner_id,
                     u.name AS requester_name, u.email AS requester_email, u.phone AS requester_phone
@@ -91,6 +101,7 @@ class BookRequest
 
     public function find($requestId)
     {
+        // Find one exact request by id.
         $statement = $this->db->prepare(
             'SELECT * FROM (
                 SELECT * FROM requests WHERE id = :id
@@ -104,8 +115,10 @@ class BookRequest
 
     public function accept($requestId, $bookId, $meetingNote)
     {
+        // Use a transaction so the accepted request and the rejected alternatives stay in sync.
         $this->db->beginTransaction();
 
+        // First mark the chosen request as accepted and save the meeting note.
         $updateAccepted = $this->db->prepare(
             'UPDATE requests SET status = :status, meeting_note = :meeting_note WHERE id = :id'
         );
@@ -115,6 +128,7 @@ class BookRequest
             'id' => $requestId,
         ]);
 
+        // Then reject the other pending requests for the same book.
         $rejectOthers = $this->db->prepare(
             'UPDATE requests SET status = :status WHERE book_id = :book_id AND id != :request_id AND status = :pending'
         );
@@ -130,6 +144,7 @@ class BookRequest
 
     public function reject($requestId)
     {
+        // Reject only one specific request.
         $statement = $this->db->prepare(
             'UPDATE requests SET status = :status WHERE id = :id'
         );
@@ -141,6 +156,7 @@ class BookRequest
 
     public function countAccepted()
     {
+        // Count all accepted requests in the whole platform.
         $statement = $this->db->prepare('SELECT COUNT(*) FROM requests WHERE status = :status');
         $statement->execute(['status' => 'accepted']);
 
@@ -149,6 +165,7 @@ class BookRequest
 
     public function allForAdmin($status = '')
     {
+        // Admin can optionally filter the global request list by status.
         $sql = 'SELECT r.id, r.book_id, r.requester_id, r.status, r.meeting_note, r.request_date,
                        b.title, b.subject, b.class_name AS class_label, b.school_level AS level_label, b.owner_id,
                        owner.name AS owner_name, requester.name AS requester_name, requester.email AS requester_email
@@ -174,6 +191,7 @@ class BookRequest
 
     public function cancelByAdmin($requestId)
     {
+        // From the admin point of view, cancelling a request means forcing it to rejected.
         $statement = $this->db->prepare(
             'UPDATE requests
              SET status = :status
@@ -187,6 +205,7 @@ class BookRequest
 
     public function countAcceptedForRequester($requesterId)
     {
+        // Count how many books one requester successfully obtained.
         $statement = $this->db->prepare(
             'SELECT COUNT(*)
              FROM requests
@@ -202,6 +221,7 @@ class BookRequest
 
     public function countAcceptedForOwner($ownerId)
     {
+        // Count how many requests were accepted on one owner's books.
         $statement = $this->db->prepare(
             'SELECT COUNT(*)
              FROM requests r
@@ -218,6 +238,7 @@ class BookRequest
 
     public function sumAcceptedValueForRequester($requesterId)
     {
+        // Add up the estimated value of books received by one requester.
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)
              FROM requests r
@@ -234,6 +255,7 @@ class BookRequest
 
     public function sumAcceptedValueForOwner($ownerId)
     {
+        // Add up the estimated value of books that one owner gave to others.
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)
              FROM requests r
@@ -250,6 +272,7 @@ class BookRequest
 
     public function sumAcceptedValueGlobal()
     {
+        // Add up the estimated value of all accepted exchanges in the platform.
         $statement = $this->db->prepare(
             'SELECT NVL(SUM(b.estimated_price), 0)
              FROM requests r

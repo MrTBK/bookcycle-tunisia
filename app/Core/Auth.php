@@ -37,6 +37,7 @@ class Auth
 
     public static function login($user)
     {
+        // Keep only the session fields that the UI and guards need on every request.
         $_SESSION['user'] = [
             'id' => (int) $user['id'],
             'name' => $user['name'],

@@ -1,9 +1,16 @@
+<!-- This page is the public catalogue.
+     On the left, the user chooses filters.
+     On the right, the user sees matching books. -->
 <section class="section">
     <div class="container layout-grid">
+        <!-- The left box is the search filter area. -->
         <aside class="panel">
             <p class="eyebrow">Recherche</p>
             <h2>Filtres</h2>
+            <!-- This form sends the chosen filters in the URL using GET,
+                 so the result can be refreshed and shared easily. -->
             <form class="form-stack" method="get" action="<?= htmlspecialchars($basePath) ?>/catalog">
+                <!-- These dropdowns help the user search by level, subject, and class. -->
                 <div class="field">
                     <label for="filter-level">Niveau</label>
                     <select id="filter-level" name="level">
@@ -43,6 +50,7 @@
             </form>
         </aside>
 
+        <!-- The right side shows the books that match the chosen filters. -->
         <section>
             <div class="section-head">
                 <div>
@@ -50,12 +58,14 @@
                     <h2>Livres disponibles</h2>
                 </div>
                 <div class="hero-actions">
+                    <!-- Show how many books were found. -->
                     <span id="book-count"><?= count($catalogBooks ?? []) ?> livre(s) trouve(s)</span>
                     <a class="button button-secondary button-small" href="<?= htmlspecialchars($basePath) ?>/add-book">Donner un livre</a>
                 </div>
             </div>
             <div class="card-grid" id="book-grid">
                 <?php foreach (($catalogBooks ?? []) as $book): ?>
+                    <!-- One card = one book result. -->
                     <article class="book-card">
                         <span class="badge"><?= htmlspecialchars((string) ($book['level_label'] ?? $book['level'] ?? '')) ?></span>
                         <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>
@@ -74,6 +84,7 @@
 </section>
 
 <?php if (!empty($selectedBook)): ?>
+    <!-- If one specific book was selected, show its detail box under the catalogue. -->
     <section class="section">
         <div class="container">
             <div class="panel">
@@ -88,6 +99,7 @@
                     <span class="badge badge-alt"><?= htmlspecialchars((string) $selectedBook['condition_label']) ?></span>
                 </div>
                 <div class="hero-actions">
+                    <!-- The action at the bottom changes depending on who is looking at the book. -->
                     <?php if (empty($currentUser)): ?>
                         <a class="button" href="<?= htmlspecialchars($basePath) ?>/login">Connectez-vous pour demander ce livre</a>
                     <?php elseif ((int) ($currentUser['id'] ?? 0) === (int) ($selectedBook['owner_id'] ?? 0)): ?>
@@ -106,6 +118,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Pick the two dropdowns that depend on each other.
     const levelSelect = document.getElementById('filter-level');
     const classSelect = document.getElementById('filter-class');
 
@@ -113,12 +126,15 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // Keep every class option in memory so we can hide or show them later.
     const allOptions = Array.from(classSelect.querySelectorAll('option'));
 
     const syncClasses = () => {
+        // Read the currently selected level and class.
         const selectedLevel = levelSelect.value;
         const currentValue = classSelect.value;
 
+        // If a class belongs to another level, hide it.
         allOptions.forEach((option) => {
             if (!option.dataset.level) {
                 option.hidden = false;
@@ -128,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
             option.hidden = selectedLevel !== '' && option.dataset.level !== selectedLevel;
         });
 
+        // If the selected class is no longer visible, move to the first valid one.
         const visibleOptions = allOptions.filter((option) => !option.hidden);
         const stillVisible = visibleOptions.some((option) => option.value === currentValue);
 
@@ -136,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Update the class dropdown each time the level changes.
     levelSelect.addEventListener('change', syncClasses);
     syncClasses();
 });

@@ -1,3 +1,4 @@
+<!-- This page explains how user data is used in the platform. -->
 <section class="section">
     <div class="container">
         <div class="panel">
