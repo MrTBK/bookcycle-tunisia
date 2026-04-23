@@ -51,7 +51,6 @@ Le projet suit une architecture MVC :
 - `Controllers`
 - `Models`
 - `Views`
-- `routes`
 - `public/index.php`
 
 ## Base De Donnees

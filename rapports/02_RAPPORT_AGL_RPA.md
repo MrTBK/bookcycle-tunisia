@@ -106,14 +106,14 @@ Le projet s'appuie sur une architecture MVC :
 - les **controleurs** recoivent les requetes
 - les **modeles** manipulent les donnees
 - les **vues** affichent les pages
-- les **routes** relient les URL aux actions
+- le **front controller** relie les URL aux actions
 
 ### 1.8 Definition Of Done
 
 Une fonctionnalite est consideree comme terminee si :
 
 - la logique metier est implemente
-- la route fonctionne
+- la page ou l'action fonctionne
 - l'interface est accessible
 - les donnees sont validees
 - la fonctionnalite a ete testee manuellement

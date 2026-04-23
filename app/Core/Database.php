@@ -11,7 +11,6 @@ class Database
 
     public static function connection()
     {
-        // Reuse one PDO instance during the request to avoid opening many Oracle connections.
         if (self::$connection instanceof PDO) {
             return self::$connection;
         }

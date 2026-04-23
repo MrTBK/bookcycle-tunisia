@@ -20,53 +20,52 @@ class BookController extends Controller
 
     public function latest()
     {
+        //raja3 el ktob el jdod 
         $this->json($this->books->latest(4));
     }
 
     public function index()
     {
+        //a9ra catalogue w 7ot fih les filtres eli jayin
         $filters = [
             'level' => $_GET['level'] ?? null,
             'class_name' => $_GET['class_name'] ?? null,
             'subject' => $_GET['subject'] ?? null,
             'status' => $_GET['status'] ?? null,
             'id' => $_GET['id'] ?? null,
-        ];
-
+        ];        
         $this->json($this->books->all($filters));
     }
 
     public function store()
     {
+        // Only connected users are allowed to publish books.
+        //ken el user connecte inajem y3ml post l book 
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
-
-        // Accept both JSON API requests and classic HTML form submissions.
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;
         }
 
+        //wa9ef ken fama champ obligatoire mch m3abi
         foreach (['subject', 'level', 'class_name', 'condition', 'estimated_price'] as $field) {
             if (empty($payload[$field])) {
                 $this->respondError('Veuillez remplir tous les champs obligatoires.', '/add-book', 422);
                 return;
             }
         }
-
+        //khali el level w class mte3ou ykounou m3a ba3thom
         if (!$this->isValidClassForLevel((string) $payload['level'], (string) $payload['class_name'])) {
             $this->respondError('La classe selectionnee ne correspond pas au niveau choisi.', '/add-book', 422);
             return;
         }
-
         if (!$this->isValidSubject((string) $payload['subject'])) {
             $this->respondError('Veuillez choisir une matiere valide dans la liste.', '/add-book', 422);
             return;
         }
-
-        // Build a normalized title so books stay consistent even when users do not type one manually.
         $bookId = $this->books->create(array_merge($payload, [
             'title' => $this->buildBookTitle($payload),
             'owner_id' => Auth::id(),
@@ -83,6 +82,7 @@ class BookController extends Controller
 
     public function mine()
     {
+        //ken el user inajem ichouf el ktob mt3ou
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
             return;
@@ -93,6 +93,7 @@ class BookController extends Controller
 
     public function stats()
     {
+        //afichage  les stats 3al landing page w admin page
         $this->json([
             'totalBooks' => $this->books->countActive(),
             'totalExchanges' => $this->requests->countAccepted(),
@@ -135,6 +136,7 @@ class BookController extends Controller
 
     private function buildBookTitle($payload)
     {
+        //a3mel title mte3 el book 3al 9a3da : matiere - classe - niveau
         $subject = isset($payload['subject']) ? trim((string) $payload['subject']) : '';
         $className = isset($payload['class_name']) ? trim((string) $payload['class_name']) : '';
         $level = isset($payload['level']) ? trim((string) $payload['level']) : '';
@@ -148,6 +150,7 @@ class BookController extends Controller
 
     private function isValidClassForLevel($level, $className)
     {
+        //a3mel validation ken el class name mte3ou ykoun m3a el level eli ikhtarou l user
         $options = [
             'Primaire' => [
                 '1ere annee',
@@ -193,6 +196,7 @@ class BookController extends Controller
 
     private function isValidSubject($subject)
     {
+        //khali les matieres m3a ba3thom w ma3andhomch orthographe mouchkla 3al reporting w filtering
         $subjects = [
             'Arabe',
             'Francais',

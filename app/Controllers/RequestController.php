@@ -9,11 +9,10 @@ use App\Models\BookRequest;
 use App\Models\Notification;
 use App\Models\User;
 
-// This controller manages the "I want this book" flow.
-// It creates requests, shows requests, accepts requests, and rejects requests.
+
+// el controller hedha inadhem el processus "Nheb el kteb hedha". Y9ala , ywarri , ya9boul , w yerfez des demandes.
 class RequestController extends Controller
 {
-    // These helpers let this controller work with requests, books, notifications, and users.
     private $requests;
     private $books;
     private $notifications;
@@ -21,7 +20,6 @@ class RequestController extends Controller
 
     public function __construct()
     {
-        // Build all helper objects once so every method can reuse them.
         $this->requests = new BookRequest();
         $this->books = new Book();
         $this->notifications = new Notification();
@@ -30,19 +28,17 @@ class RequestController extends Controller
 
     public function store()
     {
-        // Only connected users can ask for a book.
+        //ken el connected users inajem yab3th dommande 
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
-
-        // Accept both JSON payloads and regular form posts.
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;
         }
 
-        // Read the book id from what the user sent.
+        //a9ra el id mta3 el book li 7ab yotlbou
         $bookId = (int) ($payload['bookId'] ?? 0);
         $userId = (int) Auth::id();
         $book = $this->books->find($bookId);
@@ -52,19 +48,19 @@ class RequestController extends Controller
             return;
         }
 
-        // A user is not allowed to ask for their own book.
+        // el user ma ynajmch yotleb el kteb mt3ou
         if ((int) $book['owner_id'] === $userId) {
             $this->respondError('Vous ne pouvez pas demander votre propre livre.', '/catalog?id=' . $bookId, 422);
             return;
         }
 
-        // Also block duplicate pending requests for the same user and same book.
+        // na7i el duplacation mta3 el demandes en attente l nafs el user w nafs el book
         if ($this->requests->existsPending($bookId, $userId)) {
             $this->respondError('Une demande en attente existe deja.', '/catalog?id=' . $bookId, 422);
             return;
         }
 
-        // Create the request first, then notify the book owner about the new interest.
+        // a3mel el demande 9bal w ba3d ab3ath notification lel owner mta3 el book 
         $this->requests->create($bookId, $userId);
         $this->notifications->create(
             (int) $book['owner_id'],
@@ -83,7 +79,7 @@ class RequestController extends Controller
 
     public function mine()
     {
-        // Return the requests sent by the connected user.
+        //raja3 el demandes li ba3thom el user el connected
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
             return;
@@ -94,7 +90,7 @@ class RequestController extends Controller
 
     public function received()
     {
-        // Return the pending requests received on the connected user's books.
+        //raja3 el demandes li waslou lel moula lekteb 3la ktbou
         if (!Auth::check()) {
             $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
             return;
@@ -105,13 +101,13 @@ class RequestController extends Controller
 
     public function accept()
     {
-        // Only a connected user can accept a request.
+        //ken el connected users inajem y9bal dommande
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
-        // Read which request to accept and the meeting note sent by the owner.
+        //a9ra el id mta3 el demande li 7ab y9balha w el meeting note eli 7ab y7ottha lel demandeur
         $requestId = (int) ($_GET['id'] ?? 0);
         $payload = json_decode((string) file_get_contents('php://input'), true);
         if (!is_array($payload)) {
@@ -136,13 +132,13 @@ class RequestController extends Controller
             return;
         }
 
-        // Accept the chosen request, reject competing pending requests, and reserve the book.
+        // accept el demande hedhi w ina7i el demandes l okhra l nafs el kteb ba3d update status mta3 el book lel reserved
         $this->requests->accept($requestId, (int) $request['book_id'], $meetingNote);
         $this->books->updateStatus((int) $request['book_id'], 'reserved');
         $owner = $this->users->findById((int) $book['owner_id']);
         $requester = $this->users->findById((int) $request['requester_id']);
 
-        // Send both sides the contact details they need to complete the handoff offline.
+        // ab3th notification lel demandeur w lel owner
         if ($requester && $owner) {
             $this->notifications->create(
                 (int) $request['requester_id'],
@@ -176,13 +172,13 @@ class RequestController extends Controller
 
     public function reject()
     {
-        // Only a connected user can reject a request.
+        // ken el connected users inajem maye9belch dommande
         if (!Auth::check()) {
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
 
-        // Read the target request from the URL.
+        //a9ra el id mta3 el demande li 7ab yorfedhha
         $requestId = (int) ($_GET['id'] ?? 0);
         $request = $this->requests->find($requestId);
 
@@ -197,7 +193,7 @@ class RequestController extends Controller
             return;
         }
 
-        // A rejection only changes the target request and informs the requester.
+        // cancel el request hedhi w ab3ath notification lel demandeur
         $this->requests->reject($requestId);
         $this->notifications->create(
             (int) $request['requester_id'],
@@ -216,7 +212,6 @@ class RequestController extends Controller
 
     private function isApiRequest()
     {
-        // If the URL contains /api/, respond like an API endpoint.
         $requestUri = '';
 
         if (isset($_SERVER['REQUEST_URI'])) {
@@ -228,20 +223,17 @@ class RequestController extends Controller
 
     private function respondError($message, $redirectPath, $statusCode)
     {
-        // APIs receive JSON errors.
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
             return;
         }
 
-        // Browser pages receive a flash message and a redirect.
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);
     }
 
     private function redirect($path)
     {
-        // Add the app base path before redirecting.
         $basePath = '';
         if (isset($_SERVER['APP_BASE_PATH'])) {
             $basePath = $_SERVER['APP_BASE_PATH'];

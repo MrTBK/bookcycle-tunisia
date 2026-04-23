@@ -169,9 +169,8 @@ L'application suit une architecture **MVC** :
 - `app/Controllers` : gestion des requetes
 - `app/Models` : acces aux donnees Oracle
 - `app/Views` : rendu des pages
-- `public/index.php` : point d'entree
-- `routes/web.php` : routes pages
-- `routes/api.php` : routes JSON
+- `public/index.php` : point d'entree et repartition directe vers les controleurs
+- `public/assets/js/app.js` : petites interactions cote client sans dependre d'une API JSON
 
 ---
 
@@ -248,25 +247,15 @@ Les principales pages presentes dans l'application sont :
 - `/add-book`
 - `/admin`
 
-### 5.3 API Realisee
+### 5.3 Fonctionnement Web
 
-Les routes API principales sont :
+L'application fonctionne desormais sans couche API separee.
+Les ecrans sont rendus cote serveur en PHP et les actions principales passent par :
 
-- `GET /api/me`
-- `POST /api/register`
-- `POST /api/login`
-- `POST /api/logout`
-- `GET /api/books`
-- `POST /api/books`
-- `GET /api/latest-books`
-- `GET /api/my-books`
-- `GET /api/stats`
-- `POST /api/requests`
-- `GET /api/my-requests`
-- `GET /api/received-requests`
-- `POST /api/accept-request`
-- `POST /api/reject-request`
-- `GET /api/admin-stats`
+- des pages HTML classiques
+- des formulaires `GET` et `POST`
+- des redirections avec messages flash
+- un point d'entree unique `public/index.php`
 
 ### 5.4 Fonctionnalites Principales
 
@@ -315,7 +304,7 @@ La validation technique comprend :
 - l'execution des scripts Oracle
 - la verification de la connexion PDO Oracle
 - le lancement local via `start_oracle_app.bat`
-- le controle des routes principales
+- le controle des pages et formulaires principaux
 
 ---
 

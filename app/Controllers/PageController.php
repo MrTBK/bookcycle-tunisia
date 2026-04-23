@@ -9,19 +9,18 @@ use App\Models\BookRequest;
 use App\Models\Notification;
 use App\Models\User;
 
-// This controller prepares the main pages of the website.
-// Its job is not to change data directly, but to gather the right information
-// and send that information to the correct view.
+// el conroller hedha howa eli i7adher el main pages
+// khedhemtou yjib les données eli test7a9ha les pages w b3d yeb3athha l view
 class PageController extends Controller
 {
     public function home()
     {
-        // Build the models we need for the homepage numbers and featured books.
+        //yebni el homepage data 
         $bookModel = new Book();
         $requestModel = new BookRequest();
         $acceptedCount = $requestModel->countAccepted();
 
-        // Send homepage data to the home view.
+        // yab3th el data ll home view
         $this->render('home', [
             'pageTitle' => 'Accueil',
             'currentUser' => Auth::user(),
@@ -36,7 +35,7 @@ class PageController extends Controller
 
     public function about()
     {
-        // This page is simple: it only needs the page title and current user.
+        //page hedhi simple test7a9 ken ek page title w current user
         $this->render('about', [
             'pageTitle' => 'A propos',
             'currentUser' => Auth::user(),
@@ -45,7 +44,7 @@ class PageController extends Controller
 
     public function catalog()
     {
-        // Read search filters directly from the query string so the page stays bookmarkable.
+        //ya9ra les filters men query string w yeb3athhom l book model bch yjib les ktob eli 3la les filters
         $filters = [
             'level' => $_GET['level'] ?? null,
             'class_name' => $_GET['class_name'] ?? null,
@@ -54,7 +53,7 @@ class PageController extends Controller
             'id' => $_GET['id'] ?? null,
         ];
 
-        // Send the filtered catalogue, selected book, and dropdown options to the catalog page.
+        //yab3th les données eli test7a9ha el catalog view 
         $this->render('catalog', [
             'pageTitle' => 'Catalogue',
             'currentUser' => Auth::user(),
@@ -67,7 +66,7 @@ class PageController extends Controller
 
     public function contact()
     {
-        // This page only needs standard shared data.
+        // testha9 ken el page title w current user
         $this->render('contact', [
             'pageTitle' => 'Contact',
             'currentUser' => Auth::user(),
@@ -87,7 +86,7 @@ class PageController extends Controller
 
     public function register()
     {
-        // Registration page also reads flash messages after redirects.
+        //ta9ra les données eli b3aththom el auth controller bch taffichi les messages error wela success
         $this->render('register', [
             'pageTitle' => 'Inscription',
             'currentUser' => Auth::user(),
@@ -98,7 +97,7 @@ class PageController extends Controller
 
     public function privacyPolicy()
     {
-        // Static information page.
+        // testha9 ken el page title w current user
         $this->render('privacy-policy', [
             'pageTitle' => 'Politique de confidentialite',
             'currentUser' => Auth::user(),
@@ -107,7 +106,7 @@ class PageController extends Controller
 
     public function dashboard()
     {
-        // The dashboard is private, so anonymous visitors must go to login first.
+        // dashboard page test7a9 user ykoun connected, q ken le yeb3athou l login page
         if (!Auth::check()) {
             $basePath = '';
             if (isset($_SERVER['APP_BASE_PATH'])) {
@@ -118,7 +117,7 @@ class PageController extends Controller
             exit;
         }
 
-        // Build the data needed for the connected user's dashboard.
+        //tebni el data eli test7a9ha el dashboard page w b3d teb3athha l view bch taffichiha
         $requests = new BookRequest();
         $bookModel = new Book();
         $notificationModel = new Notification();
@@ -148,7 +147,7 @@ class PageController extends Controller
 
     public function addBook()
     {
-        // Only connected users may open the "add book" page.
+        //ken el connected user inajem yodkhel ll add book page
         if (!Auth::check()) {
             $basePath = '';
             if (isset($_SERVER['APP_BASE_PATH'])) {
@@ -159,7 +158,7 @@ class PageController extends Controller
             exit;
         }
 
-        // Send dropdown options and flash messages to the add-book form.
+        //ab3th dropdown options w flash messages l add book view 
         $this->render('add-book', [
             'pageTitle' => 'Ajouter un livre',
             'currentUser' => Auth::user(),
@@ -172,7 +171,7 @@ class PageController extends Controller
 
     public function admin()
     {
-        // Only admins may enter the admin page.
+        //ken el admin yodkhel ll admin page
         if (!Auth::isAdmin()) {
             $basePath = '';
             if (isset($_SERVER['APP_BASE_PATH'])) {
@@ -190,7 +189,7 @@ class PageController extends Controller
         $userSearch = isset($_GET['user_search']) ? trim($_GET['user_search']) : '';
         $requestStatus = isset($_GET['request_status']) ? trim($_GET['request_status']) : '';
 
-        // Build every dataset the admin page needs in one place before rendering the view.
+        // ebni el data eli test7a9ha el admin page w b3d teb3athha l view bch taffichiha
         $this->render('admin', [
             'pageTitle' => 'Administration',
             'currentUser' => Auth::user(),
@@ -215,8 +214,7 @@ class PageController extends Controller
 
     private function pullFlash($key)
     {
-        // Flash messages live only for one request:
-        // read the value, then delete it from session.
+        // flash messages live ken lil request el jey w ba3d ma yeb3athom l view yetfasekh
         $value = null;
         if (isset($_SESSION[$key])) {
             $value = $_SESSION[$key];
@@ -229,7 +227,7 @@ class PageController extends Controller
 
     private function classOptions()
     {
-        // This gives the UI the allowed classes for each school level.
+        // hedhi les class options eli test7a9ha les forms w les filters, w 3la 7asb el level eli y5tarou l user, el class options yetbadel
         return [
             'Primaire' => [
                 '1ere annee',
@@ -246,7 +244,7 @@ class PageController extends Controller
             ],
             'Lycee' => [
                 '1ere secondaire',
-                '2eme info',
+                '2eme informatique',
                 '2eme sc',
                 '2eme lettre',
                 '2eme eco',
@@ -268,7 +266,7 @@ class PageController extends Controller
 
     private function subjectOptions()
     {
-        // This gives the UI the official subject list used by the forms and filters.
+        //hehdi les subject options eli test7a9ha les forms w les filters, w 3la 7asb el level eli y5tarou l user, el subject options yetbadel
         return [
             'Arabe',
             'Francais',

@@ -6,54 +6,50 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\User;
 
-// This controller is the "front door" for users.
-// It helps people create an account, enter the app, leave the app,
-// and ask the app who is connected right now.
+// el controller hedha howa beb el users y3awen les utilisateurs y3mlou compte, yconnectiw, ydisconnectiw, w ys2lou 3la chkon ely mconnecti houni tw
 class AuthController extends Controller
 {
-    // This variable will hold our helper that talks to the users table.
+    // el variable hedha bech ykoun fih el helper li ykhdem m3a table users. yani bech y3awenna n3mlou compte, nconnectiw, w ndisconnectiw ....
     private $users;
 
     public function __construct()
     {
-        // Build the helper object once so we can reuse it in every method.
+        //ebni el helper mta3i m3a table users
         $this->users = new User();
     }
 
     public function register()
     {
-        // Step 1: collect the information the visitor sent.
+        //step 1 : lem el ma3loumet li baathhom el visitor
         $payload = $this->requestData();
 
-        // Step 2: make sure the important boxes are not empty.
+        //step 2 : t2aked li el ma3loumet el mohimmin mesh ferghin
         if (empty($payload['name']) || empty($payload['email']) || empty($payload['password']) || empty($payload['phone'])) {
             $this->respondError('Tous les champs sont obligatoires.', '/register', 422);
             return;
         }
 
-        // Step 3: do not allow two different accounts with the same email.
+        //step 3: matkhalich 2 comptes yest3mlou nafs email. yani el email lazem ykoun unique fi database
         if ($this->users->findByEmail($payload['email'])) {
             $this->respondError('Cet email existe deja.', '/register', 422);
             return;
         }
 
-        // Step 4: save the new person in the database.
+        //step 4:  9ayed el new user fl database
         $id = $this->users->create($payload);
-
-        // API clients want JSON, but browser forms want a redirect.
         if ($this->isApiRequest()) {
             $this->json(['success' => true, 'userId' => $id]);
             return;
         }
 
-        // For normal pages, save a success message and send the user to login.
+        // el message hedha bech iji fi login page ken el inscription reussie
         $_SESSION['flash_success'] = 'Inscription reussie. Vous pouvez maintenant vous connecter.';
         $this->redirect('/login');
     }
 
     public function login()
     {
-        // Read the data sent by the user.
+        // a9ra el data eli b3athha el user
         $payload = $this->requestData();
         $email = '';
 
@@ -61,7 +57,7 @@ class AuthController extends Controller
             $email = $payload['email'];
         }
 
-        // Try to find a user with this email.
+        //lawej ala user bel mail hedha
         $user = $this->users->findByEmail($email);
 
         $password = '';
@@ -69,19 +65,19 @@ class AuthController extends Controller
             $password = (string) $payload['password'];
         }
 
-        // Check whether the secret password matches the saved hashed password.
+        // thabet mel pass
         if (!$user || !password_verify($password, $user['password'])) {
             $this->respondError('Email ou mot de passe invalide.', '/login', 401);
             return;
         }
 
-        // Even if the password is correct, a disabled account must stay outside.
+        //hata ken el pass s7i7 el disabled acc maynajmch iconnecti
         if (isset($user['is_active']) && (int) $user['is_active'] === 0) {
             $this->respondError('Votre compte est desactive. Contactez l administrateur.', '/login', 403);
             return;
         }
 
-        // Store the user in the session so the app remembers them on the next pages.
+        //9ayed el user fl session bech el app t3rf eli mconnecti w t3tih les droits mta3ou
         Auth::login($user);
 
         if ($this->isApiRequest()) {
@@ -97,7 +93,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        // Remove the current user from the session.
+        // na7i el user mel session bech ydisconnecti
         Auth::logout();
 
         if ($this->isApiRequest()) {
@@ -110,8 +106,8 @@ class AuthController extends Controller
 
     public function me()
     {
-        // This is a tiny helper endpoint that answers:
-        // "Is someone connected? If yes, who?"
+
+        // hedhi endpoint bech t3awd 3la client chkon ely mconnecti, w t9oulo ken mconnecti chnoua ismou w email mt3ou
         $this->json([
             'loggedIn' => Auth::check(),
             'user' => Auth::user(),
@@ -120,8 +116,6 @@ class AuthController extends Controller
 
     private function requestData()
     {
-        // Some clients send JSON instead of normal form fields,
-        // so we try to read JSON first.
         $raw = file_get_contents('php://input');
         if ($raw) {
             $decoded = json_decode($raw, true);
@@ -129,15 +123,11 @@ class AuthController extends Controller
                 return $decoded;
             }
         }
-
-        // If there was no JSON body, use the classic POST form data.
         return $_POST;
     }
 
     private function isApiRequest()
     {
-        // Simple rule:
-        // if the URL contains /api/, we answer like an API endpoint.
         $requestUri = '';
 
         if (isset($_SERVER['REQUEST_URI'])) {
@@ -149,20 +139,18 @@ class AuthController extends Controller
 
     private function respondError($message, $redirectPath, $statusCode)
     {
-        // API calls need a JSON error answer.
         if ($this->isApiRequest()) {
             $this->json(['success' => false, 'error' => $message], $statusCode);
             return;
         }
 
-        // Browser pages need a flash message and a redirect.
+        // browser yestha9 flash msg
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);
     }
 
     private function redirect($path)
     {
-        // Add the base path before redirecting, in case the app is not at the web root.
         $basePath = '';
         if (isset($_SERVER['APP_BASE_PATH'])) {
             $basePath = $_SERVER['APP_BASE_PATH'];

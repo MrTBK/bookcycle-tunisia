@@ -50,7 +50,7 @@ Pages principales :
 
 ### Controleur
 
-Les controleurs lient les routes, les modeles et les vues.
+Les controleurs lient le point d'entree web, les modeles et les vues.
 
 Principaux controleurs :
 
@@ -101,36 +101,15 @@ Les pages presentes dans le projet sont :
 
 ---
 
-## 5. API Realisee
+## 5. Fonctionnement Web
 
-Le projet propose aussi une API JSON utilisee par le JavaScript du front.
+Le projet ne repose plus sur une API JSON separee.
+Le fonctionnement web est base sur :
 
-### Authentification
-
-- `GET /api/me`
-- `POST /api/register`
-- `POST /api/login`
-- `POST /api/logout`
-
-### Livres
-
-- `GET /api/books`
-- `POST /api/books`
-- `GET /api/latest-books`
-- `GET /api/my-books`
-- `GET /api/stats`
-
-### Demandes
-
-- `POST /api/requests`
-- `GET /api/my-requests`
-- `GET /api/received-requests`
-- `POST /api/accept-request`
-- `POST /api/reject-request`
-
-### Administration
-
-- `GET /api/admin-stats`
+- le rendu serveur des pages en PHP
+- des formulaires HTML classiques
+- des redirections apres traitement
+- un script JavaScript leger reserve a quelques interactions d'interface
 
 ---
 

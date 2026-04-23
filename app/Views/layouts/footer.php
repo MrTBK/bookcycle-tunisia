@@ -1,5 +1,4 @@
     </main>
-    <!-- The footer is the bottom part shared by all pages. -->
     <footer class="site-footer">
         <div class="container footer-grid">
             <div>
@@ -16,7 +15,6 @@
             </div>
         </div>
     </footer>
-    <!-- Expose the app base path to JavaScript so scripts can build safe URLs. -->
     <script>window.APP_BASE_PATH = <?= json_encode($basePath) ?>;</script>
     <script src="<?= htmlspecialchars($basePath) ?>/assets/js/app.js"></script>
 </body>

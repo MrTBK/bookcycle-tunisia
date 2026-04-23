@@ -70,7 +70,6 @@ bookcycle-tunisia/
     Views/
   public/
     assets/
-  routes/
   database/
   rapports/
   documents_aide/
@@ -79,9 +78,7 @@ bookcycle-tunisia/
   README.md
 ```
 
-## Routes Principales
-
-### Pages Web
+## Pages Principales
 
 - `/`
 - `/about`
@@ -93,23 +90,6 @@ bookcycle-tunisia/
 - `/dashboard`
 - `/add-book`
 - `/admin`
-
-### API
-
-- `/api/me`
-- `/api/register`
-- `/api/login`
-- `/api/logout`
-- `/api/books`
-- `/api/latest-books`
-- `/api/my-books`
-- `/api/stats`
-- `/api/requests`
-- `/api/my-requests`
-- `/api/received-requests`
-- `/api/accept-request`
-- `/api/reject-request`
-- `/api/admin-stats`
 
 ## Base De Donnees
 

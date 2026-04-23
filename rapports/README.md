@@ -11,7 +11,7 @@ Ce dossier regroupe des versions propres et coherentes des rapports du projet.
 - `03_RAPPORT_SGBD.md`
   Partie base de donnees Oracle, schema relationnel, contraintes, SQL et PL/SQL.
 - `04_RAPPORT_WEB2.md`
-  Partie Programmation Web 2 avec architecture MVC, pages, API et fonctionnalites.
+  Partie Programmation Web 2 avec architecture MVC, pages, formulaires et fonctionnalites.
 - `05_FICHE_PROJET.md`
   Fiche courte de presentation utile pour la soutenance ou une remise rapide.
 
@@ -20,7 +20,7 @@ Ce dossier regroupe des versions propres et coherentes des rapports du projet.
 Ces fichiers ont ete reconstitues a partir des rapports existants du projet et verifies avec :
 
 - la structure reelle du depot
-- les routes web et API
+- les pages et actions web presentes dans le projet
 - le schema Oracle dans `database/02_schema.sql`
 - les pages presentes dans `app/Views/pages`
 

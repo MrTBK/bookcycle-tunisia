@@ -3,7 +3,12 @@
 // Load the bootstrap file first so config, helpers, sessions, and autoloading are ready.
 require_once dirname(__DIR__) . '/app/bootstrap.php';
 
-use App\Core\Router;
+use App\Controllers\AdminController;
+use App\Controllers\AuthController;
+use App\Controllers\BookController;
+use App\Controllers\NotificationController;
+use App\Controllers\PageController;
+use App\Controllers\RequestController;
 
 // SCRIPT_NAME usually looks like /bookcycle/public/index.php.
 // We clean it up so we can detect whether the app is installed inside a subfolder.
@@ -22,12 +27,6 @@ if ($scriptName !== '' && str_ends_with($scriptName, '/index.php')) {
 
 // Save the base path in the request so views and scripts can build correct URLs later.
 $_SERVER['APP_BASE_PATH'] = $basePath;
-
-// Create one router instance and then feed it all page routes and API routes.
-$router = new Router();
-
-require dirname(__DIR__) . '/routes/web.php';
-require dirname(__DIR__) . '/routes/api.php';
 
 // REQUEST_URI may contain both the path and a query string, like /catalog?id=5.
 // We keep only the path because routing should not depend on filter/query values.
@@ -51,5 +50,93 @@ if (isset($_SERVER['REQUEST_METHOD'])) {
     $requestMethod = $_SERVER['REQUEST_METHOD'];
 }
 
-// Hand the cleaned method + path to the router so it can find the right controller action.
-$router->dispatch($requestMethod, $requestPath);
+// Directly dispatch web pages and form actions without a separate routes layer.
+$handler = null;
+
+if ($requestMethod === 'GET') {
+    switch ($requestPath) {
+        case '/':
+            $handler = [PageController::class, 'home'];
+            break;
+        case '/about':
+            $handler = [PageController::class, 'about'];
+            break;
+        case '/catalog':
+            $handler = [PageController::class, 'catalog'];
+            break;
+        case '/contact':
+            $handler = [PageController::class, 'contact'];
+            break;
+        case '/login':
+            $handler = [PageController::class, 'login'];
+            break;
+        case '/privacy-policy':
+            $handler = [PageController::class, 'privacyPolicy'];
+            break;
+        case '/register':
+            $handler = [PageController::class, 'register'];
+            break;
+        case '/dashboard':
+            $handler = [PageController::class, 'dashboard'];
+            break;
+        case '/notifications/read':
+            $handler = [NotificationController::class, 'read'];
+            break;
+        case '/add-book':
+            $handler = [PageController::class, 'addBook'];
+            break;
+        case '/admin':
+            $handler = [PageController::class, 'admin'];
+            break;
+    }
+} elseif ($requestMethod === 'POST') {
+    switch ($requestPath) {
+        case '/login':
+            $handler = [AuthController::class, 'login'];
+            break;
+        case '/register':
+            $handler = [AuthController::class, 'register'];
+            break;
+        case '/add-book':
+            $handler = [BookController::class, 'store'];
+            break;
+        case '/request-book':
+            $handler = [RequestController::class, 'store'];
+            break;
+        case '/accept-request':
+            $handler = [RequestController::class, 'accept'];
+            break;
+        case '/reject-request':
+            $handler = [RequestController::class, 'reject'];
+            break;
+        case '/admin/toggle-user':
+            $handler = [AdminController::class, 'toggleUser'];
+            break;
+        case '/admin/delete-book':
+            $handler = [AdminController::class, 'deleteBook'];
+            break;
+        case '/admin/restore-book':
+            $handler = [AdminController::class, 'restoreBook'];
+            break;
+        case '/admin/cancel-request':
+            $handler = [AdminController::class, 'cancelRequest'];
+            break;
+        case '/admin/notify':
+            $handler = [AdminController::class, 'notify'];
+            break;
+        case '/logout':
+            $handler = [AuthController::class, 'logout'];
+            break;
+    }
+}
+
+if ($handler === null) {
+    http_response_code(404);
+    echo '404 - Page not found';
+    return;
+}
+
+$controllerClass = $handler[0];
+$action = $handler[1];
+$controller = new $controllerClass();
+$controller->$action();

@@ -6,40 +6,39 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\Notification;
 
-// This controller is in charge of opening a notification
-// and changing it from "not read yet" to "already read".
+// el contoller hedha ykoun fiha method wa7da li tbadal status mta3 notification not read yet to read
 class NotificationController extends Controller
 {
     private $notifications;
 
     public function __construct()
     {
-        // Create the helper that knows how to manage notification rows in the database.
+        // yasna3 object wa7ed ykoun fiha method markAsRead li tbadal status mta3 notification
         $this->notifications = new Notification();
     }
 
     public function read()
     {
-        // Only connected users may read private notifications.
+        //ken el connected user tjih notif
         if (!Auth::check()) {
             $this->redirect('/login');
         }
 
-        // Read the notification id from the URL.
+        //a9ra id mta3 notification min URL 
         $notificationId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-        // Double-check that this notification really belongs to the current user.
+        //double check li notification hedhi mta3 el user li connected taw
         $notification = $this->notifications->findForUser($notificationId, (int) Auth::id());
 
-        // If the notification exists, mark it as read.
+        //ken el notification mawjoud w mta3 el user li connected taw, badal status mta3ha l read
         if ($notification) {
             $this->notifications->markAsRead($notificationId, (int) Auth::id());
         }
 
-        // After opening the notification, go back to the notifications part of the dashboard.
+        //ba3d ma ihel notification, raja3ou lil dashboard section notifications
         $redirectPath = '/dashboard#section-notifications';
 
-        // If a safe internal redirect is provided, use it instead.
+        //ken fama redirect path fi query string w ybda b /, raja3ou lih fi3oudh el  dashboard
         if (isset($_GET['redirect']) && is_string($_GET['redirect']) && str_starts_with($_GET['redirect'], '/')) {
             $redirectPath = $_GET['redirect'];
         }
@@ -49,7 +48,6 @@ class NotificationController extends Controller
 
     private function redirect($path)
     {
-        // Add the app base path before sending the browser away.
         $basePath = '';
         if (isset($_SERVER['APP_BASE_PATH'])) {
             $basePath = $_SERVER['APP_BASE_PATH'];

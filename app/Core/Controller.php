@@ -17,7 +17,7 @@ abstract class Controller
         }
         $unreadNotificationsCount = 0;
 
-        // Populate navbar notification data automatically for logged-in users.
+        //navbar ll data notifcation 
         if (isset($data['unreadNotificationsCount'])) {
             $unreadNotificationsCount = (int) $data['unreadNotificationsCount'];
         } elseif (isset($currentUser) && is_array($currentUser) && isset($currentUser['id'])) {
