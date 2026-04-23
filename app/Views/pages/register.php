@@ -35,10 +35,3 @@
         </form>
     </div>
 </section>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Start any register-page JavaScript behavior from the global app script.
-    BookCycle.initRegisterPage();
-});
-</script>

@@ -7,8 +7,7 @@ Ce fichier regroupe des diagrammes Mermaid utiles pour comprendre et presenter *
 ```mermaid
 flowchart LR
     U["Utilisateur"] --> P["public/index.php"]
-    P --> R["Router"]
-    R --> C["Controllers"]
+    P --> C["Controllers"]
     C --> M["Models"]
     M --> D["Oracle Database"]
     C --> V["Views"]
@@ -19,17 +18,17 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A["public/index.php"] --> B["routes/web.php + routes/api.php"]
-    B --> C["PageController"]
-    B --> D["AuthController"]
-    B --> E["BookController"]
-    B --> F["RequestController"]
-    B --> G["AdminController"]
-    B --> H["NotificationController"]
+    A["public/index.php"] --> C["PageController"]
+    A --> D["AuthController"]
+    A --> E["BookController"]
+    A --> F["RequestController"]
+    A --> G["AdminController"]
+    A --> H["NotificationController"]
 
     C --> I["Views/pages"]
     D --> J["User model"]
     E --> K["Book model"]
+    E --> O["AcademicOption model"]
     F --> L["BookRequest model"]
     F --> K
     F --> M["Notification model"]
@@ -74,6 +73,8 @@ erDiagram
     USERS ||--o{ NOTIFICATIONS : receives
     USERS ||--o{ EXCHANGES : gives
     USERS ||--o{ EXCHANGES : receives
+    SUBJECTS }o--o{ BOOKS : classifies
+    SCHOOL_CLASSES }o--o{ BOOKS : structures
     BOOKS ||--o{ REQUESTS : gets
     BOOKS ||--o{ EXCHANGES : becomes
 
@@ -84,6 +85,21 @@ erDiagram
         string password
         string phone
         string role
+        int is_active
+    }
+
+    SUBJECTS {
+        int id
+        string name
+        int sort_order
+        int is_active
+    }
+
+    SCHOOL_CLASSES {
+        int id
+        string school_level
+        string class_name
+        int sort_order
         int is_active
     }
 
@@ -132,15 +148,13 @@ erDiagram
 sequenceDiagram
     participant U as Utilisateur
     participant I as index.php
-    participant R as Router
     participant C as Controller
     participant M as Model
     participant V as View
     participant DB as Oracle
 
     U->>I: Ouvrir une URL
-    I->>R: Envoyer methode + chemin
-    R->>C: Choisir la bonne action
+    I->>C: Choisir la bonne action
     C->>M: Demander des donnees
     M->>DB: Executer SQL
     DB-->>M: Retour des resultats
@@ -237,7 +251,7 @@ sequenceDiagram
     participant N as Notification model
     participant DB as Oracle
 
-    U->>R: POST /api/requests
+    U->>R: POST /request-book
     R->>R: Verifier auth
     R->>B: find(bookId)
     B->>DB: SELECT book
@@ -338,12 +352,6 @@ flowchart TD
 
 ```mermaid
 classDiagram
-    class Router {
-        +get(path, handler)
-        +post(path, handler)
-        +dispatch(method, path)
-    }
-
     class Auth {
         +user()
         +id()
@@ -364,21 +372,17 @@ classDiagram
     class AdminController
     class NotificationController
 
+    class AcademicOption
     class User
     class Book
     class BookRequest
     class Notification
 
-    Router --> PageController
-    Router --> AuthController
-    Router --> BookController
-    Router --> RequestController
-    Router --> AdminController
-    Router --> NotificationController
-
     AuthController --> User
     BookController --> Book
     BookController --> BookRequest
+    BookController --> AcademicOption
+    PageController --> AcademicOption
     RequestController --> BookRequest
     RequestController --> Book
     RequestController --> Notification
@@ -418,7 +422,6 @@ stateDiagram-v2
 flowchart TD
     A["bookcycle-tunisia"] --> B["app"]
     A --> C["public"]
-    A --> D["routes"]
     A --> E["database"]
     A --> F["rapports"]
     A --> G["documents_aide"]

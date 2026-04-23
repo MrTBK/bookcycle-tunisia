@@ -36,7 +36,7 @@ Nous remercions egalement l'Ecole Superieure d'Economie Numerique pour le cadre 
 **BookCycle Tunisia** est une application web academique qui facilite la reutilisation des livres scolaires en Tunisie.  
 La plateforme permet a des utilisateurs de publier des livres, consulter un catalogue, envoyer des demandes, suivre les notifications et administrer la plateforme.
 
-Le projet repose sur une architecture **MVC en PHP**, une base de donnees **Oracle XE** et plusieurs objets **PL/SQL** destines a renforcer les traitements metier.  
+Le projet repose sur une application web **PHP** organisee de facon claire, une base de donnees **Oracle XE** et plusieurs objets **PL/SQL** destines a renforcer les traitements metier.  
 Il couvre a la fois l'analyse fonctionnelle, la modelisation, le developpement web, l'administration des donnees et une reflexion sur l'amelioration des processus.
 
 **Mots cles :** `Oracle`, `PL/SQL`, `PHP`, `MVC`, `livres scolaires`, `catalogue`, `administration`
@@ -52,7 +52,7 @@ Ce projet integre mobilise plusieurs competences :
 
 - **AGL** pour l'analyse, les acteurs, les besoins et l'organisation du projet
 - **SGBD** pour la conception du schema Oracle et des objets PL/SQL
-- **Programmation Web 2** pour l'application MVC et l'interface utilisateur
+- **Programmation Web 2** pour l'application PHP, les formulaires et l'interface utilisateur
 - **RPA** pour la reflexion sur l'automatisation et l'amelioration des processus
 
 ---
@@ -156,7 +156,7 @@ Les besoins fonctionnels principaux sont :
 
 Les besoins non fonctionnels retenus sont :
 
-- architecture MVC claire
+- organisation claire des fichiers PHP
 - utilisation d'Oracle XE
 - validation cote serveur
 - code lisible et modulaire
@@ -164,13 +164,15 @@ Les besoins non fonctionnels retenus sont :
 
 ### 3.4 Architecture Logique
 
-L'application suit une architecture **MVC** :
+L'application est organisee en trois groupes de fichiers :
 
-- `app/Controllers` : gestion des requetes
-- `app/Models` : acces aux donnees Oracle
-- `app/Views` : rendu des pages
+- `app/Controllers` : traitement des actions et des formulaires
+- `app/Models` : acces aux donnees Oracle avec `PDO`
+- `app/Views` : rendu des pages en PHP
 - `public/index.php` : point d'entree et repartition directe vers les controleurs
 - `public/assets/js/app.js` : petites interactions cote client sans dependre d'une API JSON
+
+Cette organisation peut etre lue comme une forme simple de MVC, mais pour la soutenance elle peut surtout etre presentee comme une maniere propre de separer le traitement, les donnees et l'affichage.
 
 ---
 
@@ -187,9 +189,11 @@ Le projet utilise **Oracle XE** afin de respecter les objectifs du module SGBD e
 
 ### 4.2 Tables Principales
 
-Le schema contient cinq tables principales :
+Le schema contient des tables metier et deux tables de reference pour les choix academiques :
 
 - `users`
+- `subjects`
+- `school_classes`
 - `books`
 - `requests`
 - `exchanges`
@@ -205,6 +209,12 @@ Le schema integre :
 - une contrainte `UNIQUE` sur `users.email`
 - des index pour les recherches frequentes
 
+Les tables `subjects` et `school_classes` servent de source de verite pour :
+
+- les listes de matieres
+- les listes de classes par niveau
+- la validation des formulaires d'ajout et de filtrage
+
 ### 4.4 Objets PL/SQL
 
 Les objets PL/SQL principaux sont :
@@ -214,7 +224,6 @@ Les objets PL/SQL principaux sont :
 - `count_books_by_user`
 - `calculate_money_saved`
 - `trg_books_updated_at`
-- `trg_prevent_self_request`
 - `trg_book_exchange_log`
 
 ---
@@ -269,6 +278,9 @@ Le projet permet :
 - l'affichage des notifications
 - l'acces a un tableau de bord utilisateur
 - l'acces a un tableau de bord administrateur
+
+Les listes de matieres et de classes ne sont plus definies en dur dans les controleurs.
+Elles sont chargees depuis Oracle via des tables de reference, ce qui facilite l'evolution du catalogue scolaire sans modifier le code PHP.
 
 ---
 
@@ -343,4 +355,4 @@ Les ameliorations possibles sont :
 **BookCycle Tunisia** est un projet integre coherent qui relie analyse, base de donnees, developpement web et reflexion sur l'automatisation.  
 La solution obtenue est fonctionnelle, claire et suffisamment riche pour illustrer les objectifs des modules concernes.
 
-Le projet montre qu'une architecture simple en PHP, associee a Oracle et a des objets PL/SQL bien choisis, permet de construire une plateforme utile et pedagogiquement solide.
+Le projet montre qu'une application PHP simple, associee a Oracle et a des objets PL/SQL bien choisis, permet de construire une plateforme utile et pedagogiquement solide.

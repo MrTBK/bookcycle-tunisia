@@ -3,7 +3,7 @@
 ## Introduction
 
 La partie Programmation Web 2 du projet **BookCycle Tunisia** consiste a developper une application web permettant de consulter, publier et demander des livres scolaires.  
-L'application est connectee a une base Oracle et organisee selon une architecture MVC.
+L'application est connectee a une base Oracle et reste basee sur les notions classiques vues en PHP : pages, formulaires, sessions, redirections et acces aux donnees avec `PDO`.
 
 ---
 
@@ -21,20 +21,27 @@ L'objectif de l'application est de :
 
 ## 2. Architecture Adoptee
 
-Le projet suit une architecture **MVC**.
+Le projet est organise de facon simple en trois parties :
 
-### Modele
+- des fichiers qui gerent les traitements
+- des fichiers qui lisent les donnees
+- des fichiers qui affichent les pages
 
-Les modeles assurent l'acces aux donnees Oracle via `PDO`.
+Cette organisation correspond a une presentation de type **MVC**, mais elle reste surtout une facon claire de ranger le code PHP du projet.
+
+### Acces Aux Donnees
+
+Les fichiers de donnees assurent l'acces a Oracle via `PDO`.
 
 Exemples :
 
+- `AcademicOption`
 - `User`
 - `Book`
 - `BookRequest`
 - `Notification`
 
-### Vue
+### Pages Affichees
 
 Les vues affichent les pages de l'application en PHP.
 
@@ -48,11 +55,11 @@ Pages principales :
 - ajout de livre
 - administration
 
-### Controleur
+### Traitement Des Actions
 
-Les controleurs lient le point d'entree web, les modeles et les vues.
+Les fichiers de traitement relient le point d'entree web, les donnees et les pages affichees.
 
-Principaux controleurs :
+Principaux fichiers de traitement :
 
 - `PageController`
 - `AuthController`
@@ -110,6 +117,9 @@ Le fonctionnement web est base sur :
 - des formulaires HTML classiques
 - des redirections apres traitement
 - un script JavaScript leger reserve a quelques interactions d'interface
+
+Les listes de matieres, de niveaux et de classes sont maintenant chargees depuis Oracle a travers le modele `AcademicOption`.
+Cette approche remplace les anciennes listes codees en dur et garde le code PHP aligne avec les donnees reelles de la base.
 
 ---
 
@@ -197,6 +207,7 @@ Les regles metier importantes incluent :
 - impossibilite de demander son propre livre
 - prevention des demandes en double
 - coherence entre niveau et classe
+- verification des matieres autorisees depuis la table `subjects`
 
 ---
 
@@ -204,8 +215,8 @@ Les regles metier importantes incluent :
 
 ### Points Forts
 
-- architecture claire
-- separation MVC
+- organisation claire
+- separation simple des responsabilites
 - integration reelle avec Oracle
 - front dynamique simple avec JavaScript
 - tableau de bord admin utile pour la soutenance
@@ -219,7 +230,31 @@ Les regles metier importantes incluent :
 
 ---
 
+## 9. Alignement Avec Le Cours PHP
+
+Le projet reutilise bien les notions principales vues dans le cours de PHP :
+
+- syntaxe PHP integree dans les pages HTML
+- formulaires avec `method="post"`
+- recuperation des donnees avec `$_POST`
+- conditions, tableaux, `foreach` et fonctions
+- inclusion et chargement de fichiers
+- sessions et redirections
+- acces a la base avec `PDO`
+
+Ces notions sont visibles dans des fichiers comme :
+
+- `app/Views/pages/register.php`
+- `app/bootstrap.php`
+- `app/Core/Database.php`
+- `app/Controllers/AuthController.php`
+
+Le projet est simplement plus organise qu'un petit exercice procedural.
+L'idee importante pour la soutenance est que les notions de base du cours ont bien ete reutilisees dans une application complete.
+
+---
+
 ## Conclusion
 
 La partie Web 2 de **BookCycle Tunisia** a permis de construire une application complete, reliee a Oracle, couvrant les besoins essentiels du projet.  
-Elle valorise l'architecture MVC, la gestion des roles, les operations CRUD et l'exploitation d'une base de donnees reelle.
+Elle valorise surtout les notions de PHP vues en cours, la gestion des roles, les operations CRUD et l'exploitation d'une base de donnees reelle.

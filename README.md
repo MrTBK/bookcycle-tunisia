@@ -96,6 +96,8 @@ bookcycle-tunisia/
 Le schema Oracle principal contient :
 
 - `users`
+- `subjects`
+- `school_classes`
 - `books`
 - `requests`
 - `exchanges`
@@ -108,6 +110,12 @@ Le projet utilise aussi :
 - des procedures
 - des fonctions
 - une vue de reporting `v_book_overview`
+
+Les listes academiques ne sont plus codees en dur dans PHP :
+
+- les matieres sont stockees dans `subjects`
+- les niveaux et classes sont stockes dans `school_classes`
+- les formulaires et la validation lisent maintenant ces tables
 
 ## Lancement Local
 
@@ -146,7 +154,10 @@ Configuration par defaut attendue :
 3. `database/03_sample_data.sql`
 4. `database/05_plsql_objects.sql`
 5. `database/04_queries.sql`
-6. `database/06_annex_objects.sql`
+
+Script annexe :
+
+- aucun script annexe supplementaire n'est necessaire pour une installation normale
 
 ## Comptes De Demonstration
 

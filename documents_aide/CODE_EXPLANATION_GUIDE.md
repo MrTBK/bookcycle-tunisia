@@ -22,8 +22,6 @@ The project follows a simple MVC structure:
 
 - `public/index.php`
   This is the front door of the website.
-- `routes/`
-  These files decide which controller should answer a URL.
 - `app/Controllers/`
   Controllers receive the request and decide what to do.
 - `app/Models/`
@@ -35,7 +33,7 @@ So the path is usually:
 
 1. browser sends request
 2. `public/index.php` starts the app
-3. router chooses the right controller
+3. `public/index.php` chooses the right controller action
 4. controller asks model for data
 5. model talks to Oracle
 6. controller sends data to a view
@@ -47,10 +45,8 @@ So the path is usually:
 
 This file:
 - loads the bootstrap
-- creates the router
-- loads web routes and API routes
 - reads the request URL
-- sends the URL to the router
+- calls the matching controller action directly
 
 In simple words:
 
@@ -66,18 +62,6 @@ This file prepares the app:
 In simple words:
 
 > "Before the app works, prepare the toolbox."
-
-### Step 3: `app/Core/Router.php`
-
-The router compares the URL and HTTP method with the route list.
-
-Example:
-- `GET /catalog` goes to `PageController::catalog`
-- `POST /login` goes to `AuthController::login`
-
-In simple words:
-
-> "If the user asks for this URL, call this controller method."
 
 ## 4. How pages work
 
@@ -167,8 +151,8 @@ Flow:
    - condition
    - estimated price
 3. controller checks required fields
-4. controller checks that class belongs to level
-5. controller checks that subject is in the allowed subject list
+4. controller checks that class belongs to level using `school_classes`
+5. controller checks that subject exists in `subjects`
 6. controller builds a title automatically
 7. model inserts the book in Oracle
 
@@ -334,6 +318,12 @@ People using the platform.
 ### `books`
 Books added by users.
 
+### `subjects`
+Official list of school subjects.
+
+### `school_classes`
+Official list of classes grouped by school level.
+
 ### `requests`
 Requests from one user asking for one book.
 
@@ -352,37 +342,13 @@ Creates Oracle users and grants rights.
 Creates tables, constraints, sequences, triggers, indexes, and view.
 
 ### `03_sample_data.sql`
-Adds demo users, books, requests, exchanges, and notifications.
+Adds demo users, subjects, classes, books, requests, exchanges, and notifications.
 
 ### `04_queries.sql`
 Shows sample SQL queries for learning and reporting.
 
 ### `05_plsql_objects.sql`
 Adds procedures, functions, triggers, and PL/SQL examples.
-
-### `06_annex_objects.sql`
-Shows Oracle objects for report/annex use.
-
-## 17. Routes in simple words
-
-### Web routes
-
-These routes show normal pages in the browser:
-- `/`
-- `/catalog`
-- `/login`
-- `/register`
-- `/dashboard`
-- `/admin`
-
-### API routes
-
-These routes are for JSON/API style calls:
-- `/api/login`
-- `/api/register`
-- `/api/books`
-- `/api/requests`
-- `/api/admin-stats`
 
 ## 18. Why comments were added this way
 
@@ -401,20 +367,19 @@ If you want to understand the project quickly, read them in this order:
 1. `README.md`
 2. `public/index.php`
 3. `app/bootstrap.php`
-4. `app/Core/Router.php`
-5. `routes/web.php`
-6. `app/Controllers/PageController.php`
-7. `app/Controllers/AuthController.php`
-8. `app/Controllers/BookController.php`
-9. `app/Controllers/RequestController.php`
-10. `app/Models/User.php`
-11. `app/Models/Book.php`
-12. `app/Models/BookRequest.php`
-13. `database/02_schema.sql`
-14. `database/05_plsql_objects.sql`
+4. `app/Controllers/PageController.php`
+5. `app/Controllers/AuthController.php`
+6. `app/Controllers/BookController.php`
+7. `app/Controllers/RequestController.php`
+8. `app/Models/AcademicOption.php`
+9. `app/Models/User.php`
+10. `app/Models/Book.php`
+11. `app/Models/BookRequest.php`
+12. `database/02_schema.sql`
+13. `database/05_plsql_objects.sql`
 
 ## 20. Short summary
 
 If you remember only one thing, remember this:
 
-> The router picks a controller, the controller asks a model, the model talks to Oracle, and the view shows the result.
+> `public/index.php` picks a controller action, the controller asks a model, the model talks to Oracle, and the view shows the result.

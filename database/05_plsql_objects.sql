@@ -51,6 +51,9 @@ BEGIN
     WHERE id = v_book_id;
 
     add_notification(v_requester_id, 'Votre demande pour le livre "' || v_title || '" a ete acceptee.');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Aucune demande ne correspond a l''identifiant fourni.');
 END;
 /
 
@@ -75,9 +78,10 @@ CREATE OR REPLACE FUNCTION calculate_money_saved
 RETURN NUMBER IS
     v_total NUMBER;
 BEGIN
-    SELECT COUNT(*) * 25
+    SELECT NVL(SUM(b.estimated_price), 0)
     INTO v_total
-    FROM exchanges;
+    FROM exchanges e
+    JOIN books b ON b.id = e.book_id;
 
     RETURN v_total;
 END;
@@ -92,25 +96,7 @@ BEGIN
 END;
 /
 
--- Trigger 2 : empecher un utilisateur de demander son propre livre.
-CREATE OR REPLACE TRIGGER trg_prevent_self_request
-BEFORE INSERT ON requests
-FOR EACH ROW
-DECLARE
-    v_owner_id books.owner_id%TYPE;
-BEGIN
-    SELECT owner_id
-    INTO v_owner_id
-    FROM books
-    WHERE id = :NEW.book_id;
-
-    IF v_owner_id = :NEW.requester_id THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Un utilisateur ne peut pas demander son propre livre.');
-    END IF;
-END;
-/
-
--- Trigger 3 : journaliser automatiquement un echange quand un livre passe a exchanged.
+-- Trigger 2 : journaliser automatiquement un echange quand un livre passe a exchanged.
 CREATE OR REPLACE TRIGGER trg_book_exchange_log
 AFTER UPDATE OF status ON books
 FOR EACH ROW
@@ -181,6 +167,7 @@ DECLARE
     v_money_saved NUMBER;
 BEGIN
     add_notification(2, 'Test manuel de notification depuis PL/SQL.');
+    accept_request(2, 'Rendez-vous confirme demain a 10h.');
     v_total_books := count_books_by_user(2);
     v_money_saved := calculate_money_saved();
 

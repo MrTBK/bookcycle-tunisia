@@ -28,7 +28,7 @@ Les avantages principaux dans ce projet sont :
 
 ## 2. Schema Relationnel
 
-Le schema comporte cinq tables principales.
+Le schema comporte des tables metier ainsi que des tables de reference pour les choix académiques.
 
 ### Table `USERS`
 
@@ -40,6 +40,25 @@ Le schema comporte cinq tables principales.
 - `role`
 - `is_active`
 - `created_at`
+
+### Table `SUBJECTS`
+
+- `id`
+- `name`
+- `sort_order`
+- `is_active`
+
+Cette table centralise les matieres disponibles dans les formulaires et dans les filtres.
+
+### Table `SCHOOL_CLASSES`
+
+- `id`
+- `school_level`
+- `class_name`
+- `sort_order`
+- `is_active`
+
+Cette table centralise les classes autorisees et leur rattachement au niveau scolaire.
 
 ### Table `BOOKS`
 
@@ -98,6 +117,8 @@ Les relations principales sont :
 - `exchanges.receiver_id -> users.id`
 - `notifications.user_id -> users.id`
 
+Les tables `subjects` et `school_classes` sont des tables de reference consultees par l'application pour alimenter les formulaires et valider les donnees saisies.
+
 Le schema contient aussi :
 
 - des cles primaires
@@ -119,6 +140,8 @@ Exemples de valeurs controlees :
 Pour rester compatible avec Oracle XE, les identifiants sont generes a l'aide de sequences et triggers :
 
 - `seq_users` / `trg_users_pk`
+- `seq_subjects` / `trg_subjects_pk`
+- `seq_school_classes` / `trg_school_classes_pk`
 - `seq_books` / `trg_books_pk`
 - `seq_requests` / `trg_requests_pk`
 - `seq_exchanges` / `trg_exchanges_pk`
@@ -136,6 +159,8 @@ Cette vue combine les informations des livres et de leurs proprietaires.
 
 Les index presents dans le schema sont :
 
+- `idx_subjects_active`
+- `idx_school_classes_level`
 - `idx_books_owner`
 - `idx_books_subject`
 - `idx_books_level`
@@ -156,7 +181,6 @@ Les scripts Oracle du projet sont :
 3. `03_sample_data.sql`
 4. `04_queries.sql`
 5. `05_plsql_objects.sql`
-6. `06_annex_objects.sql`
 
 Ordre d'execution recommande :
 
@@ -165,7 +189,6 @@ Ordre d'execution recommande :
 3. `03_sample_data.sql`
 4. `05_plsql_objects.sql`
 5. `04_queries.sql`
-6. `06_annex_objects.sql`
 
 ---
 
@@ -202,7 +225,6 @@ Ces requetes sont utilisees pour les besoins metier et pour la demonstration en 
 ### Triggers Metier
 
 - `trg_books_updated_at`
-- `trg_prevent_self_request`
 - `trg_book_exchange_log`
 
 ---
@@ -234,10 +256,8 @@ Le projet conserve volontairement certains elements Oracle importants :
 - `%ROWTYPE`
 - `SQL%ROWCOUNT`
 - `DBMS_OUTPUT.PUT_LINE`
-- `ALL_USERS`
-- `USER_OBJECTS`
 
-Ces elements enrichissent la demonstration technique du projet.
+Ces elements enrichissent la demonstration technique du projet et restent coherents avec les notions vues dans le cours de PL/SQL.
 
 ---
 

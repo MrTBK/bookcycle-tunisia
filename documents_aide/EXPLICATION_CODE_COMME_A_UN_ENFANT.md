@@ -56,15 +56,6 @@ Le projet est range avec la logique **MVC**.
 C'est la porte d'entree.
 Quand quelqu'un arrive sur le site, il passe d'abord par ici.
 
-### `routes/`
-
-C'est la liste des chemins.
-Cela dit :
-
-- si quelqu'un ouvre `/`, envoie-le ici
-- si quelqu'un ouvre `/catalog`, envoie-le la
-- si quelqu'un envoie `POST /login`, envoie-le a la connexion
-
 ### `app/Controllers/`
 
 Les controleurs sont comme des chefs d'orchestre.
@@ -95,7 +86,7 @@ Quand quelqu'un ouvre une page, il se passe ceci :
 
 1. le navigateur envoie une demande
 2. `public/index.php` attrape cette demande
-3. le routeur regarde le chemin
+3. `public/index.php` regarde le chemin
 4. il choisit le bon controleur
 5. le controleur demande des informations au modele
 6. le modele parle a Oracle
@@ -104,7 +95,7 @@ Quand quelqu'un ouvre une page, il se passe ceci :
 
 En image dans la tete :
 
-`Utilisateur -> Porte -> Routeur -> Controleur -> Modele -> Base de donnees -> Vue -> Utilisateur`
+`Utilisateur -> Porte -> Controleur -> Modele -> Base de donnees -> Vue -> Utilisateur`
 
 ## 4. La porte principale : `public/index.php`
 
@@ -114,11 +105,8 @@ C'est lui qui ouvre l'application.
 Il fait plusieurs choses :
 
 - il charge `app/bootstrap.php`
-- il cree le routeur
-- il charge les routes web
-- il charge les routes API
 - il lit l'URL demandee
-- il envoie la demande au routeur
+- il appelle la bonne methode de controleur
 
 En mots tres simples :
 
@@ -135,24 +123,6 @@ Avant que le projet fonctionne, il faut preparer des outils.
 - preparer des fonctions utiles
 
 Sans lui, l'application aurait du mal a demarrer correctement.
-
-## 6. Le policier de la route : `app/Core/Router.php`
-
-Le routeur compare :
-
-- la methode HTTP comme `GET` ou `POST`
-- le chemin comme `/catalog` ou `/login`
-
-Puis il choisit la bonne action.
-
-Exemples :
-
-- `GET /catalog` va vers `PageController::catalog`
-- `POST /login` va vers `AuthController::login`
-- `POST /api/requests` va vers `RequestController::store`
-
-Le routeur ne fait pas le travail metier.
-Il choisit juste la bonne porte interieure.
 
 ## 7. Le gardien de session : `app/Core/Auth.php`
 
@@ -285,8 +255,8 @@ Quand quelqu'un ajoute un livre :
 1. on verifie qu'il est connecte
 2. on lit les donnees du formulaire
 3. on verifie les champs obligatoires
-4. on verifie que la classe correspond au niveau
-5. on verifie que la matiere est autorisee
+4. on verifie que la classe correspond au niveau grace a la table `school_classes`
+5. on verifie que la matiere existe dans la table `subjects`
 6. on construit automatiquement un titre
 7. on enregistre le livre
 
@@ -414,43 +384,6 @@ Ces fichiers montrent le resultat final a l'ecran.
 Ils ne doivent pas contenir toute la logique metier.
 Le gros travail doit rester dans les controleurs et modeles.
 
-## 15. Les routes
-
-Il y a deux grandes familles.
-
-### Les routes web
-
-Dans `routes/web.php`, on trouve les pages normales du navigateur :
-
-- `/`
-- `/about`
-- `/catalog`
-- `/contact`
-- `/login`
-- `/register`
-- `/dashboard`
-- `/add-book`
-- `/admin`
-
-### Les routes API
-
-Dans `routes/api.php`, on trouve les routes JSON :
-
-- `/api/me`
-- `/api/register`
-- `/api/login`
-- `/api/logout`
-- `/api/books`
-- `/api/latest-books`
-- `/api/my-books`
-- `/api/stats`
-- `/api/requests`
-- `/api/my-requests`
-- `/api/received-requests`
-- `/api/accept-request`
-- `/api/reject-request`
-- `/api/admin-stats`
-
 ## 16. La base de donnees comme une boite a tiroirs
 
 Imagine une armoire avec plusieurs tiroirs.
@@ -462,6 +395,14 @@ Il garde les personnes.
 ### Tiroir `books`
 
 Il garde les livres.
+
+### Tiroir `subjects`
+
+Il garde la liste officielle des matieres.
+
+### Tiroir `school_classes`
+
+Il garde la liste officielle des classes et leur niveau.
 
 ### Tiroir `requests`
 
@@ -536,25 +477,23 @@ Cela rend la base plus intelligente.
 Lis les fichiers dans cet ordre :
 
 1. `public/index.php`
-2. `routes/web.php`
-3. `routes/api.php`
-4. `app/Core/Router.php`
-5. `app/Core/Auth.php`
-6. `app/Controllers/PageController.php`
-7. `app/Controllers/AuthController.php`
-8. `app/Controllers/BookController.php`
-9. `app/Controllers/RequestController.php`
-10. `app/Models/User.php`
-11. `app/Models/Book.php`
-12. `app/Models/BookRequest.php`
-13. `app/Models/Notification.php`
-14. `database/02_schema.sql`
+2. `app/Core/Auth.php`
+3. `app/Controllers/PageController.php`
+4. `app/Controllers/AuthController.php`
+5. `app/Controllers/BookController.php`
+6. `app/Controllers/RequestController.php`
+7. `app/Models/AcademicOption.php`
+8. `app/Models/User.php`
+9. `app/Models/Book.php`
+10. `app/Models/BookRequest.php`
+11. `app/Models/Notification.php`
+12. `database/02_schema.sql`
 
 ## 21. La phrase la plus importante
 
 Si tu dois retenir une seule idee, retiens celle-ci :
 
-> Le routeur choisit le bon controleur, le controleur demande au modele, le modele parle a Oracle, puis la vue montre le resultat.
+> `public/index.php` choisit le bon controleur, le controleur demande au modele, le modele parle a Oracle, puis la vue montre le resultat.
 
 ## 22. Resume ultra simple
 

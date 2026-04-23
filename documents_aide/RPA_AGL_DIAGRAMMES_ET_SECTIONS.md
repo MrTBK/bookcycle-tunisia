@@ -280,7 +280,7 @@ L'organisation du projet peut etre assimilee a une gestion de type **Scrum simpl
 
 Une fonctionnalite est consideree terminee si :
 - la logique metier est implemente
-- la route est accessible
+- l'action web est accessible
 - la vue fonctionne
 - les entrees sont validees
 - le rendu ne casse pas les autres pages
@@ -422,13 +422,14 @@ Le projet illustre bien la complementarite entre modules :
 
 - **AGL** : analyse, acteurs, cas d'utilisation, backlog, architecture
 - **SGBD** : schema Oracle, contraintes, vue, index, PL/SQL
-- **Programmation Web 2** : MVC, routes, pages, API, formulaires
+- **Programmation Web 2** : MVC, point d'entree unique, pages, formulaires, controleurs et validation
 - **RPA** : reingenierie et automatisation ciblee des processus
 
 Les evolutions recentes du projet confirment cette integration :
 - ajout des pages publiques dans l'application web
 - enrichissement du catalogue avec filtres structures
 - validation forte de la matiere et de la classe
+- chargement des matieres et classes depuis Oracle via `subjects` et `school_classes`
 - mise en coherence entre front, controleurs et modele Oracle
 
 ---

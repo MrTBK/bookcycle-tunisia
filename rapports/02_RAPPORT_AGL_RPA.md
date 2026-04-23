@@ -17,7 +17,7 @@ Le projet a suivi une logique de travail progressive :
 - identification des acteurs
 - modelisation du domaine
 - conception de la base Oracle
-- developpement de l'application MVC
+- developpement de l'application PHP
 - tests et corrections
 
 ### 1.2 Acteurs
@@ -101,12 +101,14 @@ Exemples de user stories du projet :
 
 ### 1.7 Architecture Logique
 
-Le projet s'appuie sur une architecture MVC :
+Le projet s'appuie sur une organisation simple des fichiers PHP :
 
 - les **controleurs** recoivent les requetes
 - les **modeles** manipulent les donnees
 - les **vues** affichent les pages
 - le **front controller** relie les URL aux actions
+
+Cette organisation peut etre presentee comme une forme simple de MVC, mais elle reste avant tout une separation pratique entre traitement, donnees et affichage.
 
 ### 1.8 Definition Of Done
 

@@ -67,6 +67,9 @@
                         <!-- Only admins see the admin link. -->
                         <a href="<?= htmlspecialchars($basePath) ?>/admin">Admin</a>
                     <?php endif; ?>
+                    <form class="nav-inline-form" method="post" action="<?= htmlspecialchars($basePath) ?>/logout">
+                        <button class="button button-secondary button-small" type="submit">Deconnexion</button>
+                    </form>
                 <?php else: ?>
                     <!-- Visitors who are not connected see login and registration links. -->
                     <a href="<?= htmlspecialchars($basePath) ?>/login">Connexion</a>

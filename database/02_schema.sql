@@ -1,4 +1,4 @@
-/*
+﻿/*
     Script 2 : creation du schema relationnel Oracle.
     A executer connecte en tant que BOOKCYCLE_APP.
 */
@@ -14,8 +14,6 @@
     - one reporting view
 */
 
--- TABLE USERS : stocke les differents acteurs de la plateforme.
--- This table stores the people who use the platform.
 CREATE TABLE users (
     id NUMBER PRIMARY KEY,
     name VARCHAR2(120) NOT NULL,
@@ -29,8 +27,26 @@ CREATE TABLE users (
     CONSTRAINT chk_users_active CHECK (is_active IN (0, 1))
 );
 
--- TABLE BOOKS : stocke les livres publies par les utilisateurs.
--- This table stores the books shared on the platform.
+CREATE TABLE subjects (
+    id NUMBER PRIMARY KEY,
+    name VARCHAR2(120) NOT NULL,
+    sort_order NUMBER DEFAULT 0 NOT NULL,
+    is_active NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT uq_subjects_name UNIQUE (name),
+    CONSTRAINT chk_subjects_active CHECK (is_active IN (0, 1))
+);
+
+CREATE TABLE school_classes (
+    id NUMBER PRIMARY KEY,
+    school_level VARCHAR2(40) NOT NULL,
+    class_name VARCHAR2(60) NOT NULL,
+    sort_order NUMBER DEFAULT 0 NOT NULL,
+    is_active NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT uq_school_classes UNIQUE (school_level, class_name),
+    CONSTRAINT chk_school_classes_level CHECK (school_level IN ('Primaire', 'College', 'Lycee')),
+    CONSTRAINT chk_school_classes_active CHECK (is_active IN (0, 1))
+);
+
 CREATE TABLE books (
     id NUMBER PRIMARY KEY,
     title VARCHAR2(180) NOT NULL,
@@ -50,8 +66,6 @@ CREATE TABLE books (
     CONSTRAINT chk_books_active CHECK (is_active IN (0, 1))
 );
 
--- TABLE REQUESTS : stocke les demandes de reservation des livres.
--- This table stores who asked for which book.
 CREATE TABLE requests (
     id NUMBER PRIMARY KEY,
     book_id NUMBER NOT NULL,
@@ -64,8 +78,6 @@ CREATE TABLE requests (
     CONSTRAINT chk_requests_status CHECK (status IN ('pending', 'accepted', 'rejected'))
 );
 
--- TABLE EXCHANGES : historise les echanges finalises.
--- This table stores completed exchanges for history and reporting.
 CREATE TABLE exchanges (
     id NUMBER PRIMARY KEY,
     book_id NUMBER NOT NULL,
@@ -78,8 +90,6 @@ CREATE TABLE exchanges (
     CONSTRAINT fk_exchanges_receiver FOREIGN KEY (receiver_id) REFERENCES users(id)
 );
 
--- TABLE NOTIFICATIONS : gere les notifications applicatives.
--- This table stores in-app messages shown to users.
 CREATE TABLE notifications (
     id NUMBER PRIMARY KEY,
     user_id NUMBER NOT NULL,
@@ -91,24 +101,40 @@ CREATE TABLE notifications (
     CONSTRAINT chk_notifications_read CHECK (is_read IN (0, 1))
 );
 
--- Sequences 11g pour remplacer les identity columns.
--- Dans Oracle XE / 11g, on utilise souvent une sequence + un trigger
--- pour generer automatiquement l'identifiant primaire.
--- Each sequence is like an automatic number generator.
 CREATE SEQUENCE seq_users START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE seq_subjects START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE seq_school_classes START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_books START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_requests START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_exchanges START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_notifications START WITH 1 INCREMENT BY 1 NOCACHE;
 
--- Triggers d'auto-incrementation compatibles Oracle 11g XE.
--- Each trigger takes the next number from its sequence before an INSERT.
 CREATE OR REPLACE TRIGGER trg_users_pk
 BEFORE INSERT ON users
 FOR EACH ROW
 BEGIN
     IF :NEW.id IS NULL THEN
         SELECT seq_users.NEXTVAL INTO :NEW.id FROM dual;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_subjects_pk
+BEFORE INSERT ON subjects
+FOR EACH ROW
+BEGIN
+    IF :NEW.id IS NULL THEN
+        SELECT seq_subjects.NEXTVAL INTO :NEW.id FROM dual;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_school_classes_pk
+BEFORE INSERT ON school_classes
+FOR EACH ROW
+BEGIN
+    IF :NEW.id IS NULL THEN
+        SELECT seq_school_classes.NEXTVAL INTO :NEW.id FROM dual;
     END IF;
 END;
 /
@@ -153,8 +179,8 @@ BEGIN
 END;
 /
 
--- INDEX utiles pour accelerer les recherches courantes.
--- Indexes make frequent searches faster.
+CREATE INDEX idx_subjects_active ON subjects(is_active, sort_order);
+CREATE INDEX idx_school_classes_level ON school_classes(school_level, sort_order);
 CREATE INDEX idx_books_owner ON books(owner_id);
 CREATE INDEX idx_books_subject ON books(subject);
 CREATE INDEX idx_books_level ON books(school_level);
@@ -162,9 +188,6 @@ CREATE INDEX idx_requests_book ON requests(book_id);
 CREATE INDEX idx_requests_requester ON requests(requester_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 
--- Vue utile pour le reporting et les requetes multi-tables.
--- Une vue est une requete enregistree que l'on peut reutiliser comme table logique.
--- This view combines book data and owner data into one easier reporting result.
 CREATE OR REPLACE VIEW v_book_overview AS
 SELECT
     b.id AS book_id,
@@ -181,11 +204,9 @@ SELECT
 FROM books b
 JOIN users u ON u.id = b.owner_id;
 
-/*
-    Privileges donnes a l'utilisateur de reporting.
-*/
--- The reporting user can read data but not modify it.
 GRANT SELECT ON users TO bookcycle_report;
+GRANT SELECT ON subjects TO bookcycle_report;
+GRANT SELECT ON school_classes TO bookcycle_report;
 GRANT SELECT ON books TO bookcycle_report;
 GRANT SELECT ON requests TO bookcycle_report;
 GRANT SELECT ON exchanges TO bookcycle_report;

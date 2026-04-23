@@ -84,6 +84,14 @@ textarea {
     flex-wrap: wrap;
 }
 
+.nav-inline-form {
+    margin: 0;
+}
+
+.nav-inline-form .button {
+    white-space: nowrap;
+}
+
 .main-nav > a,
 .nav-dropdown summary {
     display: inline-flex;

@@ -108,10 +108,11 @@ SELECT status, COUNT(*) AS total_requests
 FROM requests
 GROUP BY status;
 
--- 18. Rapport financier simple : economie estimee a 25 DT par echange.
+-- 18. Rapport financier : economie estimee basee sur le prix des livres echanges.
 SELECT COUNT(*) AS total_exchanges,
-       COUNT(*) * 25 AS money_saved_dt
-FROM exchanges;
+       NVL(SUM(b.estimated_price), 0) AS money_saved_dt
+FROM exchanges e
+JOIN books b ON b.id = e.book_id;
 
 -- ROLLBACK annule les modifications de demonstration pour pouvoir
 -- rejouer le script pendant le TP ou la soutenance.

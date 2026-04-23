@@ -33,10 +33,7 @@ class RequestController extends Controller
             $this->respondError('Authentification requise.', '/login', 401);
             return;
         }
-        $payload = json_decode((string) file_get_contents('php://input'), true);
-        if (!is_array($payload)) {
-            $payload = $_POST;
-        }
+        $payload = $_POST;
 
         //a9ra el id mta3 el book li 7ab yotlbou
         $bookId = (int) ($payload['bookId'] ?? 0);
@@ -68,35 +65,8 @@ class RequestController extends Controller
             (string) (Auth::user()['name'] ?? 'Utilisateur')
         );
 
-        if ($this->isApiRequest()) {
-            $this->json(['success' => true]);
-            return;
-        }
-
         $_SESSION['flash_success'] = 'Demande envoyee avec succes.';
         $this->redirect('/dashboard');
-    }
-
-    public function mine()
-    {
-        //raja3 el demandes li ba3thom el user el connected
-        if (!Auth::check()) {
-            $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
-            return;
-        }
-
-        $this->json($this->requests->mine((int) Auth::id()));
-    }
-
-    public function received()
-    {
-        //raja3 el demandes li waslou lel moula lekteb 3la ktbou
-        if (!Auth::check()) {
-            $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
-            return;
-        }
-
-        $this->json($this->requests->received((int) Auth::id()));
     }
 
     public function accept()
@@ -109,10 +79,7 @@ class RequestController extends Controller
 
         //a9ra el id mta3 el demande li 7ab y9balha w el meeting note eli 7ab y7ottha lel demandeur
         $requestId = (int) ($_GET['id'] ?? 0);
-        $payload = json_decode((string) file_get_contents('php://input'), true);
-        if (!is_array($payload)) {
-            $payload = $_POST;
-        }
+        $payload = $_POST;
         $meetingNote = trim((string) ($payload['meetingNote'] ?? ''));
         $request = $this->requests->find($requestId);
 
@@ -152,11 +119,6 @@ class RequestController extends Controller
                 . $requester['name'] . ' | Email: ' . $requester['email'] . ' | Telephone: ' . $requester['phone'],
                 (string) $requester['name']
             );
-        }
-
-        if ($this->isApiRequest()) {
-            $this->json(['success' => true]);
-            return;
         }
 
         $contactSummary = '';
@@ -201,33 +163,12 @@ class RequestController extends Controller
             (string) (Auth::user()['name'] ?? 'Utilisateur')
         );
 
-        if ($this->isApiRequest()) {
-            $this->json(['success' => true]);
-            return;
-        }
-
         $_SESSION['flash_success'] = 'Demande refusee.';
         $this->redirect('/dashboard');
     }
 
-    private function isApiRequest()
-    {
-        $requestUri = '';
-
-        if (isset($_SERVER['REQUEST_URI'])) {
-            $requestUri = $_SERVER['REQUEST_URI'];
-        }
-
-        return str_contains($requestUri, '/api/');
-    }
-
     private function respondError($message, $redirectPath, $statusCode)
     {
-        if ($this->isApiRequest()) {
-            $this->json(['success' => false, 'error' => $message], $statusCode);
-            return;
-        }
-
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);
     }

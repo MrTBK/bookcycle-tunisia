@@ -1,17 +1,15 @@
-<!-- This page lets a connected user add one new book to the platform. -->
+﻿<!-- This page lets a connected user add one new book to the platform. -->
 <section class="section">
     <div class="container form-page">
         <form class="panel wide-form" id="add-book-form" method="post" action="<?= htmlspecialchars($basePath) ?>/add-book">
             <p class="eyebrow">Don de livre</p>
             <h1>Ajouter un livre</h1>
-            <!-- Flash messages appear after redirects when something succeeds or fails. -->
             <?php if (!empty($flashError)): ?>
                 <div class="panel" style="border-color:#c0392b;color:#8e2b23;"><?= htmlspecialchars($flashError) ?></div>
             <?php endif; ?>
             <?php if (!empty($flashSuccess)): ?>
                 <div class="panel" style="border-color:#2d7a46;color:#1f5c33;"><?= htmlspecialchars($flashSuccess) ?></div>
             <?php endif; ?>
-            <!-- The form uses guided dropdowns so the user chooses valid values. -->
             <div class="form-grid">
                 <div class="field">
                     <label for="book-subject">Matiere</label>
@@ -27,9 +25,9 @@
                 <div class="field">
                     <label for="book-level">Niveau</label>
                     <select id="book-level" name="level" required>
-                        <option value="Primaire">Primaire</option>
-                        <option value="College">College</option>
-                        <option value="Lycee">Lycee</option>
+                        <?php foreach (($levelOptions ?? []) as $levelOption): ?>
+                            <option value="<?= htmlspecialchars($levelOption) ?>"><?= htmlspecialchars($levelOption) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="field">
@@ -66,9 +64,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Start the general add-book page behavior from app.js.
-    BookCycle.initAddBookPage();
-
     const levelSelect = document.getElementById('book-level');
     const classSelect = document.getElementById('book-class');
 
@@ -76,20 +71,16 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Keep all class options in memory so we can hide/show them when the level changes.
     const allOptions = Array.from(classSelect.querySelectorAll('option'));
 
     const syncClasses = () => {
-        // Read the chosen level and current class selection.
         const selectedLevel = levelSelect.value;
         const currentValue = classSelect.value;
 
-        // Hide classes that do not belong to the selected level.
         allOptions.forEach((option) => {
             option.hidden = option.dataset.level !== selectedLevel;
         });
 
-        // If the currently selected class no longer fits, move to the first visible one.
         const visibleOptions = allOptions.filter((option) => option.dataset.level === selectedLevel);
         const stillVisible = visibleOptions.some((option) => option.value === currentValue);
 
