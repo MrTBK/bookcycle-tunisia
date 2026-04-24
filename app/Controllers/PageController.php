@@ -53,6 +53,7 @@ class PageController extends Controller
             'status' => $_GET['status'] ?? null,
             'id' => $_GET['id'] ?? null,
         ];
+        $classOptions = $this->academicOptions->classesByLevel();
 
         $this->render('catalog', [
             'pageTitle' => 'Catalogue',
@@ -60,8 +61,10 @@ class PageController extends Controller
             'catalogBooks' => (new Book())->all($filters),
             'selectedBook' => !empty($filters['id']) ? (new Book())->find((int) $filters['id']) : null,
             'levelOptions' => $this->academicOptions->levels(),
-            'classOptions' => $this->academicOptions->classesByLevel(),
-            'subjectOptions' => $this->academicOptions->subjects(),
+            'classOptions' => $classOptions,
+            'subjectOptions' => $this->academicOptions->subjects($filters['level'] ?? null, $filters['class_name'] ?? null),
+            'allSubjectOptions' => $this->academicOptions->subjects(),
+            'subjectOptionsByClass' => $this->academicOptions->classSubjectsByLevel(),
         ]);
     }
 
@@ -152,14 +155,21 @@ class PageController extends Controller
             exit;
         }
 
+        $levelOptions = $this->academicOptions->levels();
+        $classOptions = $this->academicOptions->classesByLevel();
+        $defaultLevel = isset($levelOptions[0]) ? $levelOptions[0] : null;
+        $defaultClass = ($defaultLevel !== null && isset($classOptions[$defaultLevel][0])) ? $classOptions[$defaultLevel][0] : null;
+
         $this->render('add-book', [
             'pageTitle' => 'Ajouter un livre',
             'currentUser' => Auth::user(),
             'flashError' => $this->pullFlash('flash_error'),
             'flashSuccess' => $this->pullFlash('flash_success'),
-            'levelOptions' => $this->academicOptions->levels(),
-            'classOptions' => $this->academicOptions->classesByLevel(),
-            'subjectOptions' => $this->academicOptions->subjects(),
+            'levelOptions' => $levelOptions,
+            'classOptions' => $classOptions,
+            'subjectOptions' => $this->academicOptions->subjects($defaultLevel, $defaultClass),
+            'allSubjectOptions' => $this->academicOptions->subjects(),
+            'subjectOptionsByClass' => $this->academicOptions->classSubjectsByLevel(),
         ]);
     }
 

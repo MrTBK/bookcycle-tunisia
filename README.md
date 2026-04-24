@@ -98,6 +98,7 @@ Le schema Oracle principal contient :
 - `users`
 - `subjects`
 - `school_classes`
+- `class_subjects`
 - `books`
 - `requests`
 - `exchanges`
@@ -115,6 +116,7 @@ Les listes academiques ne sont plus codees en dur dans PHP :
 
 - les matieres sont stockees dans `subjects`
 - les niveaux et classes sont stockes dans `school_classes`
+- les correspondances classe -> matieres sont stockees dans `class_subjects`
 - les formulaires et la validation lisent maintenant ces tables
 
 ## Lancement Local

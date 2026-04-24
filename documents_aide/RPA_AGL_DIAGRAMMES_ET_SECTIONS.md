@@ -91,21 +91,27 @@ Ce choix est justifie par :
 
 ### 1.6 Processus As-Is
 
+Ici, **As-Is** designe la situation avant l'existence de la plateforme BookCycle Tunisia.
+
 ```mermaid
 flowchart TD
-    A["Le demandeur envoie une demande"] --> B["Le proprietaire consulte son dashboard"]
-    B --> C["Le proprietaire analyse les demandes recues"]
-    C --> D["Il decide manuellement d'accepter ou refuser"]
-    D --> E["Le statut de la demande est mis a jour"]
-    E --> F["Le livre passe a reserved si besoin"]
-    F --> G["Des notifications sont envoyees"]
+    A["Demandeur cherche un livre"] --> B["Contact manuel avec un proprietaire potentiel"]
+    B --> C["Echange par telephone, message ou reseaux sociaux"]
+    C --> D["Le proprietaire verifie manuellement la disponibilite"]
+    D --> E["Analyse manuelle sans priorisation"]
+    E --> G{"Decision"}
+    G -->|Accepter| H["Accord manuel entre les deux parties"]
+    G -->|Refuser| I["Refus communique manuellement"]
+    H --> J["Fixer un rendez-vous hors systeme"]
+    I --> K["Informer manuellement le demandeur"]
+    J --> L["Echange du livre sans suivi centralise"]
 ```
 
 ### 1.7 Analyse SWOT As-Is
 
 #### Forces
 - processus facile a comprendre
-- application deja fonctionnelle
+- peu de dependance technique
 - logique metier centralisee
 
 #### Faiblesses
@@ -129,8 +135,8 @@ La methodologie retenue est une :
 - **refonte progressive avec forte automatisation ciblee**
 
 Cette approche est adaptee car :
-- le processus existe deja et fonctionne
-- il faut l'ameliorer sans casser l'application
+- le processus existe deja a l'etat manuel
+- il faut l'ameliorer sans casser la simplicite du service
 - un projet academique doit rester maitrisable
 
 ### 1.9 Solution To-Be
@@ -154,18 +160,23 @@ La solution cible proposee combine :
 
 ### 1.10 Diagramme To-Be
 
+Ici, **To-Be** designe la solution cible : la plateforme BookCycle Tunisia.
+
 ```mermaid
 flowchart TD
-    A["Nouvelle demande"] --> B["Workflow de traitement"]
+    A["Nouvelle demande"] --> B["Workflow applicatif"]
     B --> C["Verification des regles metier"]
-    B --> D["Priorisation automatique"]
-    C --> E["Interface proprietaire"]
-    D --> E
-    E --> F{"Decision humaine"}
-    F -->|Accepter| G["RPA : mise a jour + notifications + rejet des autres demandes"]
-    F -->|Refuser| H["RPA : notification de refus"]
-    G --> I["Statistiques et suivi"]
-    H --> I
+    B --> D["Calcul automatique de priorite"]
+    D --> E["File d'attente triee pour le proprietaire"]
+    E --> F["Relance automatique si delai depasse"]
+    C --> G["Dashboard proprietaire avec suggestion"]
+    F --> G
+    G --> H{"Decision humaine"}
+    H -->|Accepter| I["Automatiser : accepter + rejeter les autres + reserver le livre"]
+    H -->|Refuser| J["Automatiser : refuser + notifier"]
+    I --> K["Notifications et suivi SLA"]
+    J --> K
+    K --> L["Reporting admin et KPI"]
 ```
 
 ### 1.11 Gains Attendus
@@ -429,7 +440,7 @@ Les evolutions recentes du projet confirment cette integration :
 - ajout des pages publiques dans l'application web
 - enrichissement du catalogue avec filtres structures
 - validation forte de la matiere et de la classe
-- chargement des matieres et classes depuis Oracle via `subjects` et `school_classes`
+- chargement des matieres et classes depuis Oracle via `subjects`, `school_classes` et `class_subjects`
 - mise en coherence entre front, controleurs et modele Oracle
 
 ---

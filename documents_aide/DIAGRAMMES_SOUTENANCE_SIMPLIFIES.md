@@ -1,6 +1,6 @@
 # Diagrammes Simplifies Pour La Soutenance
 
-Ce fichier regroupe 5 diagrammes simples et propres a montrer au professeur.
+Ce fichier regroupe 6 diagrammes simples et propres a montrer au professeur.
 
 ## 1. Diagramme Des Cas D'utilisation
 
@@ -25,67 +25,73 @@ flowchart LR
     A --> UC15["Envoyer des notifications"]
 ```
 
-## 2. Diagramme De Classes Simplifie
+## 2. Diagramme De Classes De La Plateforme (To-Be)
 
 ```mermaid
 classDiagram
-    class User {
-        +id
-        +name
-        +email
-        +password
-        +phone
-        +role
-        +is_active
-    }
+    class Controller
+    class PageController
+    class AuthController
+    class BookController
+    class RequestController
+    class AdminController
+    class AcademicOption
+    class User
+    class Book
+    class BookRequest
+    class Notification
+    class Database
 
-    class Book {
-        +id
-        +title
-        +subject
-        +class_name
-        +school_level
-        +condition_label
-        +estimated_price
-        +status
-        +owner_id
-    }
+    Controller <|-- PageController
+    Controller <|-- AuthController
+    Controller <|-- BookController
+    Controller <|-- RequestController
+    Controller <|-- AdminController
 
-    class BookRequest {
-        +id
-        +book_id
-        +requester_id
-        +status
-        +meeting_note
-        +request_date
-    }
+    PageController --> AcademicOption
+    PageController --> Book
+    PageController --> BookRequest
+    PageController --> Notification
+    PageController --> User
+    AuthController --> User
+    BookController --> Book
+    BookController --> AcademicOption
+    RequestController --> Book
+    RequestController --> BookRequest
+    RequestController --> Notification
+    RequestController --> User
+    AdminController --> User
+    AdminController --> Book
+    AdminController --> BookRequest
+    AdminController --> Notification
 
-    class Notification {
-        +id
-        +user_id
-        +sender_name
-        +message
-        +is_read
-        +created_at
-    }
-
-    class Exchange {
-        +id
-        +book_id
-        +owner_id
-        +receiver_id
-        +exchange_date
-        +status
-    }
-
-    User "1" --> "0..*" Book : publie
-    User "1" --> "0..*" BookRequest : envoie
-    User "1" --> "0..*" Notification : recoit
-    Book "1" --> "0..*" BookRequest : concerne
-    Book "1" --> "0..1" Exchange : devient
+    AcademicOption --> Database
+    User --> Database
+    Book --> Database
+    BookRequest --> Database
+    Notification --> Database
 ```
 
-## 3. Diagramme De Sequence - Envoi D'une Demande
+## 3. Diagramme As-Is / To-Be
+
+```mermaid
+flowchart LR
+    subgraph A["As-Is : avant la plateforme"]
+        A1["Recherche manuelle de livres"] --> A2["Contact direct entre personnes"]
+        A2 --> A3["Traitement manuel des demandes"]
+        A3 --> A4["Pas de suivi centralise"]
+    end
+
+    subgraph B["To-Be : BookCycle Tunisia"]
+        B1["Catalogue en ligne"] --> B2["Demande depuis la plateforme"]
+        B2 --> B3["Dashboard proprietaire"]
+        B3 --> B4["Notifications et suivi"]
+    end
+
+    A4 --> B1
+```
+
+## 4. Diagramme De Sequence - Envoi D'une Demande
 
 ```mermaid
 sequenceDiagram
@@ -114,7 +120,7 @@ sequenceDiagram
     RC-->>U: Redirection vers dashboard
 ```
 
-## 4. Diagramme De Sequence - Acceptation D'une Demande
+## 5. Diagramme De Sequence - Acceptation D'une Demande
 
 ```mermaid
 sequenceDiagram
@@ -147,7 +153,7 @@ sequenceDiagram
     RC-->>P: Message de succes
 ```
 
-## 5. Diagramme Entite-Relation
+## 6. Diagramme Entite-Relation
 
 ```mermaid
 erDiagram
@@ -205,6 +211,7 @@ erDiagram
 ## Conseils De Presentation
 
 - montre d'abord le diagramme des cas d'utilisation
-- puis le diagramme de classes
+- puis le diagramme de classes de la plateforme
+- montre le diagramme `As-Is / To-Be` seulement si on te demande la partie BPR
 - ensuite un seul diagramme de sequence si le temps est court
 - termine par le diagramme entite-relation pour relier la partie web a la base

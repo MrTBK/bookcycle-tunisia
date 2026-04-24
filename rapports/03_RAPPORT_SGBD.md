@@ -28,7 +28,7 @@ Les avantages principaux dans ce projet sont :
 
 ## 2. Schema Relationnel
 
-Le schema comporte des tables metier ainsi que des tables de reference pour les choix académiques.
+Le schema comporte des tables metier ainsi que des tables de reference pour les choix academiques.
 
 ### Table `USERS`
 
@@ -59,6 +59,16 @@ Cette table centralise les matieres disponibles dans les formulaires et dans les
 - `is_active`
 
 Cette table centralise les classes autorisees et leur rattachement au niveau scolaire.
+
+### Table `CLASS_SUBJECTS`
+
+- `id`
+- `class_id`
+- `subject_id`
+- `sort_order`
+- `is_active`
+
+Cette table d'association indique quelles matieres sont autorisees pour chaque classe.
 
 ### Table `BOOKS`
 
@@ -116,8 +126,10 @@ Les relations principales sont :
 - `exchanges.owner_id -> users.id`
 - `exchanges.receiver_id -> users.id`
 - `notifications.user_id -> users.id`
+- `class_subjects.class_id -> school_classes.id`
+- `class_subjects.subject_id -> subjects.id`
 
-Les tables `subjects` et `school_classes` sont des tables de reference consultees par l'application pour alimenter les formulaires et valider les donnees saisies.
+Les tables `subjects`, `school_classes` et `class_subjects` sont des tables de reference consultees par l'application pour alimenter les formulaires et valider les donnees saisies.
 
 Le schema contient aussi :
 
@@ -125,6 +137,7 @@ Le schema contient aussi :
 - des cles etrangeres
 - des contraintes `CHECK`
 - une contrainte `UNIQUE` sur `users.email`
+- une contrainte `UNIQUE` sur le couple `class_id, subject_id` dans `class_subjects`
 
 Exemples de valeurs controlees :
 
@@ -142,6 +155,7 @@ Pour rester compatible avec Oracle XE, les identifiants sont generes a l'aide de
 - `seq_users` / `trg_users_pk`
 - `seq_subjects` / `trg_subjects_pk`
 - `seq_school_classes` / `trg_school_classes_pk`
+- `seq_class_subjects` / `trg_class_subjects_pk`
 - `seq_books` / `trg_books_pk`
 - `seq_requests` / `trg_requests_pk`
 - `seq_exchanges` / `trg_exchanges_pk`
@@ -161,6 +175,8 @@ Les index presents dans le schema sont :
 
 - `idx_subjects_active`
 - `idx_school_classes_level`
+- `idx_class_subjects_class`
+- `idx_class_subjects_subject`
 - `idx_books_owner`
 - `idx_books_subject`
 - `idx_books_level`

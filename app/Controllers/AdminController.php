@@ -26,6 +26,25 @@ class AdminController extends Controller
         $this->notifications = new Notification();
     }
 
+    public function stats()
+    {
+        // ken el admin ira el nwemer
+        if (!Auth::isAdmin()) {
+            $this->json(['success' => false, 'error' => 'Acces administrateur requis.'], 403);
+            return;
+        }
+
+        // traja3ek el dashbored mta3 el admin w t3tik les stats mta3 el platform
+        $this->json([
+            'totalUsers' => $this->users->countAll(),
+            'totalBooks' => $this->books->countActive(),
+            'totalExchanges' => $this->requests->countAccepted(),
+            'inactiveBooks' => $this->books->countInactive(),
+            'booksByLevel' => $this->books->countByLevel(),
+            'mostRequestedSubjects' => $this->books->mostRequestedSubjects(5),
+        ]);
+    }
+
     public function toggleUser()
     {
         //thabet kenou admin

@@ -113,12 +113,45 @@
 document.addEventListener('DOMContentLoaded', function () {
     const levelSelect = document.getElementById('filter-level');
     const classSelect = document.getElementById('filter-class');
+    const subjectSelect = document.getElementById('filter-subject');
+    const subjectMap = <?= json_encode($subjectOptionsByClass ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const allSubjects = <?= json_encode($allSubjectOptions ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
-    if (!levelSelect || !classSelect) {
+    if (!levelSelect || !classSelect || !subjectSelect) {
         return;
     }
 
     const allOptions = Array.from(classSelect.querySelectorAll('option'));
+    const subjectPlaceholder = '<option value=\"\">Toutes</option>';
+
+    const subjectsForSelection = () => {
+        const selectedOption = classSelect.options[classSelect.selectedIndex] || null;
+        const inferredLevel = selectedOption && selectedOption.dataset.level ? selectedOption.dataset.level : '';
+        const selectedLevel = levelSelect.value || inferredLevel;
+        const selectedClass = classSelect.value;
+
+        if (selectedLevel && selectedClass && subjectMap[selectedLevel] && subjectMap[selectedLevel][selectedClass]) {
+            return subjectMap[selectedLevel][selectedClass];
+        }
+
+        if (selectedLevel && subjectMap[selectedLevel]) {
+            const mergedSubjects = [];
+
+            Object.values(subjectMap[selectedLevel]).forEach((classSubjects) => {
+                classSubjects.forEach((subject) => {
+                    if (!mergedSubjects.includes(subject)) {
+                        mergedSubjects.push(subject);
+                    }
+                });
+            });
+
+            if (mergedSubjects.length > 0) {
+                return mergedSubjects;
+            }
+        }
+
+        return allSubjects;
+    };
 
     const syncClasses = () => {
         const selectedLevel = levelSelect.value;
@@ -141,7 +174,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    levelSelect.addEventListener('change', syncClasses);
+    const syncSubjects = () => {
+        const currentValue = subjectSelect.value;
+        const availableSubjects = subjectsForSelection();
+
+        subjectSelect.innerHTML = subjectPlaceholder;
+
+        availableSubjects.forEach((subject) => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+
+        if (availableSubjects.includes(currentValue)) {
+            subjectSelect.value = currentValue;
+        }
+    };
+
+    levelSelect.addEventListener('change', function () {
+        syncClasses();
+        syncSubjects();
+    });
+    classSelect.addEventListener('change', syncSubjects);
     syncClasses();
+    syncSubjects();
 });
 </script>

@@ -20,6 +20,24 @@ class BookController extends Controller
         $this->academicOptions = new AcademicOption();
     }
 
+    public function latest()
+    {
+        $this->json($this->books->latest(4));
+    }
+
+    public function index()
+    {
+        $filters = [
+            'level' => $_GET['level'] ?? null,
+            'class_name' => $_GET['class_name'] ?? null,
+            'subject' => $_GET['subject'] ?? null,
+            'status' => $_GET['status'] ?? null,
+            'id' => $_GET['id'] ?? null,
+        ];
+
+        $this->json($this->books->all($filters));
+    }
+
     public function store()
     {
         if (!Auth::check()) {
@@ -27,7 +45,10 @@ class BookController extends Controller
             return;
         }
 
-        $payload = $_POST;
+        $payload = json_decode((string) file_get_contents('php://input'), true);
+        if (!is_array($payload)) {
+            $payload = $_POST;
+        }
 
         foreach (['subject', 'level', 'class_name', 'condition', 'estimated_price'] as $field) {
             if (empty($payload[$field])) {
@@ -41,22 +62,62 @@ class BookController extends Controller
             return;
         }
 
-        if (!$this->isValidSubject((string) $payload['subject'])) {
-            $this->respondError('Veuillez choisir une matiere valide dans la liste.', '/add-book', 422);
+        if (!$this->isValidSubject((string) $payload['level'], (string) $payload['class_name'], (string) $payload['subject'])) {
+            $this->respondError('La matiere selectionnee ne correspond pas a la classe choisie.', '/add-book', 422);
             return;
         }
 
-        $this->books->create(array_merge($payload, [
+        $bookId = $this->books->create(array_merge($payload, [
             'title' => $this->buildBookTitle($payload),
             'owner_id' => Auth::id(),
         ]));
+
+        if ($this->isApiRequest()) {
+            $this->json(['success' => true, 'bookId' => $bookId]);
+            return;
+        }
 
         $_SESSION['flash_success'] = 'Livre ajoute avec succes.';
         $this->redirect('/dashboard');
     }
 
+    public function mine()
+    {
+        if (!Auth::check()) {
+            $this->json(['success' => false, 'error' => 'Authentification requise.'], 401);
+            return;
+        }
+
+        $this->json($this->books->mine((int) Auth::id()));
+    }
+
+    public function stats()
+    {
+        $this->json([
+            'totalBooks' => $this->books->countActive(),
+            'totalExchanges' => $this->requests->countAccepted(),
+            'moneySaved' => $this->requests->sumAcceptedValueGlobal(),
+        ]);
+    }
+
+    private function isApiRequest()
+    {
+        $requestUri = '';
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $requestUri = $_SERVER['REQUEST_URI'];
+        }
+
+        return str_contains($requestUri, '/api/');
+    }
+
     private function respondError($message, $redirectPath, $statusCode)
     {
+        if ($this->isApiRequest()) {
+            $this->json(['success' => false, 'error' => $message], $statusCode);
+            return;
+        }
+
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);
     }
@@ -86,8 +147,8 @@ class BookController extends Controller
         return $this->academicOptions->hasClassForLevel($level, $className);
     }
 
-    private function isValidSubject($subject)
+    private function isValidSubject($level, $className, $subject)
     {
-        return $this->academicOptions->hasSubject($subject);
+        return $this->academicOptions->hasSubjectForClass($level, $className, $subject);
     }
 }

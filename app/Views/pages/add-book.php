@@ -12,17 +12,6 @@
             <?php endif; ?>
             <div class="form-grid">
                 <div class="field">
-                    <label for="book-subject">Matiere</label>
-                    <select id="book-subject" name="subject" required>
-                        <option value="">Choisir une matiere</option>
-                        <?php foreach (($subjectOptions ?? []) as $subjectOption): ?>
-                            <option value="<?= htmlspecialchars($subjectOption) ?>">
-                                <?= htmlspecialchars($subjectOption) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="field">
                     <label for="book-level">Niveau</label>
                     <select id="book-level" name="level" required>
                         <?php foreach (($levelOptions ?? []) as $levelOption): ?>
@@ -41,6 +30,17 @@
                                     </option>
                                 <?php endforeach; ?>
                             </optgroup>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="book-subject">Matiere</label>
+                    <select id="book-subject" name="subject" required>
+                        <option value="">Choisir une matiere</option>
+                        <?php foreach (($subjectOptions ?? []) as $subjectOption): ?>
+                            <option value="<?= htmlspecialchars($subjectOption) ?>">
+                                <?= htmlspecialchars($subjectOption) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -66,12 +66,43 @@
 document.addEventListener('DOMContentLoaded', function () {
     const levelSelect = document.getElementById('book-level');
     const classSelect = document.getElementById('book-class');
+    const subjectSelect = document.getElementById('book-subject');
+    const subjectMap = <?= json_encode($subjectOptionsByClass ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const allSubjects = <?= json_encode($allSubjectOptions ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
-    if (!levelSelect || !classSelect) {
+    if (!levelSelect || !classSelect || !subjectSelect) {
         return;
     }
 
     const allOptions = Array.from(classSelect.querySelectorAll('option'));
+    const subjectPlaceholder = '<option value="">Choisir une matiere</option>';
+
+    const subjectsForSelection = () => {
+        const selectedLevel = levelSelect.value;
+        const selectedClass = classSelect.value;
+
+        if (selectedLevel && selectedClass && subjectMap[selectedLevel] && subjectMap[selectedLevel][selectedClass]) {
+            return subjectMap[selectedLevel][selectedClass];
+        }
+
+        if (selectedLevel && subjectMap[selectedLevel]) {
+            const mergedSubjects = [];
+
+            Object.values(subjectMap[selectedLevel]).forEach((classSubjects) => {
+                classSubjects.forEach((subject) => {
+                    if (!mergedSubjects.includes(subject)) {
+                        mergedSubjects.push(subject);
+                    }
+                });
+            });
+
+            if (mergedSubjects.length > 0) {
+                return mergedSubjects;
+            }
+        }
+
+        return allSubjects;
+    };
 
     const syncClasses = () => {
         const selectedLevel = levelSelect.value;
@@ -89,7 +120,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    levelSelect.addEventListener('change', syncClasses);
+    const syncSubjects = () => {
+        const currentValue = subjectSelect.value;
+        const availableSubjects = subjectsForSelection();
+
+        subjectSelect.innerHTML = subjectPlaceholder;
+
+        availableSubjects.forEach((subject) => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+
+        if (availableSubjects.includes(currentValue)) {
+            subjectSelect.value = currentValue;
+        }
+    };
+
+    levelSelect.addEventListener('change', function () {
+        syncClasses();
+        syncSubjects();
+    });
+    classSelect.addEventListener('change', syncSubjects);
     syncClasses();
+    syncSubjects();
 });
 </script>

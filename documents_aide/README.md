@@ -13,6 +13,6 @@ Ce dossier contient des documents utiles pour comprendre le projet, reviser, et 
 - `DIAGRAMMES_PROJET_COMPLETS.md`
   Nouveau fichier avec des diagrammes Mermaid utiles pour comprendre et presenter le projet.
 - `DIAGRAMMES_SOUTENANCE_SIMPLIFIES.md`
-  Version courte avec 5 diagrammes propres a montrer pendant la soutenance.
+  Version courte avec les diagrammes les plus faciles a presenter a l'oral.
 
 Ce dossier est separe de `rapports/` pour garder les rapports finals propres.

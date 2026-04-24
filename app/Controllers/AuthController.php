@@ -36,7 +36,11 @@ class AuthController extends Controller
         }
 
         //step 4:  9ayed el new user fl database
-        $this->users->create($payload);
+        $id = $this->users->create($payload);
+        if ($this->isApiRequest()) {
+            $this->json(['success' => true, 'userId' => $id]);
+            return;
+        }
 
         // el message hedha bech iji fi login page ken el inscription reussie
         $_SESSION['flash_success'] = 'Inscription reussie. Vous pouvez maintenant vous connecter.';
@@ -76,6 +80,14 @@ class AuthController extends Controller
         //9ayed el user fl session bech el app t3rf eli mconnecti w t3tih les droits mta3ou
         Auth::login($user);
 
+        if ($this->isApiRequest()) {
+            $this->json([
+                'success' => true,
+                'user' => Auth::user(),
+            ]);
+            return;
+        }
+
         $this->redirect('/dashboard');
     }
 
@@ -84,16 +96,54 @@ class AuthController extends Controller
         // na7i el user mel session bech ydisconnecti
         Auth::logout();
 
+        if ($this->isApiRequest()) {
+            $this->json(['success' => true]);
+            return;
+        }
+
         $this->redirect('/');
+    }
+
+    public function me()
+    {
+
+        // hedhi endpoint bech t3awd 3la client chkon ely mconnecti, w t9oulo ken mconnecti chnoua ismou w email mt3ou
+        $this->json([
+            'loggedIn' => Auth::check(),
+            'user' => Auth::user(),
+        ]);
     }
 
     private function requestData()
     {
+        $raw = file_get_contents('php://input');
+        if ($raw) {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
         return $_POST;
+    }
+
+    private function isApiRequest()
+    {
+        $requestUri = '';
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $requestUri = $_SERVER['REQUEST_URI'];
+        }
+
+        return str_contains($requestUri, '/api/');
     }
 
     private function respondError($message, $redirectPath, $statusCode)
     {
+        if ($this->isApiRequest()) {
+            $this->json(['success' => false, 'error' => $message], $statusCode);
+            return;
+        }
+
         // browser yestha9 flash msg
         $_SESSION['flash_error'] = $message;
         $this->redirect($redirectPath);

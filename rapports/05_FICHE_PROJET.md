@@ -46,14 +46,12 @@ Le projet vise a mettre en relation les proprietaires de livres et les demandeur
 
 ## Architecture
 
-Le projet est organise en trois parties simples :
+Le projet suit une architecture MVC :
 
-- `Controllers` pour traiter les actions
-- `Models` pour lire et ecrire les donnees
-- `Views` pour afficher les pages
+- `Controllers`
+- `Models`
+- `Views`
 - `public/index.php`
-
-Cette organisation reste proche des notions de base du cours PHP : pages, formulaires, traitements, sessions et `PDO`.
 
 ## Base De Donnees
 
@@ -62,12 +60,13 @@ Tables principales :
 - `users`
 - `subjects`
 - `school_classes`
+- `class_subjects`
 - `books`
 - `requests`
 - `exchanges`
 - `notifications`
 
-Les matieres, niveaux et classes sont desormais geres dans Oracle via des tables de reference plutot que dans des listes PHP codees en dur.
+Les matieres, niveaux, classes et correspondances classe -> matieres sont desormais geres dans Oracle via des tables de reference plutot que dans des listes PHP codees en dur.
 
 Objets Oracle importants :
 

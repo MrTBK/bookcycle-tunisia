@@ -73,7 +73,9 @@ erDiagram
     USERS ||--o{ NOTIFICATIONS : receives
     USERS ||--o{ EXCHANGES : gives
     USERS ||--o{ EXCHANGES : receives
-    SUBJECTS }o--o{ BOOKS : classifies
+    SUBJECTS ||--o{ CLASS_SUBJECTS : allows
+    SCHOOL_CLASSES ||--o{ CLASS_SUBJECTS : maps
+    SUBJECTS }o--o{ BOOKS : labels
     SCHOOL_CLASSES }o--o{ BOOKS : structures
     BOOKS ||--o{ REQUESTS : gets
     BOOKS ||--o{ EXCHANGES : becomes
@@ -99,6 +101,14 @@ erDiagram
         int id
         string school_level
         string class_name
+        int sort_order
+        int is_active
+    }
+
+    CLASS_SUBJECTS {
+        int id
+        int class_id
+        int subject_id
         int sort_order
         int is_active
     }
@@ -219,7 +229,7 @@ sequenceDiagram
     B->>B: Verifier auth
     B->>B: Verifier champs
     B->>B: Verifier classe/niveau
-    B->>B: Verifier matiere
+    B->>B: Verifier matiere autorisee pour la classe
     B->>B: Construire titre
     B->>M: create(book data)
     M->>DB: INSERT books
@@ -348,11 +358,18 @@ flowchart TD
     H --> I
 ```
 
-## 15. Diagramme De Classes Simplifie
+## 15. Diagramme De Classes De La Plateforme (To-Be)
 
 ```mermaid
 classDiagram
+    class Controller {
+        <<abstract>>
+        +render(view, data)
+        +json(payload, statusCode)
+    }
+
     class Auth {
+        <<static>>
         +user()
         +id()
         +check()
@@ -362,39 +379,151 @@ classDiagram
     }
 
     class Database {
+        <<singleton>>
         +connection()
     }
 
-    class PageController
-    class AuthController
-    class BookController
-    class RequestController
-    class AdminController
-    class NotificationController
+    class PageController {
+        +home()
+        +catalog()
+        +dashboard()
+        +addBook()
+        +admin()
+    }
 
-    class AcademicOption
-    class User
-    class Book
-    class BookRequest
-    class Notification
+    class AuthController {
+        +login()
+        +register()
+        +logout()
+    }
 
-    AuthController --> User
-    BookController --> Book
-    BookController --> BookRequest
-    BookController --> AcademicOption
-    PageController --> AcademicOption
-    RequestController --> BookRequest
-    RequestController --> Book
-    RequestController --> Notification
-    RequestController --> User
+    class BookController {
+        +latest()
+        +index()
+        +store()
+        +mine()
+        +stats()
+    }
 
+    class RequestController {
+        +store()
+        +mine()
+        +received()
+        +accept()
+        +reject()
+    }
+
+    class AdminController {
+        +stats()
+        +toggleUser()
+        +deleteBook()
+        +restoreBook()
+        +cancelRequest()
+        +notify()
+    }
+
+    class NotificationController {
+        +read()
+    }
+
+    class AcademicOption {
+        +subjects(level, className)
+        +levels()
+        +classesByLevel()
+        +classSubjectsByLevel()
+    }
+
+    class User {
+        +findByEmail()
+        +findById()
+        +create()
+        +countAll()
+    }
+
+    class Book {
+        +all(filters)
+        +find(id)
+        +create(data)
+        +updateStatus(id, status)
+        +countByLevel()
+    }
+
+    class BookRequest {
+        +create(bookId, requesterId)
+        +find(id)
+        +accept(id, bookId, note)
+        +reject(id)
+        +existsPending(bookId, userId)
+    }
+
+    class Notification {
+        +create(userId, message, sender)
+        +markAsRead(id, userId)
+        +latestForUser(userId, limit)
+    }
+
+    Controller <|-- PageController
+    Controller <|-- AuthController
+    Controller <|-- BookController
+    Controller <|-- RequestController
+    Controller <|-- AdminController
+    Controller <|-- NotificationController
+
+    PageController --> AcademicOption : charge listes
+    PageController --> Book : catalogue
+    PageController --> BookRequest : stats dashboard
+    PageController --> Notification : dashboard
+    PageController --> User : admin
+    AuthController --> User : authentifie
+    BookController --> Book : CRUD livre
+    BookController --> BookRequest : stats
+    BookController --> AcademicOption : validation academique
+    RequestController --> Book : verifier livre
+    RequestController --> BookRequest : workflow demande
+    RequestController --> Notification : notifier
+    RequestController --> User : lire contacts
+    AdminController --> User : moderer
+    AdminController --> Book : moderer
+    AdminController --> BookRequest : annuler
+    AdminController --> Notification : diffuser
+    NotificationController --> Notification : lecture
+
+    PageController ..> Auth : controle acces
+    AuthController ..> Auth : session
+    BookController ..> Auth : session
+    RequestController ..> Auth : session
+    AdminController ..> Auth : role admin
+    NotificationController ..> Auth : session
+
+    AcademicOption --> Database
     User --> Database
     Book --> Database
     BookRequest --> Database
     Notification --> Database
 ```
 
-## 16. Cycle De Vie D'Un Livre
+## 16. Diagramme As-Is / To-Be Du Processus Metier
+
+```mermaid
+flowchart LR
+    subgraph A["As-Is : fonctionnement manuel avant la plateforme"]
+        A1["Parents / eleves cherchent un livre"] --> A2["Contact par bouche-a-oreille, telephone ou reseaux sociaux"]
+        A2 --> A3["Le proprietaire repond manuellement"]
+        A3 --> A4["Le rendez-vous est organise hors systeme"]
+        A4 --> A5["Aucun suivi centralise des demandes"]
+    end
+
+    subgraph B["To-Be : BookCycle Tunisia"]
+        B1["Visiteur consulte le catalogue"] --> B2["Utilisateur envoie une demande"]
+        B2 --> B3["Le proprietaire traite depuis le dashboard"]
+        B3 --> B4["Reservation et notifications automatiques"]
+        B4 --> B5["Suivi centralise et statistiques admin"]
+    end
+
+    A5 --> B1
+```
+
+## 17. Cycle De Vie D'Un Livre
 
 ```mermaid
 stateDiagram-v2
@@ -406,7 +535,7 @@ stateDiagram-v2
     Hidden --> Available : admin reactive
 ```
 
-## 17. Cycle De Vie D'Une Demande
+## 18. Cycle De Vie D'Une Demande
 
 ```mermaid
 stateDiagram-v2
@@ -416,7 +545,7 @@ stateDiagram-v2
     Pending --> Rejected : another request accepted
 ```
 
-## 18. Carte Simple Des Dossiers
+## 19. Carte Simple Des Dossiers
 
 ```mermaid
 flowchart TD

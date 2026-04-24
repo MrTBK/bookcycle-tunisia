@@ -47,6 +47,18 @@ CREATE TABLE school_classes (
     CONSTRAINT chk_school_classes_active CHECK (is_active IN (0, 1))
 );
 
+CREATE TABLE class_subjects (
+    id NUMBER PRIMARY KEY,
+    class_id NUMBER NOT NULL,
+    subject_id NUMBER NOT NULL,
+    sort_order NUMBER DEFAULT 0 NOT NULL,
+    is_active NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT fk_class_subjects_class FOREIGN KEY (class_id) REFERENCES school_classes(id),
+    CONSTRAINT fk_class_subjects_subject FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    CONSTRAINT uq_class_subjects UNIQUE (class_id, subject_id),
+    CONSTRAINT chk_class_subjects_active CHECK (is_active IN (0, 1))
+);
+
 CREATE TABLE books (
     id NUMBER PRIMARY KEY,
     title VARCHAR2(180) NOT NULL,
@@ -104,6 +116,7 @@ CREATE TABLE notifications (
 CREATE SEQUENCE seq_users START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_subjects START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_school_classes START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE seq_class_subjects START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_books START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_requests START WITH 1 INCREMENT BY 1 NOCACHE;
 CREATE SEQUENCE seq_exchanges START WITH 1 INCREMENT BY 1 NOCACHE;
@@ -135,6 +148,16 @@ FOR EACH ROW
 BEGIN
     IF :NEW.id IS NULL THEN
         SELECT seq_school_classes.NEXTVAL INTO :NEW.id FROM dual;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_class_subjects_pk
+BEFORE INSERT ON class_subjects
+FOR EACH ROW
+BEGIN
+    IF :NEW.id IS NULL THEN
+        SELECT seq_class_subjects.NEXTVAL INTO :NEW.id FROM dual;
     END IF;
 END;
 /
@@ -181,6 +204,8 @@ END;
 
 CREATE INDEX idx_subjects_active ON subjects(is_active, sort_order);
 CREATE INDEX idx_school_classes_level ON school_classes(school_level, sort_order);
+CREATE INDEX idx_class_subjects_class ON class_subjects(class_id, sort_order);
+CREATE INDEX idx_class_subjects_subject ON class_subjects(subject_id, sort_order);
 CREATE INDEX idx_books_owner ON books(owner_id);
 CREATE INDEX idx_books_subject ON books(subject);
 CREATE INDEX idx_books_level ON books(school_level);
@@ -207,6 +232,7 @@ JOIN users u ON u.id = b.owner_id;
 GRANT SELECT ON users TO bookcycle_report;
 GRANT SELECT ON subjects TO bookcycle_report;
 GRANT SELECT ON school_classes TO bookcycle_report;
+GRANT SELECT ON class_subjects TO bookcycle_report;
 GRANT SELECT ON books TO bookcycle_report;
 GRANT SELECT ON requests TO bookcycle_report;
 GRANT SELECT ON exchanges TO bookcycle_report;

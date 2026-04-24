@@ -256,7 +256,7 @@ Quand quelqu'un ajoute un livre :
 2. on lit les donnees du formulaire
 3. on verifie les champs obligatoires
 4. on verifie que la classe correspond au niveau grace a la table `school_classes`
-5. on verifie que la matiere existe dans la table `subjects`
+5. on verifie que la matiere est autorisee pour cette classe grace aux tables `subjects` et `class_subjects`
 6. on construit automatiquement un titre
 7. on enregistre le livre
 
@@ -403,6 +403,10 @@ Il garde la liste officielle des matieres.
 ### Tiroir `school_classes`
 
 Il garde la liste officielle des classes et leur niveau.
+
+### Tiroir `class_subjects`
+
+Il garde la liste des matieres autorisees pour chaque classe.
 
 ### Tiroir `requests`
 

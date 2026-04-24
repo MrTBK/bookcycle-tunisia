@@ -27,3 +27,10 @@
         </form>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Start any login-page JavaScript behavior from the global app script.
+    BookCycle.initLoginPage();
+});
+</script>

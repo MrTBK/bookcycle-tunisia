@@ -152,7 +152,7 @@ Flow:
    - estimated price
 3. controller checks required fields
 4. controller checks that class belongs to level using `school_classes`
-5. controller checks that subject exists in `subjects`
+5. controller checks that subject is allowed for that class using `class_subjects` and `subjects`
 6. controller builds a title automatically
 7. model inserts the book in Oracle
 
@@ -324,6 +324,9 @@ Official list of school subjects.
 ### `school_classes`
 Official list of classes grouped by school level.
 
+### `class_subjects`
+Official mapping between each class and its allowed subjects.
+
 ### `requests`
 Requests from one user asking for one book.
 
@@ -342,7 +345,7 @@ Creates Oracle users and grants rights.
 Creates tables, constraints, sequences, triggers, indexes, and view.
 
 ### `03_sample_data.sql`
-Adds demo users, subjects, classes, books, requests, exchanges, and notifications.
+Adds demo users, subjects, classes, class-subject mappings, books, requests, exchanges, and notifications.
 
 ### `04_queries.sql`
 Shows sample SQL queries for learning and reporting.
