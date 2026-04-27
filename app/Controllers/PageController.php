@@ -173,6 +173,42 @@ class PageController extends Controller
         ]);
     }
 
+    /**
+     * Afficher le formulaire de modification d'un livre.
+     * L'identifiant du livre est lu depuis le parametre GET ?id=X.
+     * La page n'est accessible qu'au proprietaire du livre.
+     */
+    public function editBook()
+    {
+        // Rediriger vers la connexion si l'utilisateur n'est pas authentifie.
+        if (!Auth::check()) {
+            $basePath = isset($_SERVER['APP_BASE_PATH']) ? $_SERVER['APP_BASE_PATH'] : '';
+            header('Location: ' . $basePath . '/login');
+            exit;
+        }
+
+        // Lire l'identifiant du livre depuis l'URL (?id=X).
+        $bookId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $bookModel = new Book();
+        $book = $bookModel->find($bookId);
+
+        // Verifier que le livre existe et appartient a l'utilisateur connecte.
+        if (!$book || (int) $book['owner_id'] !== (int) Auth::id()) {
+            $basePath = isset($_SERVER['APP_BASE_PATH']) ? $_SERVER['APP_BASE_PATH'] : '';
+            header('Location: ' . $basePath . '/dashboard');
+            exit;
+        }
+
+        // Afficher la page avec les donnees actuelles du livre pre-remplies.
+        $this->render('edit-book', [
+            'pageTitle'    => 'Modifier le livre',
+            'currentUser'  => Auth::user(),
+            'book'         => $book,
+            'flashError'   => $this->pullFlash('flash_error'),
+            'flashSuccess' => $this->pullFlash('flash_success'),
+        ]);
+    }
+
     public function admin()
     {
         if (!Auth::isAdmin()) {

@@ -100,8 +100,19 @@
                             <h3><?= htmlspecialchars((string) $book['subject']) ?></h3>
                             <p class="meta">Classe: <?= htmlspecialchars((string) ($book['class_label'] ?? '')) ?></p>
                             <p class="meta">Niveau: <?= htmlspecialchars((string) ($book['level_label'] ?? '')) ?></p>
+                            <p class="meta">Etat: <?= htmlspecialchars((string) ($book['condition_label'] ?? '')) ?></p>
                             <p class="meta">Prix estime: <?= htmlspecialchars((string) ($book['estimated_price'] ?? 0)) ?> DT</p>
+                            <?php if (!empty($book['description'])): ?>
+                                <p class="meta"><?= htmlspecialchars((string) $book['description']) ?></p>
+                            <?php endif; ?>
                             <span class="badge"><?= htmlspecialchars((string) $book['status']) ?></span>
+                            <!-- Bouton Modifier : redirige vers le formulaire de modification du livre -->
+                            <p style="margin-top:.75rem;">
+                                <a class="button button-secondary button-small"
+                                   href="<?= htmlspecialchars($basePath) ?>/edit-book?id=<?= urlencode((string) $book['id']) ?>">
+                                    Modifier
+                                </a>
+                            </p>
                         </article>
                     <?php endforeach; ?>
                 <?php endif; ?>
