@@ -87,37 +87,12 @@ BEGIN
 END;
 /
 
--- Trigger 1 : mettre a jour automatiquement la date de modification du livre.
-CREATE OR REPLACE TRIGGER trg_books_updated_at
-BEFORE UPDATE ON books
-FOR EACH ROW
-BEGIN
-    :NEW.updated_at := SYSDATE;
-END;
-/
+/*
+    Les triggers ont ete deplace dans le script dedie :
+    database/06_triggers.sql
 
--- Trigger 2 : journaliser automatiquement un echange quand un livre passe a exchanged.
-CREATE OR REPLACE TRIGGER trg_book_exchange_log
-AFTER UPDATE OF status ON books
-FOR EACH ROW
-WHEN (NEW.status = 'exchanged' AND OLD.status <> 'exchanged')
-DECLARE
-    v_receiver_id requests.requester_id%TYPE;
-BEGIN
-    SELECT requester_id
-    INTO v_receiver_id
-    FROM requests
-    WHERE book_id = :NEW.id
-      AND status = 'accepted'
-      AND ROWNUM = 1;
-
-    INSERT INTO exchanges (book_id, owner_id, receiver_id, exchange_date, status)
-    VALUES (:NEW.id, :NEW.owner_id, v_receiver_id, SYSDATE, 'completed');
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        NULL;
-END;
-/
+    Ce fichier contient uniquement les procedures, fonctions et curseurs.
+*/
 
 /*
     Bloc PL/SQL 1 : exemple de curseur implicite.

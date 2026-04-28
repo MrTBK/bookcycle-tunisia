@@ -129,12 +129,13 @@
                             <th>Telephone</th>
                             <th>Role</th>
                             <th>Etat</th>
-                            <th>Action</th>
+                            <th>Activer / Desactiver</th>
+                            <th>Supprimer</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($adminUsers)): ?>
-                            <tr><td colspan="6">Aucun utilisateur trouve.</td></tr>
+                            <tr><td colspan="7">Aucun utilisateur trouve.</td></tr>
                         <?php else: ?>
                             <?php foreach ($adminUsers as $user): ?>
                                 <tr>
@@ -144,12 +145,22 @@
                                     <td><?= htmlspecialchars((string) $user['role']) ?></td>
                                     <td><?= ((int) ($user['is_active'] ?? 1) === 1) ? 'Actif' : 'Inactif' ?></td>
                                     <td>
+                                        <!-- Bouton activer/desactiver (suppression logique) -->
                                         <form method="post" action="<?= htmlspecialchars($basePath) ?>/admin/toggle-user?id=<?= urlencode((string) $user['id']) ?>">
                                             <?php if ((int) ($user['is_active'] ?? 1) === 1): ?>
                                                 <button class="button button-small button-danger" type="submit">Desactiver</button>
                                             <?php else: ?>
                                                 <button class="button button-small" type="submit">Reactiver</button>
                                             <?php endif; ?>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <!-- Bouton supprimer definitivement (DELETE physique en base) -->
+                                        <form method="post"
+                                              action="<?= htmlspecialchars($basePath) ?>/admin/delete-user"
+                                              onsubmit="return confirm('Supprimer definitivement <?= htmlspecialchars((string) $user['name']) ?> ? Cette action est irreversible.');">
+                                            <input type="hidden" name="user_id" value="<?= htmlspecialchars((string) $user['id']) ?>">
+                                            <button class="button button-small button-danger" type="submit">Supprimer</button>
                                         </form>
                                     </td>
                                 </tr>

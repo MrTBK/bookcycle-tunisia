@@ -104,6 +104,7 @@ class User
 
     public function setActive($userId, $isActive)
     {
+        // Activer ou desactiver un compte utilisateur sans le supprimer de la base.
         $statement = $this->db->prepare(
             'UPDATE users
              SET is_active = :is_active
@@ -112,7 +113,52 @@ class User
 
         $statement->execute([
             'is_active' => $isActive ? 1 : 0,
-            'id' => (int) $userId,
+            'id'        => (int) $userId,
         ]);
+
+        // Liberer le curseur PDO apres execution.
+        $statement->closeCursor();
+    }
+
+    /**
+     * Supprimer physiquement un utilisateur de la base de donnees (DELETE reel).
+     * Contrairement a setActive() qui fait une suppression logique,
+     * cette methode efface definitivement la ligne de la table users.
+     * Elle supprime d'abord les notifications de l'utilisateur pour
+     * respecter les contraintes de cles etrangeres.
+     */
+    public function delete($userId)
+    {
+        // Supprimer d'abord les notifications pour respecter la contrainte FK.
+        $stmt = $this->db->prepare('DELETE FROM notifications WHERE user_id = :id');
+        $stmt->execute(['id' => (int) $userId]);
+        $stmt->closeCursor();
+
+        // Supprimer les demandes envoyees par cet utilisateur.
+        $stmt = $this->db->prepare('DELETE FROM requests WHERE requester_id = :id');
+        $stmt->execute(['id' => (int) $userId]);
+        $stmt->closeCursor();
+
+        // Supprimer l'utilisateur lui-meme de la table users.
+        $stmt = $this->db->prepare('DELETE FROM users WHERE id = :id');
+        $stmt->execute(['id' => (int) $userId]);
+        $stmt->closeCursor();
+    }
+
+    /**
+     * Verifier si un utilisateur possede encore des livres actifs.
+     * Utilise avant la suppression pour eviter d'orpheliner des livres.
+     */
+    public function hasActiveBooks($userId)
+    {
+        // Compter les livres actifs de cet utilisateur.
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*) FROM books WHERE owner_id = :id AND is_active = 1'
+        );
+        $stmt->execute(['id' => (int) $userId]);
+        $count = (int) $stmt->fetchColumn();
+        $stmt->closeCursor();
+
+        return $count > 0;
     }
 }

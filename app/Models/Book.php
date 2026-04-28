@@ -263,10 +263,42 @@ class Book
 
     public function updateStatus($bookId, $status)
     {
+        // Mettre a jour uniquement le statut d'un livre (available, reserved, exchanged).
         $statement = $this->db->prepare('UPDATE books SET status = :status, updated_at = SYSDATE WHERE id = :id');
         $statement->execute([
             'status' => $status,
-            'id' => $bookId,
+            'id'     => $bookId,
         ]);
+    }
+
+    /**
+     * Modifier les informations d'un livre appartenant a l'utilisateur connecte.
+     * La condition owner_id = :owner_id garantit qu'un utilisateur ne peut
+     * modifier que ses propres livres et non ceux d'un autre utilisateur.
+     */
+    public function update($bookId, $ownerId, $data)
+    {
+        // Requete UPDATE avec parametres prepares pour eviter les injections SQL.
+        $statement = $this->db->prepare(
+            'UPDATE books
+             SET condition_label   = :condition_label,
+                 estimated_price   = :estimated_price,
+                 description       = :description,
+                 updated_at        = SYSDATE
+             WHERE id       = :id
+               AND owner_id = :owner_id'
+        );
+
+        // Executer la requete avec les nouvelles valeurs fournies par le formulaire.
+        $statement->execute([
+            'condition_label' => $data['condition'],
+            'estimated_price' => (float) $data['estimated_price'],
+            'description'     => !empty($data['description']) ? $data['description'] : null,
+            'id'              => (int) $bookId,
+            'owner_id'        => (int) $ownerId,
+        ]);
+
+        // Liberer le curseur PDO apres execution pour liberer les ressources.
+        $statement->closeCursor();
     }
 }
