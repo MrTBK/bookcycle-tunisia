@@ -1,323 +1,425 @@
-# RAPPORT DU PROJET INTÉGRÉ
-## BookCycle Tunisia
+<div align="center">
+
+**Ecole Supérieure d'Economie Numérique**
+**UNIVERSITÉ DE LA MANOUBA**
+
+&nbsp;
+
+&nbsp;
+
+**Projet de Fin d'Année**
+
+*Filière : Licence 2 — Big Data et Intelligence Artificielle*
+
+&nbsp;
+
+&nbsp;
+
+Application web de don, d'échange et de réutilisation des livres scolaires
+**\<\<BookCycle Tunisia\>\>**
+
+&nbsp;
+
+**Rapport Intégré — AGL · SGBD · Programmation Web 2 · RPA**
+
+&nbsp;
+
+&nbsp;
+
+**Réalisé par :**
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Mortadha Yakoubi
+
+&nbsp;
+
+**Présenté le :** 28/04/2026
+
+&nbsp;
+
+**Année Universitaire: 2025/2026**
+
+</div>
 
 ---
 
-**Université de la Manouba**
-**École Supérieure d'Économie Numérique — ESEN**
-**Licence 2 — Big Data et Intelligence Artificielle**
-**Année universitaire 2025 / 2026**
+&nbsp;
+
+## Sommaire
+
+```
+I    Présentation du cadre du projet                                          5
+     Introduction                                                             5
+     1)   Présentation du projet BookCycle Tunisia                            5
+     2)   Problématique                                                       6
+     3)   Objectifs                                                           6
+     4)   Public cible                                                        6
+     5)   Valeur ajoutée                                                      7
+
+II   Partie WEB                                                               8
+     Introduction                                                             8
+     1)   Partie Visiteur                                                     8
+          1.1  Page d'accueil                                                 8
+          1.2  Catalogue des livres                                           9
+          1.3  Inscription et Connexion                                       9
+     2)   Partie Utilisateur                                                 10
+          2.1  Tableau de bord                                               10
+          2.2  Ajouter un livre                                              11
+          2.3  Modifier un livre                                             11
+          2.4  Envoyer une demande                                           12
+          2.5  Traitement des demandes reçues                                12
+          2.6  Notifications                                                 13
+     3)   Partie Administrateur                                              13
+          3.1  Dashboard Administrateur                                      13
+          3.2  Gestion des utilisateurs                                      14
+          3.3  Modération des livres                                         14
+          3.4  Gestion des demandes                                          14
+          3.5  Envoi de notifications                                        15
+
+III  Analyse et Génie Logiciel (AGL)                                         16
+     Introduction                                                            16
+     1)   Acteurs de BookCycle Tunisia                                       16
+     2)   Besoins Fonctionnels                                               17
+     3)   User Stories                                                       18
+     4)   Product Backlog                                                    19
+     5)   Architecture Logique                                               20
+
+IV   Base de Données Oracle (SGBD)                                           21
+     Introduction                                                            21
+     1)   Schéma relationnel                                                 21
+     2)   Contraintes d'intégrité                                            23
+     3)   Séquences et Triggers d'auto-incrément                             23
+     4)   Vue de reporting                                                   24
+     5)   Objets PL/SQL                                                      24
+
+V    Réingénierie des Processus d'Affaires (RPA)                             27
+     Introduction                                                            27
+     1)   Cartographie des processus                                         27
+     2)   Processus sélectionné — État As-Is                                 28
+     3)   Solution cible — État To-Be                                        29
+     4)   KPI de pilotage                                                    30
+
+VI   Conclusion Générale                                                     31
+```
 
 ---
 
-**Projet intégré commun aux modules :**
-AGL · SGBD · Programmation Web 2 · RPA
+&nbsp;
 
-**Titre du projet :** BookCycle Tunisia
-**Thème :** Plateforme web de don, d'échange et de réutilisation des livres scolaires en Tunisie
+<div align="center">
 
-**Réalisé par :** Mortadha Yakoubi
+## Chapitre I
+### Présentation du cadre du projet
 
-**Encadré par :** *(à compléter)*
-
----
-
-## Table des Matières
-
-1. [Remerciements](#remerciements)
-2. [Résumé](#résumé)
-3. [Introduction Générale](#introduction-générale)
-4. [Présentation du Projet](#présentation-du-projet)
-5. [Analyse et Génie Logiciel](#analyse-et-génie-logiciel)
-6. [Partie SGBD — Base de Données Oracle](#partie-sgbd)
-7. [Partie Programmation Web 2](#partie-web-2)
-8. [Partie RPA](#partie-rpa)
-9. [Tests et Validation](#tests-et-validation)
-10. [Difficultés et Limites](#difficultés-et-limites)
-11. [Améliorations Proposées](#améliorations-proposées)
-12. [Conclusion Générale](#conclusion-générale)
+</div>
 
 ---
 
-## Remerciements
+### Introduction
 
-Nous remercions les enseignants responsables des modules **AGL**, **SGBD**, **Programmation Web 2** et **RPA** pour leur encadrement pédagogique et leur disponibilité tout au long de la réalisation de ce projet.
+Au niveau de ce premier chapitre, nous tenons à décrire le cadre général dans lequel s'est déroulé notre projet de fin d'année. Nous entamons ce chapitre par une description du contexte de notre projet, puis nous exposons la problématique, les objectifs assignés, le public cible et la valeur ajoutée de la plateforme BookCycle Tunisia.
 
-Nous remercions également l'**École Supérieure d'Économie Numérique (ESEN)** et l'**Université de la Manouba** pour le cadre académique et les ressources pédagogiques mises à disposition.
+### 1. Présentation du projet
 
----
+Notre projet consiste à mettre en place une plateforme web de don, d'échange et de réutilisation des livres scolaires en Tunisie.
 
-## Résumé
+Chaque année, des familles tunisiennes dépensent des sommes importantes pour acquérir des manuels scolaires, alors que d'anciens exemplaires en bon état restent inutilisés. **BookCycle Tunisia** répond à ce constat en proposant une solution numérique simple : une plateforme web qui met en relation les propriétaires de livres scolaires et les demandeurs, avec un espace d'administration complet pour superviser la plateforme.
 
-**BookCycle Tunisia** est une application web académique conçue pour faciliter la réutilisation des livres scolaires en Tunisie. La plateforme met en relation des propriétaires de livres et des demandeurs, tout en offrant un espace d'administration complet.
+Le projet repose sur une architecture **MVC en PHP 7.4**, une base de données **Oracle XE** enrichie d'objets **PL/SQL**, et une interface utilisateur construite avec HTML, CSS et JavaScript natif. Il constitue un projet intégré couvrant quatre modules : AGL, SGBD, Programmation Web 2 et RPA.
 
-Le projet repose sur une architecture **MVC en PHP 7.4**, une base de données **Oracle XE** enrichie d'objets **PL/SQL**, et une interface utilisateur construite avec HTML, CSS et JavaScript natif. Il constitue un projet intégré couvrant à la fois l'analyse fonctionnelle (AGL), la modélisation et l'administration des données (SGBD), le développement web côté serveur (Programmation Web 2), et une réflexion sur l'automatisation des processus métier (RPA).
-
-**Mots-clés :** Oracle XE, PL/SQL, PHP 7.4, MVC, PDO_OCI, livres scolaires, catalogue, administration, Big Data, ESEN.
-
----
-
-## 1. Introduction Générale
-
-### 1.1 Contexte
-
-Chaque année en Tunisie, de nombreuses familles acquièrent des manuels scolaires à prix élevé, alors que d'anciens exemplaires en bon état restent inutilisés. Ce phénomène génère un gaspillage économique et matériel important, particulièrement pour les familles à revenus modestes.
-
-Le projet **BookCycle Tunisia** part de ce constat pour proposer une solution numérique simple, accessible et administrable : une plateforme web permettant aux propriétaires de livres de les mettre à disposition, et aux demandeurs de les solliciter directement.
-
-### 1.2 Motivation Académique
-
-Ce projet intégré constitue l'aboutissement pratique de quatre modules enseignés en Licence 2 à l'ESEN :
-
-| Module | Apport dans ce projet |
+| Module | Apport dans BookCycle Tunisia |
 |---|---|
-| **AGL** | Analyse des besoins, identification des acteurs, modélisation UML, backlog produit |
-| **SGBD** | Conception du schéma Oracle, contraintes d'intégrité, requêtes SQL, objets PL/SQL |
-| **Programmation Web 2** | Architecture MVC en PHP, formulaires, sessions, contrôle d'accès par rôle |
+| **AGL** | Analyse des besoins, acteurs, user stories, backlog produit, architecture |
+| **SGBD** | Schéma Oracle, contraintes, séquences, PL/SQL, index, vues |
+| **Programmation Web 2** | Application MVC PHP, sessions, formulaires, sécurité, PDO_OCI |
 | **RPA** | Cartographie des processus, analyse As-Is / To-Be, scénarios d'automatisation |
 
-### 1.3 Organisation du Rapport
+### 2. Problématique
 
-Le présent rapport suit la structure du projet intégré. Chaque partie correspond à un module et développe les éléments techniques et méthodologiques associés.
+> *Comment concevoir et développer une plateforme web fiable permettant la mise en relation de propriétaires de livres scolaires et de demandeurs en Tunisie, avec un système de gestion des demandes, des notifications automatiques et une interface d'administration, en s'appuyant sur une architecture MVC PHP et une base de données Oracle ?*
 
----
+### 3. Objectifs
 
-## 2. Présentation du Projet
+- Permettre la **publication** de livres scolaires avec informations complètes (niveau, classe, matière, état, prix)
+- Offrir un **catalogue filtrable** dynamiquement par niveau, classe et matière depuis Oracle
+- Gérer l'**envoi, l'acceptation et le refus** de demandes d'échange entre utilisateurs
+- **Notifier automatiquement** les utilisateurs lors des événements importants
+- Fournir un espace d'**administration** avec statistiques, modération et gestion
 
-### 2.1 Contexte Fonctionnel
+### 4. Public cible
 
-La plateforme met en relation trois types d'acteurs :
-
-- Les **utilisateurs propriétaires**, qui publient leurs livres scolaires
-- Les **utilisateurs demandeurs**, qui recherchent et sollicitent ces livres
-- L'**administrateur**, qui supervise et modère l'ensemble de la plateforme
-
-### 2.2 Problématique
-
-> *Comment concevoir et développer une plateforme web fiable permettant la mise en relation de propriétaires de livres scolaires et de demandeurs, avec un système de gestion des demandes, des notifications et une interface d'administration, en s'appuyant sur une architecture MVC PHP et une base de données Oracle ?*
-
-### 2.3 Objectifs du Projet
-
-Les objectifs principaux sont les suivants :
-
-- **Publication** : permettre à tout utilisateur connecté de publier un livre scolaire disponible
-- **Catalogue** : offrir un catalogue filtrable par niveau scolaire, classe et matière
-- **Demandes** : gérer l'envoi, le suivi, l'acceptation et le rejet de demandes
-- **Notifications** : informer les utilisateurs des événements importants sur la plateforme
-- **Administration** : fournir un tableau de bord de modération et de statistiques
-
-### 2.4 Public Cible
-
-- Élèves et lycéens en recherche de manuels scolaires
-- Parents souhaitant réduire les dépenses scolaires
-- Étudiants et familles détenteurs de livres en bon état
+- Élèves et lycéens tunisiens en recherche de manuels scolaires
+- Parents souhaitant réduire leurs dépenses scolaires
+- Familles détentrices de livres en bon état souhaitant les céder
 - Administrateurs responsables de la plateforme
 
-### 2.5 Valeur Ajoutée
+### 5. Valeur ajoutée
 
-| Dimension | Bénéfice |
+| Dimension | Bénéfice pour BookCycle Tunisia |
 |---|---|
-| **Économique** | Réduction des dépenses scolaires par la réutilisation |
-| **Environnemental** | Limitation du gaspillage de ressources imprimées |
-| **Social** | Accessibilité des manuels pour les familles à revenus limités |
-| **Académique** | Intégration cohérente de quatre modules en un projet concret |
+| **Économique** | Réduction des dépenses scolaires des familles tunisiennes |
+| **Environnemental** | Réutilisation des manuels, moins de gaspillage |
+| **Social** | Accès aux livres pour les familles à revenus limités |
+| **Académique** | Projet intégré cohérent couvrant 4 modules en L2 BDIA |
 
 ---
 
-## 3. Analyse et Génie Logiciel
+&nbsp;
 
-### 3.1 Identification des Acteurs
+<div align="center">
 
-#### Visiteur (non authentifié)
+## Chapitre II
+### Partie WEB
 
-Le visiteur accède librement à :
+</div>
 
-- La page d'accueil (`/`)
-- Le catalogue public (`/catalog`) avec filtres par niveau, classe et matière
-- Les pages institutionnelles : À propos (`/about`), Contact (`/contact`), Politique de confidentialité (`/privacy-policy`)
-- Les formulaires d'inscription (`/register`) et de connexion (`/login`)
+---
 
-#### Utilisateur Connecté
+### Introduction
 
-En plus des droits du visiteur, l'utilisateur connecté peut :
+Au niveau de ce chapitre, nous présentons les interfaces et fonctionnalités de la plateforme **BookCycle Tunisia**, organisées par type d'utilisateur : le visiteur non connecté, l'utilisateur connecté et l'administrateur.
 
-- Accéder à son tableau de bord personnel (`/dashboard`)
-- Publier un nouveau livre (`/add-book`)
-- Modifier un livre publié (`/edit-book`) — état, prix estimé, description
-- Consulter ses livres publiés
-- Envoyer une demande pour un livre d'un autre utilisateur
-- Consulter ses demandes envoyées et reçues
-- Accepter ou refuser les demandes reçues
-- Consulter ses notifications
+### 1. Partie Visiteur
 
-#### Administrateur
+#### 1.1 Page d'accueil
 
-En plus des droits de l'utilisateur, l'administrateur peut :
+La page d'accueil (`/`) est la vitrine publique de BookCycle Tunisia. Elle présente la plateforme avec une section héro et deux boutons d'action : **Parcourir les livres** et **Ajouter un livre**. Trois cartes statistiques affichent en temps réel le nombre de livres actifs, le nombre d'échanges validés et l'économie totale estimée (en DT).
 
-- Accéder au tableau de bord d'administration (`/admin`)
-- Consulter les statistiques globales (utilisateurs, livres, échanges, économie estimée)
-- Activer ou désactiver des comptes utilisateurs
-- Supprimer définitivement un compte utilisateur (si sans livres actifs)
-- Masquer ou restaurer des livres signalés
-- Annuler des demandes en cours
-- Envoyer des notifications ciblées ou globales
+La section **Derniers livres** affiche les 4 livres les plus récemment publiés, avec le niveau scolaire, la matière, la classe, l'état et le prix de chaque livre. Un bouton **Détails** renvoie vers la fiche du livre dans le catalogue.
 
-### 3.2 Besoins Fonctionnels
+#### 1.2 Catalogue des livres
 
-| Identifiant | Besoin | Priorité |
-|---|---|---|
-| BF-01 | Inscription et authentification | Haute |
-| BF-02 | Gestion de session utilisateur | Haute |
-| BF-03 | Publication d'un livre avec validation | Haute |
-| BF-04 | Catalogue filtrable par niveau / classe / matière | Haute |
-| BF-05 | Détail d'un livre | Haute |
-| BF-06 | Envoi et traitement d'une demande | Haute |
-| BF-07 | Système de notifications en temps différé | Moyenne |
-| BF-08 | Tableau de bord utilisateur | Haute |
-| BF-09 | Tableau de bord administrateur avec statistiques | Haute |
-| BF-10 | Modération des utilisateurs et des livres | Haute |
+Le catalogue (`/catalog`) est accessible sans connexion. Un panneau latéral propose trois filtres dynamiques :
+- **Niveau** : Primaire, Collège, Lycée — chargé depuis Oracle
+- **Classe** : mise à jour automatique selon le niveau
+- **Matière** : mise à jour automatique selon la classe
 
-### 3.3 Besoins Non Fonctionnels
+La grille de résultats affiche les livres correspondants. La fiche d'un livre (accessible via **Détails**) montre toutes ses informations et un bouton **Envoyer une demande** pour les utilisateurs connectés.
 
-| Catégorie | Exigence |
+#### 1.3 Inscription et Connexion
+
+**Inscription (`/register`) :** formulaire avec nom complet, email (unique), téléphone (8 chiffres obligatoires, validé côté serveur) et mot de passe. Après inscription, redirection vers la connexion.
+
+**Connexion (`/login`) :** formulaire email + mot de passe. Un compte désactivé par l'admin ne peut pas se connecter. Après connexion réussie, redirection vers le tableau de bord.
+
+---
+
+### 2. Partie Utilisateur
+
+#### 2.1 Tableau de bord
+
+Le tableau de bord (`/dashboard`) est l'espace personnel de chaque utilisateur connecté, organisé en quatre sections :
+
+**Statistiques personnelles :** livres reçus, livres donnés, argent économisé, argent fait économiser (en DT).
+
+**Notifications :** historique complet des messages reçus (nouvelles demandes, acceptations, refus, messages admin) avec statut lu / non lu.
+
+**Mes livres :** liste des livres publiés avec matière, classe, niveau, état, prix, description, statut (disponible / réservé / échangé) et bouton **Modifier**.
+
+**Demandes reçues / envoyées :** traitement des demandes sur ses propres livres et suivi des demandes envoyées à d'autres propriétaires.
+
+#### 2.2 Ajouter un livre
+
+Le formulaire `/add-book` permet de publier un livre avec : niveau scolaire, classe (dynamique), matière (dynamique), état (Neuf / Bon / Usagé), prix estimé et description optionnelle. Le titre est généré automatiquement (`Matière - Classe - Niveau`). La validation serveur vérifie la cohérence niveau/classe/matière via Oracle.
+
+#### 2.3 Modifier un livre
+
+Le formulaire `/edit-book` permet de modifier l'état, le prix et la description d'un livre. Le niveau, la classe et la matière sont affichés en lecture seule (non modifiables) pour préserver la cohérence avec les demandes existantes. L'accès est refusé si le livre n'appartient pas à l'utilisateur connecté.
+
+#### 2.4 Envoyer une demande
+
+Depuis la fiche d'un livre dans le catalogue, l'utilisateur connecté peut envoyer une demande. Le système vérifie qu'il ne demande pas son propre livre et qu'il n'a pas déjà une demande en attente pour ce livre. Une notification est envoyée automatiquement au propriétaire.
+
+#### 2.5 Traitement des demandes reçues
+
+Dans la section **Demandes reçues** du tableau de bord, le propriétaire voit les demandes en attente avec les coordonnées du demandeur. Il peut :
+- **Accepter** : la demande passe à `accepted`, toutes les autres demandes pour ce livre sont automatiquement rejetées, le livre passe à `reserved`, et les deux parties reçoivent une notification avec leurs coordonnées respectives.
+- **Refuser** : la demande passe à `rejected` et le demandeur reçoit une notification.
+
+#### 2.6 Notifications
+
+Les notifications s'affichent dans le menu déroulant de la navbar (5 dernières non lues) et dans la section **Notifications** du tableau de bord (historique complet). Chaque notification peut être marquée comme lue.
+
+---
+
+### 3. Partie Administrateur
+
+#### 3.1 Dashboard Administrateur
+
+Le tableau de bord admin (`/admin`) affiche 4 cartes de statistiques globales (utilisateurs, livres, échanges, livres inactifs), la répartition des livres par niveau, les matières les plus demandées (top 5) et l'économie totale estimée.
+
+#### 3.2 Gestion des utilisateurs
+
+Liste complète des utilisateurs avec recherche par nom/email. Pour chaque compte :
+- **Désactiver / Réactiver** : suppression logique — le compte est bloqué sans supprimer les données
+- **Supprimer** : suppression physique définitive — bloquée si l'utilisateur a des livres actifs
+
+#### 3.3 Modération des livres
+
+Liste de tous les livres (actifs et masqués) avec actions :
+- **Masquer** : le livre disparaît du catalogue (`is_active = 0`)
+- **Restaurer** : le livre redevient visible (`is_active = 1`)
+
+#### 3.4 Gestion des demandes
+
+Liste filtrée des demandes (par statut) avec bouton **Annuler** pour forcer le statut `rejected`. Si la demande annulée était `accepted`, le livre repasse automatiquement en `available`.
+
+#### 3.5 Envoi de notifications
+
+Formulaire permettant d'envoyer un message à un utilisateur ciblé ou à tous les utilisateurs actifs en une seule opération.
+
+---
+
+&nbsp;
+
+<div align="center">
+
+## Chapitre III
+### Analyse et Génie Logiciel (AGL)
+
+</div>
+
+---
+
+### Introduction
+
+Au niveau de ce chapitre, nous appliquons la démarche Scrum au développement de BookCycle Tunisia et décrivons l'architecture logique de l'application.
+
+### 1. Acteurs de BookCycle Tunisia
+
+| Acteur | Droits |
 |---|---|
-| **Architecture** | Séparation stricte MVC |
-| **Sécurité** | Validation côté serveur, requêtes préparées PDO, contrôle des rôles |
-| **Compatibilité** | Oracle XE avec PDO_OCI |
-| **Maintenabilité** | Code modulaire, namespaces PHP |
-| **Déployabilité** | Démarrage local en une commande |
+| **Visiteur** | Accueil, catalogue, filtres, fiche livre, inscription, connexion |
+| **Utilisateur** | + Dashboard, ajouter/modifier livre, envoyer/traiter demandes, notifications |
+| **Administrateur** | + Statistiques globales, gestion comptes, modération livres, gestion demandes, envoi notifications |
 
-### 3.4 User Stories Principales
+### 2. Besoins Fonctionnels
+
+| ID | Besoin | Priorité |
+|---|---|---|
+| BF-01 | Inscription avec email unique et téléphone 8 chiffres | Haute |
+| BF-02 | Connexion / déconnexion sécurisée | Haute |
+| BF-03 | Catalogue filtrable dynamiquement par niveau/classe/matière | Haute |
+| BF-04 | Publication d'un livre avec validation Oracle | Haute |
+| BF-05 | Modification d'un livre (état, prix, description) | Haute |
+| BF-06 | Envoi d'une demande avec contrôles métier | Haute |
+| BF-07 | Acceptation / refus d'une demande | Haute |
+| BF-08 | Tableau de bord utilisateur | Haute |
+| BF-09 | Notifications automatiques | Moyenne |
+| BF-10 | Tableau de bord admin + statistiques | Haute |
+| BF-11 | Gestion des comptes et modération | Haute |
+
+### 3. User Stories
 
 ```
 US-01 : En tant que visiteur, je veux consulter le catalogue sans me connecter,
         afin de voir les livres disponibles avant de créer un compte.
 
-US-02 : En tant qu'utilisateur, je veux publier un livre scolaire avec son niveau,
-        sa classe, sa matière et son état, afin de le mettre à disposition.
+US-02 : En tant qu'utilisateur, je veux publier un livre avec niveau, classe,
+        matière et état, afin de le mettre à disposition d'autres familles.
 
 US-03 : En tant qu'utilisateur, je veux envoyer une demande pour un livre,
-        afin de prendre contact avec le propriétaire.
+        afin de prendre contact avec son propriétaire.
 
-US-04 : En tant que propriétaire, je veux accepter ou refuser une demande reçue,
-        afin de gérer les échanges à partir de mon tableau de bord.
+US-04 : En tant que propriétaire, je veux accepter ou refuser une demande
+        avec une note de rendez-vous, afin de finaliser l'échange.
 
 US-05 : En tant qu'administrateur, je veux voir les statistiques globales,
-        afin de surveiller l'activité de la plateforme.
+        afin de surveiller l'activité de BookCycle Tunisia.
 ```
 
-### 3.5 Product Backlog Simplifié
+### 4. Product Backlog
 
-| ID | User Story | Priorité | Statut |
-|---|---|---|---|
-| PB-01 | Consulter le catalogue public | Haute | Réalisé |
-| PB-02 | Créer un compte utilisateur | Haute | Réalisé |
-| PB-03 | Se connecter / se déconnecter | Haute | Réalisé |
-| PB-04 | Ajouter un livre avec validation | Haute | Réalisé |
-| PB-05 | Envoyer une demande | Haute | Réalisé |
-| PB-06 | Accepter ou refuser une demande | Haute | Réalisé |
-| PB-07 | Consulter ses notifications | Moyenne | Réalisé |
-| PB-08 | Tableau de bord utilisateur | Haute | Réalisé |
-| PB-09 | Tableau de bord administrateur | Haute | Réalisé |
-| PB-10 | Modération des livres et utilisateurs | Haute | Réalisé |
+| ID | Fonctionnalité | Priorité | Effort (JD) | Statut |
+|---|---|---|---|---|
+| PB-01 | Catalogue public consultable | Haute | 1 | Done |
+| PB-02 | Inscription / Connexion | Haute | 1.5 | Done |
+| PB-03 | Ajout d'un livre avec validation Oracle | Haute | 2 | Done |
+| PB-04 | Envoi et traitement d'une demande | Haute | 3 | Done |
+| PB-05 | Tableau de bord utilisateur | Haute | 1.5 | Done |
+| PB-06 | Tableau de bord administrateur | Haute | 2 | Done |
+| PB-07 | Gestion des comptes (admin) | Haute | 1.5 | Done |
+| PB-08 | Système de notifications | Moyenne | 1 | Done |
+| PB-09 | Filtres dynamiques classe → matières | Haute | 1.5 | Done |
+| PB-10 | Modification d'un livre (/edit-book) | Haute | 1 | Done |
+| PB-11 | Suppression permanente utilisateur | Haute | 0.5 | Done |
+| PB-12 | Upload d'image de couverture | Basse | 2 | To Do |
+| PB-13 | Token CSRF | Moyenne | 0.5 | To Do |
 
-### 3.6 Définition of Done
-
-Une fonctionnalité est considérée comme terminée si :
-
-1. La logique métier est implémentée dans le contrôleur et le modèle correspondants
-2. La validation des données est assurée côté serveur
-3. La vue associée est opérationnelle et accessible
-4. Les messages d'erreur et de succès sont correctement affichés
-5. La fonctionnalité a été testée manuellement avec des données réelles
-
-### 3.7 Architecture Logique
-
-Le projet suit le patron **MVC (Modèle-Vue-Contrôleur)** :
+### 5. Architecture Logique
 
 ```
-bookcycle-tunisia/
-│
-├── router.php                  ← Point d'entrée et routage HTTP
-│
-├── public/
-│   ├── index.php               ← Bootstrap de l'application
-│   └── assets/
-│       ├── css/                ← Feuilles de style
-│       └── js/app.js           ← Interactions légères côté client
-│
-└── app/
-    ├── Config/
-    │   └── config.php          ← Paramètres de connexion Oracle
-    ├── Core/
-    │   ├── Auth.php            ← Gestion des sessions et des rôles
-    │   ├── Controller.php      ← Classe de base des contrôleurs
-    │   └── Database.php        ← Singleton de connexion PDO/Oracle
-    ├── Models/                 ← Accès aux données (requêtes SQL)
-    ├── Controllers/            ← Logique métier et dispatching
-    └── Views/
-        ├── layouts/            ← En-tête et pied de page partagés
-        └── pages/              ← Une vue par page
+router.php (Front Controller)
+    └── public/index.php
+        ├── Controllers/
+        │   ├── AuthController    → register, login, logout
+        │   ├── BookController    → store, update, stats
+        │   ├── RequestController → store, accept, reject
+        │   ├── AdminController   → toggleUser, deleteBook, notify, cancelRequest
+        │   ├── PageController    → home, catalog, dashboard, admin, addBook, editBook
+        │   └── NotificationController → read
+        ├── Models/
+        │   ├── User, Book, BookRequest, Notification, AcademicOption
+        └── Views/
+            ├── layouts/ (header.php, footer.php)
+            └── pages/   (home, catalog, dashboard, admin, add-book, edit-book, login, register…)
 ```
 
 ---
 
-## 4. Partie SGBD — Base de Données Oracle
+&nbsp;
 
-### 4.1 Choix du SGBD
+<div align="center">
 
-Le projet utilise **Oracle Database Express Edition (XE)**, conformément aux objectifs du module SGBD. Ce choix permet d'exploiter pleinement :
+## Chapitre IV
+### Base de Données Oracle (SGBD)
 
-- Le langage **SQL** pour la définition et la manipulation des données
-- Le langage **PL/SQL** pour les traitements métier avancés
-- Les objets propriétaires Oracle : séquences, triggers, procédures, fonctions et vues
+</div>
 
-### 4.2 Schéma Relationnel
+---
 
-Le schéma comprend **8 tables** : quatre tables métier principales, trois tables de référence académique, et une table de traçabilité.
+### Introduction
 
-#### Tables de Référence Académique
+Au niveau de ce chapitre, nous présentons le schéma Oracle de BookCycle Tunisia, ses contraintes d'intégrité, ses objets PL/SQL et les éléments Oracle spécifiques exploités.
 
-| Table | Rôle |
+### 1. Schéma relationnel
+
+Le schéma comprend **8 tables** : 3 tables de référence académique et 5 tables métier.
+
+#### Tables de référence académique
+
+| Table | Contenu |
 |---|---|
-| `subjects` | Liste des matières scolaires disponibles |
-| `school_classes` | Classes disponibles par niveau (Primaire / Collège / Lycée) |
-| `class_subjects` | Association classes ↔ matières autorisées |
+| `subjects` | 19 matières (Arabe, Maths, Français, Physique-Chimie, SVT, Informatique, etc.) |
+| `school_classes` | 25 classes sur 3 niveaux (6 Primaire, 3 Collège, 16 Lycée) |
+| `class_subjects` | Correspondances classe ↔ matières autorisées (ex. : `bac info` → 8 matières) |
 
-Ces tables sont lues par l'application PHP pour alimenter dynamiquement les formulaires et valider les données saisies. Elles remplacent les anciennes listes codées en dur dans le code.
-
-#### Tables Métier
+#### Tables métier
 
 | Table | Description |
 |---|---|
-| `users` | Comptes utilisateurs avec rôle (`admin` / `user`) et statut d'activation |
-| `books` | Livres publiés avec niveau, classe, matière, état et statut de disponibilité |
-| `requests` | Demandes envoyées par les utilisateurs pour les livres disponibles |
-| `exchanges` | Enregistrements des échanges finalisés |
-| `notifications` | Messages envoyés aux utilisateurs par le système ou l'administrateur |
+| `users` | Comptes BookCycle Tunisia avec rôle (`user` / `admin`) et statut |
+| `books` | Livres publiés avec niveau, classe, matière, état, prix, propriétaire |
+| `requests` | Demandes d'échange avec statut (`pending` → `accepted` / `rejected`) |
+| `exchanges` | Échanges finalisés (enregistrés automatiquement par trigger) |
+| `notifications` | Notifications système et admin pour chaque utilisateur |
 
-### 4.3 Contraintes d'Intégrité
+### 2. Contraintes d'intégrité
 
-Le schéma intègre un ensemble complet de contraintes :
-
-| Type | Exemples |
+| Type | Exemples BookCycle Tunisia |
 |---|---|
 | **Clé primaire** | Toutes les tables |
-| **Clé étrangère** | `books.owner_id → users.id`, `requests.book_id → books.id`, etc. |
-| **UNIQUE** | `users.email`, `(school_classes.school_level, class_name)`, `(class_subjects.class_id, subject_id)` |
-| **CHECK** | `users.role IN ('admin','user')`, `books.status IN ('available','reserved','exchanged')`, `requests.status IN ('pending','accepted','rejected')` |
-| **NOT NULL** | Tous les champs obligatoires |
+| **Clé étrangère** | `books.owner_id → users.id`, `requests.book_id → books.id` |
+| **UNIQUE** | `users.email`, `(school_classes.school_level, class_name)` |
+| **CHECK** | `users.role IN ('admin','user')`, `books.status IN ('available','reserved','exchanged')` |
 
-### 4.4 Séquences et Triggers d'Auto-incrément
+### 3. Séquences et Triggers d'auto-incrément
 
-Oracle XE ne supporte pas l'`IDENTITY` clause directement dans les anciennes versions. Les identifiants sont générés via des paires **séquence + trigger** :
+8 paires séquence + trigger BEFORE INSERT assurent la génération automatique des IDs sur toutes les tables (Oracle XE sans IDENTITY natif).
 
 ```sql
 CREATE SEQUENCE seq_books START WITH 1 INCREMENT BY 1 NOCACHE;
-
 CREATE OR REPLACE TRIGGER trg_books_pk
-BEFORE INSERT ON books
-FOR EACH ROW
+BEFORE INSERT ON books FOR EACH ROW
 BEGIN
     IF :NEW.id IS NULL THEN
         SELECT seq_books.NEXTVAL INTO :NEW.id FROM dual;
@@ -325,474 +427,129 @@ BEGIN
 END;
 ```
 
-Ce pattern est appliqué uniformément sur toutes les tables : `users`, `subjects`, `school_classes`, `class_subjects`, `books`, `requests`, `exchanges`, `notifications`.
-
-### 4.5 Index de Performance
-
-Dix index sont définis pour optimiser les requêtes les plus fréquentes de l'application :
-
-```
-idx_subjects_active          → subjects(is_active, sort_order)
-idx_school_classes_level     → school_classes(school_level, sort_order)
-idx_class_subjects_class     → class_subjects(class_id, sort_order)
-idx_books_owner              → books(owner_id)
-idx_books_subject            → books(subject)
-idx_books_level              → books(school_level)
-idx_requests_book            → requests(book_id)
-idx_requests_requester       → requests(requester_id)
-idx_notifications_user       → notifications(user_id)
-```
-
-### 4.6 Vue de Reporting
+### 4. Vue de reporting
 
 ```sql
 CREATE OR REPLACE VIEW v_book_overview AS
-SELECT
-    b.id        AS book_id,
-    b.title,
-    b.subject,
-    b.class_name,
-    b.school_level,
-    b.condition_label,
-    b.estimated_price,
-    b.status,
-    u.name      AS owner_name,
-    u.email     AS owner_email,
-    b.created_at
-FROM books b
-JOIN users u ON u.id = b.owner_id;
+SELECT b.id, b.title, b.subject, b.class_name, b.school_level,
+       b.condition_label, b.estimated_price, b.status,
+       u.name AS owner_name, u.email AS owner_email, b.created_at
+FROM books b JOIN users u ON u.id = b.owner_id;
 ```
 
-Cette vue centralise les informations essentielles sur les livres et leurs propriétaires, utile pour les rapports et le tableau de bord administrateur.
-
-### 4.7 Objets PL/SQL
+### 5. Objets PL/SQL
 
 #### Procédure `add_notification`
-
-Insère une notification pour un utilisateur donné. Utilisée à chaque événement important sur la plateforme (demande reçue, demande acceptée, etc.).
-
-```sql
-CREATE OR REPLACE PROCEDURE add_notification (
-    p_user_id IN users.id%TYPE,
-    p_message IN notifications.message%TYPE
-) IS
-BEGIN
-    INSERT INTO notifications (user_id, message, is_read, created_at)
-    VALUES (p_user_id, p_message, 0, SYSDATE);
-END;
-```
+Insère une notification pour un utilisateur (appelée à chaque événement : nouvelle demande, acceptation, refus, message admin).
 
 #### Procédure `accept_request`
-
-Accepte une demande de manière atomique : met à jour le statut de la demande, rejette les autres demandes en attente pour le même livre, change le statut du livre en `reserved`, et notifie le demandeur.
-
-```sql
-CREATE OR REPLACE PROCEDURE accept_request (
-    p_request_id IN requests.id%TYPE,
-    p_meeting_note IN requests.meeting_note%TYPE
-) IS
-    v_book_id       requests.book_id%TYPE;
-    v_requester_id  requests.requester_id%TYPE;
-    v_owner_id      books.owner_id%TYPE;
-    v_title         books.title%TYPE;
-BEGIN
-    -- Récupération des informations liées à la demande
-    SELECT r.book_id, r.requester_id, b.owner_id, b.title
-    INTO v_book_id, v_requester_id, v_owner_id, v_title
-    FROM requests r JOIN books b ON b.id = r.book_id
-    WHERE r.id = p_request_id;
-
-    -- Acceptation de la demande sélectionnée
-    UPDATE requests SET status = 'accepted', meeting_note = p_meeting_note
-    WHERE id = p_request_id;
-
-    -- Rejet automatique des autres demandes du même livre
-    UPDATE requests SET status = 'rejected'
-    WHERE book_id = v_book_id AND id <> p_request_id AND status = 'pending';
-
-    -- Mise à jour du statut du livre
-    UPDATE books SET status = 'reserved', updated_at = SYSDATE WHERE id = v_book_id;
-
-    -- Notification du demandeur
-    add_notification(v_requester_id,
-        'Votre demande pour le livre "' || v_title || '" a été acceptée.');
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('Demande introuvable.');
-END;
-```
+Accepte atomiquement une demande : met à jour la demande, rejette les autres pour le même livre, passe le livre en `reserved`, notifie le demandeur.
 
 #### Fonction `count_books_by_user`
-
 Retourne le nombre de livres actifs publiés par un utilisateur.
 
-```sql
-CREATE OR REPLACE FUNCTION count_books_by_user (
-    p_user_id IN users.id%TYPE
-) RETURN NUMBER IS
-    v_total NUMBER;
-BEGIN
-    SELECT COUNT(*) INTO v_total
-    FROM books WHERE owner_id = p_user_id AND is_active = 1;
-    RETURN v_total;
-END;
-```
-
 #### Fonction `calculate_money_saved`
-
-Calcule l'économie totale estimée sur la base des prix des livres échangés.
-
-```sql
-CREATE OR REPLACE FUNCTION calculate_money_saved RETURN NUMBER IS
-    v_total NUMBER;
-BEGIN
-    SELECT NVL(SUM(b.estimated_price), 0) INTO v_total
-    FROM exchanges e JOIN books b ON b.id = e.book_id;
-    RETURN v_total;
-END;
-```
+Calcule l'économie totale estimée générée par les échanges finalisés sur BookCycle Tunisia.
 
 #### Trigger `trg_books_updated_at`
-
-Met automatiquement à jour le champ `updated_at` à chaque modification d'un livre.
+Met à jour automatiquement `updated_at` à chaque modification d'un livre.
 
 #### Trigger `trg_book_exchange_log`
+Enregistre automatiquement un échange dans `exchanges` quand un livre passe au statut `exchanged`.
 
-Inscrit automatiquement un enregistrement dans la table `exchanges` lorsqu'un livre passe au statut `exchanged`.
+#### Trigger `trg_notify_owner_on_request`
+Notifie automatiquement le propriétaire d'un livre dès qu'une nouvelle demande est insérée.
 
-### 4.8 Éléments Oracle Spécifiques Démontrés
-
-| Élément | Utilisation dans le projet |
-|---|---|
-| `%TYPE` | Typage des variables PL/SQL d'après les colonnes Oracle |
-| `%ROWTYPE` | Typage d'une variable curseur selon la structure du curseur |
-| `SQL%ROWCOUNT` | Comptage des lignes affectées après un UPDATE |
-| `DBMS_OUTPUT.PUT_LINE` | Affichage de messages de débogage dans SQL Developer |
-| `EXECUTE IMMEDIATE` | Exécution de SQL dynamique si nécessaire |
-| Curseur implicite | Utilisation de `SQL%ROWCOUNT` après UPDATE |
-| Curseur explicite | Parcours des livres disponibles avec `OPEN / FETCH / CLOSE` |
+#### Trigger `trg_validate_user_email`
+Bloque l'insertion si l'email ne contient pas `@` (`RAISE_APPLICATION_ERROR`).
 
 ---
 
-## 5. Partie Programmation Web 2
+&nbsp;
 
-### 5.1 Technologies Utilisées
+<div align="center">
 
-| Technologie | Rôle |
-|---|---|
-| **PHP 7.4** | Logique serveur, MVC, sessions |
-| **Oracle XE** | Persistance des données |
-| **PDO_OCI** | Couche d'accès aux données via Oracle |
-| **HTML5** | Structure des pages |
-| **CSS3** | Mise en forme et responsive design |
-| **JavaScript** | Interactions dynamiques légères (filtres, mise à jour d'options) |
+## Chapitre V
+### Réingénierie des Processus d'Affaires (RPA)
 
-### 5.2 Architecture MVC Détaillée
+</div>
 
-#### Couche Modèle
+---
 
-Les modèles encapsulent toutes les interactions avec la base Oracle via PDO :
+### Introduction
 
-| Modèle | Responsabilité |
-|---|---|
-| `User` | Authentification, gestion des comptes, activation/désactivation |
-| `Book` | CRUD livres, filtrage catalogue, statistiques |
-| `BookRequest` | Création, acceptation, rejet des demandes |
-| `Notification` | Lecture et marquage des notifications |
-| `AcademicOption` | Lecture des tables de référence (matières, classes, niveaux) |
+Au niveau de ce chapitre, nous analysons les processus métier de BookCycle Tunisia et proposons une solution d'automatisation pour améliorer le traitement des demandes.
 
-#### Couche Contrôleur
+### 1. Cartographie des processus
 
-| Contrôleur | Actions principales |
-|---|---|
-| `AuthController` | `showLogin`, `login`, `showRegister`, `register`, `logout` |
-| `BookController` | `index` (catalogue), `store` (ajout), `mine` (mes livres), `stats` |
-| `RequestController` | `store` (envoi demande), `accept`, `reject`, `cancel` |
-| `NotificationController` | `index`, `markRead` |
-| `AdminController` | Dashboard, gestion utilisateurs, modération livres |
-| `PageController` | Pages statiques (accueil, à propos, contact, politique) |
-
-#### Couche Vue
-
-Les vues utilisent une structure de layout partagée :
-
-```
-app/Views/
-├── layouts/
-│   ├── header.php      ← En-tête commun à toutes les pages
-│   └── footer.php      ← Pied de page commun
-└── pages/
-    ├── home.php
-    ├── catalog.php
-    ├── login.php
-    ├── register.php
-    ├── dashboard.php
-    ├── add-book.php
-    ├── admin.php
-    ├── about.php
-    ├── contact.php
-    └── privacy-policy.php
-```
-
-### 5.3 Connexion à Oracle via PDO
-
-La connexion est gérée par le singleton `Database` :
-
-```php
-self::$connection = new PDO($db['dsn'], $db['user'], $db['password'], [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_CASE               => PDO::CASE_LOWER,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-]);
-```
-
-La configuration Oracle utilisée :
-
-- **DSN** : `oci:dbname=//localhost:1521/XE;charset=AL32UTF8`
-- **Utilisateur** : `bookcycle_app`
-- **Mot de passe** : `BookCycle2026`
-
-### 5.4 Fonctionnement du Routeur
-
-Le fichier `router.php` constitue le front controller. Il intercepte toutes les requêtes HTTP et les redirige vers le contrôleur et l'action appropriés selon l'URL demandée.
-
-Le script `public/index.php` initialise la session, charge l'autoloader, et délègue le traitement au routeur.
-
-### 5.5 Gestion des Sessions et des Rôles
-
-La classe `Auth` gère l'état d'authentification via les sessions PHP :
-
-```php
-// Connexion d'un utilisateur
-Auth::login($user);   // Stocke id, name, email, role en session
-
-// Vérifications
-Auth::check();        // true si connecté
-Auth::isAdmin();      // true si role === 'admin'
-Auth::id();           // Retourne l'ID utilisateur courant
-Auth::logout();       // Détruit la session et régénère l'ID
-```
-
-### 5.6 Validation des Données — Exemple Contrôleur
-
-La validation dans `BookController::store()` illustre la cohérence entre les tables de référence Oracle et la logique PHP :
-
-```php
-// Validation cohérence niveau ↔ classe
-if (!$this->isValidClassForLevel($payload['level'], $payload['class_name'])) {
-    $this->respondError('La classe ne correspond pas au niveau.', '/add-book', 422);
-    return;
-}
-
-// Validation cohérence classe ↔ matière
-if (!$this->isValidSubject($payload['level'], $payload['class_name'], $payload['subject'])) {
-    $this->respondError('La matière ne correspond pas à la classe.', '/add-book', 422);
-    return;
-}
-```
-
-Ces vérifications s'appuient sur les tables `school_classes` et `class_subjects` dans Oracle, garantissant une cohérence totale entre la base de données et l'interface.
-
-### 5.7 Pages et Fonctionnalités
-
-| URL | Accès | Description |
+| Processus | Acteurs | SLA actuel |
 |---|---|---|
-| `/` | Tous | Page d'accueil avec présentation et livres récents |
-| `/catalog` | Tous | Catalogue filtrable par niveau, classe, matière |
-| `/about` | Tous | Présentation du projet |
-| `/contact` | Tous | Formulaire de contact |
-| `/privacy-policy` | Tous | Politique de confidentialité |
-| `/login` | Non connecté | Formulaire de connexion |
-| `/register` | Non connecté | Formulaire d'inscription (téléphone 8 chiffres obligatoire) |
-| `/dashboard` | Connecté | Livres publiés, demandes envoyées/reçues, notifications |
-| `/add-book` | Connecté | Formulaire d'ajout de livre |
-| `/edit-book` | Connecté (propriétaire) | Formulaire de modification d'un livre |
-| `/admin` | Admin | Tableau de bord d'administration |
+| Publication d'un livre | Utilisateur | 3-5 min |
+| Recherche et filtrage | Tous | < 1 sec |
+| Envoi d'une demande | Utilisateur | Immédiat |
+| **Traitement d'une demande** | **Utilisateur** | **24h à 7 jours** |
+| Finalisation d'un échange | Système | Manuel |
 
-### 5.8 Sécurité Appliquée
+### 2. Processus sélectionné — État As-Is
 
-| Mesure | Implémentation |
-|---|---|
-| **Requêtes préparées** | PDO avec paramètres liés — protection contre les injections SQL |
-| **Échappement HTML** | `htmlspecialchars()` dans les vues — protection contre le XSS |
-| **Contrôle des rôles** | Vérification de `Auth::isAdmin()` avant chaque action admin |
-| **Contrôle d'authentification** | Vérification de `Auth::check()` pour les actions protégées |
-| **Règles métier** | Impossibilité de demander son propre livre, prévention des doublons |
-| **Régénération de session** | `session_regenerate_id(true)` à la déconnexion |
+**Processus : traitement d'une demande de livre sur BookCycle Tunisia**
 
----
-
-## 6. Partie RPA
-
-### 6.1 Vision Processus
-
-La plateforme **BookCycle Tunisia** peut être analysée comme un service numérique structuré autour de cinq processus principaux :
-
-1. **Publication d'un livre** — le propriétaire met un livre en ligne
-2. **Recherche et filtrage** — le visiteur ou utilisateur explore le catalogue
-3. **Envoi d'une demande** — l'utilisateur sollicite un livre
-4. **Traitement d'une demande** — le propriétaire répond à la demande
-5. **Administration et suivi** — l'administrateur supervise la plateforme
-
-### 6.2 Processus Choisi pour l'Étude BPR
-
-Le processus sélectionné est : **le traitement d'une demande de livre**.
-
-Ce choix est justifié car il est le plus critique pour l'expérience utilisateur, le plus sujet aux délais et aux oublis, et le mieux adapté à une automatisation.
-
-#### État Actuel (As-Is)
+Ce processus est sélectionné car son SLA est inacceptable (24h à 7 jours) et il constitue le cœur de valeur de la plateforme.
 
 ```
-Demandeur                    Propriétaire               Système
-    │                             │                          │
-    ├── Envoie une demande ───────►                          │
-    │                             │                          │
-    │                     ◄─── Consulte son dashboard ──────┤
-    │                             │                          │
-    │                     ◄─── Lit les demandes reçues       │
-    │                             │                          │
-    │                     ◄─── Décide d'accepter ou refuser  │
-    │                             │                          │
-    ◄─── Notification de statut ──┼──────────────────────────┤
-    │                             │                          │
+ Demandeur          Propriétaire        Système
+     │                    │                │
+     ├── Envoie demande ──►│                │
+     │         [Le propriétaire doit se connecter manuellement]
+     │                    │◄─── Consulte dashboard ──┤
+     │              [Décision manuelle, sans délai]
+     │                    ├── Accepte / refuse ──────►│
+     │◄── Notification ───┼──────────────────────────┤
 ```
 
-#### Limites du Processus Actuel
+**Limites :** dépendance 100% manuelle, pas de rappel automatique, pas de priorisation.
 
-- Dépendance totale à l'action manuelle du propriétaire
-- Délai de réponse imprévisible et non maîtrisé
-- Risque d'oubli en cas d'absence ou de forte activité
-- Aucune priorisation automatique des demandes anciennes
-- Absence de clôture automatique des demandes redondantes
-
-#### État Cible (To-Be)
+### 3. Solution cible — État To-Be
 
 ```
-Demandeur                    Propriétaire               Système Automatisé
-    │                             │                          │
-    ├── Envoie une demande ───────►────────────────────►Notification immédiate
-    │                             │                          │
-    │                             │    ◄──── Relance auto si pending > 48h ──
-    │                             │                          │
-    │                     ◄─── Répond (accept/reject)        │
-    │                             │                          │
-    ◄─── Notification statut ─────┼──────────────────────────┤
-    │                    [Autres demandes du livre → rejected automatiquement]
+ Demandeur    Propriétaire    Système     Moteur IA    Moteur RPA
+     ├── Envoie ────►├──────────►│             │              │
+     │               │◄─ Notif. immédiate ─────┤              │
+     │               │           │── Score ───►│              │
+     │               │     [Si pending > 48h] ◄──── Relance ──┤
+     │               ├── Répond ─►│                           │
+     │◄── Notif. ────┤           │──── Clôture auto autres ───►
 ```
 
-### 6.3 Scénarios d'Automatisation
+**Gain estimé :** > 75% de réduction du délai (objectif < 12 heures).
 
-#### Scénario 1 — Relance Automatique
+### 4. KPI de pilotage
 
-- Détecter les demandes `pending` depuis plus de 48 heures
-- Envoyer une notification de relance au propriétaire
-- Remonter ces demandes en tête du tableau de bord
-
-**Bénéfice :** Réduction du délai de réponse moyen, meilleure expérience demandeur.
-
-#### Scénario 2 — Clôture Automatique
-
-- Lorsqu'une demande est acceptée, rejeter automatiquement les autres demandes du même livre
-- Notifier les autres demandeurs du rejet
-- Ce scénario est déjà partiellement implémenté dans la procédure `accept_request`
-
-**Bénéfice :** Cohérence automatique des données, moins de travail manuel pour le propriétaire.
-
-#### Scénario 3 — Reporting Automatique
-
-- Calculer et afficher des KPI de suivi en temps réel pour l'administrateur
-- Alerter l'administrateur sur les livres inactifs depuis plus de 30 jours
-- Générer des rapports périodiques de l'activité de la plateforme
-
-**Bénéfice :** Meilleure visibilité sur l'activité, décisions d'administration plus éclairées.
-
-### 6.4 KPI Définis
-
-| Indicateur | Description |
+| KPI | Cible |
 |---|---|
-| Nombre de livres actifs | Livres disponibles avec `is_active = 1` |
-| Nombre total de demandes | Toutes demandes confondues |
-| Taux d'acceptation | Demandes acceptées / total des demandes |
-| Délai moyen de traitement | Temps moyen entre envoi et réponse |
-| Nombre total d'échanges | Échanges finalisés dans la table `exchanges` |
-| Économie estimée | Somme des `estimated_price` des livres échangés (en DT) |
+| Délai moyen de traitement | < 12 heures |
+| Taux de réponse des propriétaires | > 90% |
+| Taux d'abandon des demandes | < 10% |
+| Taux d'acceptation | > 60% |
+| Économie totale estimée | Croissance continue (en DT) |
 
 ---
 
-## 7. Tests et Validation
+&nbsp;
 
-### 7.1 Tests Fonctionnels Manuels
+<div align="center">
 
-| Scénario de test | Résultat |
-|---|---|
-| Inscription avec email valide | Succès |
-| Inscription avec email déjà utilisé | Erreur correctement affichée |
-| Connexion avec bons identifiants | Succès, redirection vers `/dashboard` |
-| Connexion avec mauvais mot de passe | Erreur affichée, pas de connexion |
-| Ajout d'un livre avec tous les champs | Succès, livre visible dans le catalogue |
-| Ajout d'un livre avec classe incohérente | Erreur de validation serveur |
-| Filtrage du catalogue par niveau | Résultats corrects |
-| Envoi d'une demande sur son propre livre | Bloqué par la règle métier |
-| Envoi d'une demande en double (`pending`) | Bloqué par la règle métier |
-| Acceptation d'une demande | Statut mis à jour, autres demandes rejetées, notification envoyée |
-| Accès à `/admin` sans rôle admin | Redirection vers `/login` |
-| Déconnexion | Session détruite, redirection vers l'accueil |
+## Conclusion Générale
 
-### 7.2 Validation Technique
-
-- Exécution des 5 scripts Oracle dans l'ordre correct
-- Vérification de la connexion PDO Oracle sans erreur
-- Démarrage de l'application via `start_oracle_app.bat`
-- Accès aux 10 pages principales via le navigateur
-- Vérification des objets PL/SQL dans SQL Developer
+</div>
 
 ---
 
-## 8. Difficultés et Limites
+**BookCycle Tunisia** est un projet intégré abouti qui démontre la capacité à concevoir, modéliser et développer une application web complète répondant à un besoin réel : la réutilisation des livres scolaires en Tunisie.
 
-### 8.1 Difficultés Rencontrées
+La plateforme couvre l'ensemble du parcours utilisateur — de la consultation anonyme du catalogue jusqu'à la finalisation d'un échange — avec une interface claire organisée autour de trois espaces : le visiteur, l'utilisateur connecté et l'administrateur.
 
-| Difficulté | Solution apportée |
-|---|---|
-| Configuration d'Oracle Instant Client | Utilisation de PDO_OCI avec le chemin explicite vers les librairies |
-| Compatibilité PHP 7.4 et Oracle XE | Tests et ajustements des paramètres PDO |
-| Gestion des séquences Oracle (pas d'auto-increment natif) | Pattern séquence + trigger sur toutes les tables |
-| Synchronisation PHP ↔ PL/SQL | Tests manuels croisés entre SQL Developer et le navigateur |
-
-### 8.2 Limites Actuelles
-
-| Limite | Impact |
-|---|---|
-| Pas d'upload d'image pour les livres | Interface moins riche visuellement |
-| Pas de token CSRF | Vulnérabilité potentielle aux attaques CSRF |
-| Pas de tests automatisés | Validation entièrement manuelle |
-| Affichage mobile non optimisé | Expérience dégradée sur smartphone |
-| Automatisation RPA partielle | Scénarios définis mais non encore déployés |
-
----
-
-## 9. Améliorations Proposées
-
-| Amélioration | Priorité |
-|---|---|
-| Ajout d'un token CSRF sur tous les formulaires | Haute |
-| Upload et affichage d'images de couverture | Haute |
-| Enrichissement du profil utilisateur (biographie, ville) | Moyenne |
-| Tests automatisés (PHPUnit) | Haute |
-| Optimisation du responsive design | Moyenne |
-| Déploiement sur un serveur distant | Basse |
-| Automatisation complète des relances RPA | Moyenne |
-| Tableaux de bord analytiques plus détaillés | Basse |
-
----
-
-## 10. Conclusion Générale
-
-**BookCycle Tunisia** est un projet intégré abouti qui démontre la capacité à concevoir, modéliser et développer une application web complète en mobilisant des compétences complémentaires.
-
-Sur le plan technique, le projet livre une architecture MVC claire en PHP 7.4, une base Oracle solide avec des objets PL/SQL bien conçus, et une interface fonctionnelle couvrant tous les besoins identifiés. Sur le plan méthodologique, il illustre comment l'analyse des besoins (AGL), la conception des données (SGBD), le développement web (Web 2) et la réflexion sur les processus (RPA) se complètent naturellement autour d'un cas d'usage concret.
-
-La plateforme constitue une réponse pertinente à la problématique de départ et une base solide pour des extensions futures, notamment l'automatisation des relances et le déploiement en ligne.
+Sur le plan technique, le projet livre une architecture MVC PHP 7.4 connectée à Oracle XE, avec une validation croisée niveau/classe/matière directement depuis les tables de référence Oracle, des objets PL/SQL encapsulant la logique métier critique, et un espace d'administration complet. Sur le plan méthodologique, il démontre comment AGL (Scrum), SGBD (Oracle), Web 2 (PHP MVC) et RPA (analyse processus) se complètent naturellement autour d'un cas d'usage concret.
 
 ---
 

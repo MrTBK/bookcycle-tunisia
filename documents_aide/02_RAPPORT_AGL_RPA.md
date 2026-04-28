@@ -1,44 +1,98 @@
-# RAPPORT AGL ET RPA
-## BookCycle Tunisia
+<div align="center">
+
+**Ecole Supérieure d'Economie Numérique**
+**UNIVERSITÉ DE LA MANOUBA**
+
+&nbsp;
+
+&nbsp;
+
+**Projet de Fin d'Année**
+
+*Filière : Licence 2 — Big Data et Intelligence Artificielle*
+
+&nbsp;
+
+&nbsp;
+
+Application web de don, d'échange et de réutilisation des livres scolaires
+**\<\<BookCycle Tunisia\>\>**
+
+&nbsp;
+
+**Modules : Atelier Génie Logiciel (AGL) · Réingénierie des Processus d'Affaires (RPA)**
+
+&nbsp;
+
+&nbsp;
+
+**Réalisé par :**
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Mortadha Yakoubi
+
+&nbsp;
+
+**Présenté le :** 28/04/2026
+
+&nbsp;
+
+**Année Universitaire: 2025/2026**
+
+</div>
 
 ---
 
-**Université de la Manouba — École Supérieure d'Économie Numérique (ESEN)**
-**Licence 2 — Big Data et Intelligence Artificielle**
-**Année universitaire 2025 / 2026**
+&nbsp;
 
-**Réalisé par :** Mortadha Yakoubi
-**Modules :** Atelier Génie Logiciel (AGL) · Réingénierie des Processus d'Affaires (RPA)
+## Sommaire
+
+```
+I    Introduction                                                              5
+
+II   Partie AGL — Atelier Génie Logiciel                                      6
+     Introduction                                                             6
+     1)   Démarche Scrum                                                      6
+     2)   Identification des Acteurs                                          7
+          2.1  Visiteur (non authentifié)                                     7
+          2.2  Utilisateur Connecté                                           7
+          2.3  Administrateur                                                 7
+     3)   Besoins Fonctionnels et Non Fonctionnels                            8
+     4)   User Stories                                                        9
+     5)   Product Backlog                                                    10
+     6)   Sprint Backlog et Avancement                                       11
+          6.1  Sprint 1 — Fondations                                         11
+          6.2  Sprint 2 — Fonctionnalités Cœur                               12
+          6.3  Sprint 3 — Administration et PL/SQL                           12
+     7)   Architecture Logique                                               13
+     8)   Définition of Done                                                 14
+
+III  Partie RPA — Réingénierie des Processus d'Affaires                      15
+     Introduction                                                            15
+     1)   Cartographie des Processus Métier                                  15
+     2)   Évaluation de la Performance — État As-Is                          16
+     3)   Processus Sélectionné pour le BPR                                  17
+     4)   Analyse SWOT — État As-Is                                          18
+     5)   Méthodologie BPR Adoptée                                           19
+     6)   Solution Cible — État To-Be                                        20
+     7)   Analyse SWOT — État To-Be                                          22
+     8)   Comparaison As-Is vs To-Be                                         23
+     9)   KPI et Indicateurs de Pilotage                                     23
+
+IV   Conclusion                                                              25
+```
 
 ---
 
-## Table des Matières
+&nbsp;
 
-1. [Introduction](#introduction)
-2. [Partie AGL — Atelier Génie Logiciel](#partie-agl)
-   - 2.1 Démarche Scrum
-   - 2.2 Identification des Acteurs
-   - 2.3 Besoins Fonctionnels et Non Fonctionnels
-   - 2.4 User Stories
-   - 2.5 Product Backlog
-   - 2.6 Sprint Backlog et Avancement
-   - 2.7 Architecture Logique
-   - 2.8 Définition of Done
-3. [Partie RPA — Réingénierie des Processus d'Affaires](#partie-rpa)
-   - 3.1 Cartographie des Processus Métier
-   - 3.2 Évaluation de la Performance — État As-Is
-   - 3.3 Processus Sélectionné pour le BPR
-   - 3.4 Analyse SWOT — État As-Is
-   - 3.5 Méthodologie BPR Adoptée
-   - 3.6 Solution Cible — État To-Be
-   - 3.7 Analyse SWOT — État To-Be
-   - 3.8 Comparaison As-Is vs To-Be
-   - 3.9 KPI et Indicateurs de Pilotage
-4. [Conclusion](#conclusion)
+<div align="center">
+
+## Chapitre I
+### Introduction
+
+</div>
 
 ---
-
-## 1. Introduction
 
 Ce rapport présente la partie **Atelier Génie Logiciel (AGL)** et la partie **Réingénierie des Processus d'Affaires (RPA)** du projet intégré **BookCycle Tunisia**.
 
@@ -50,9 +104,22 @@ La partie **RPA** (Data-Driven Reengineering) analyse les processus métier de l
 
 ---
 
-## 2. Partie AGL — Atelier Génie Logiciel
+&nbsp;
 
-### 2.1 Démarche Scrum
+<div align="center">
+
+## Chapitre II
+### Partie AGL — Atelier Génie Logiciel
+
+</div>
+
+---
+
+### Introduction
+
+Au niveau de ce chapitre, nous appliquons la démarche **Scrum** au projet BookCycle Tunisia. Nous y présentons la cartographie des acteurs, les besoins fonctionnels et non fonctionnels, les user stories, le product backlog structuré par sprints, l'architecture logique, et les critères de complétion (Definition of Done).
+
+### 1. Démarche Scrum
 
 Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au contexte académique d'un développeur solo sur une durée de quelques semaines.
 
@@ -63,9 +130,9 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | **Incrément** | Application fonctionnelle livrée à la fin de chaque sprint |
 | **Definition of Done** | Critères de complétion d'une fonctionnalité |
 
-### 2.2 Identification des Acteurs
+### 2. Identification des Acteurs
 
-#### Visiteur (non authentifié)
+#### 2.1 Visiteur (non authentifié)
 
 | Action | Description |
 |---|---|
@@ -75,7 +142,7 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | Pages institutionnelles | À propos, Contact, Politique de confidentialité |
 | S'inscrire / se connecter | Accès aux formulaires d'authentification |
 
-#### Utilisateur Connecté
+#### 2.2 Utilisateur Connecté
 
 | Action | Description |
 |---|---|
@@ -87,7 +154,7 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | Gérer ses demandes | Accepter ou refuser les demandes reçues |
 | Consulter les notifications | Lire les notifications système |
 
-#### Administrateur
+#### 2.3 Administrateur
 
 | Action | Description |
 |---|---|
@@ -98,9 +165,9 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | Annulation de demandes | Annuler n'importe quelle demande |
 | Envoi de notifications | Notifier un utilisateur ou tous les utilisateurs actifs |
 
-### 2.3 Besoins Fonctionnels et Non Fonctionnels
+### 3. Besoins Fonctionnels et Non Fonctionnels
 
-#### Besoins Fonctionnels
+#### 3.1 Besoins Fonctionnels
 
 | ID | Besoin | Acteur | Priorité |
 |---|---|---|---|
@@ -115,7 +182,7 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | BF-09 | Tableau de bord administrateur | Admin | Haute |
 | BF-10 | Modération livres et utilisateurs | Admin | Haute |
 
-#### Besoins Non Fonctionnels
+#### 3.2 Besoins Non Fonctionnels
 
 | Catégorie | Exigence |
 |---|---|
@@ -126,7 +193,7 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 | **Compatibilité** | Oracle XE + PHP 7.4 + PDO_OCI |
 | **Déployabilité** | Lancement local en une commande |
 
-### 2.4 User Stories
+### 4. User Stories
 
 ```
 US-01 : En tant que visiteur,
@@ -162,7 +229,7 @@ US-08 : En tant qu'administrateur,
         afin de modérer la plateforme de manière ciblée et réversible.
 ```
 
-### 2.5 Product Backlog
+### 5. Product Backlog
 
 Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est estimé en **jours-développeur (JD)**.
 
@@ -191,9 +258,9 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 **Effort total réalisé :** ~19 jours-développeur
 **Effort restant :** ~5.5 jours-développeur
 
-### 2.6 Sprint Backlog et Avancement
+### 6. Sprint Backlog et Avancement
 
-#### Sprint 1 — Fondations (Semaines 1-2)
+#### 6.1 Sprint 1 — Fondations (Semaines 1-2)
 
 **Objectif :** Mise en place de l'architecture, de la base Oracle et de l'authentification.
 
@@ -206,7 +273,7 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 | Layout partagé (header/footer) | Done |
 | Page d'accueil | Done |
 
-#### Sprint 2 — Fonctionnalités Cœur (Semaines 3-4)
+#### 6.2 Sprint 2 — Fonctionnalités Cœur (Semaines 3-4)
 
 **Objectif :** Catalogue, ajout de livres et gestion des demandes.
 
@@ -219,7 +286,7 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 | Envoi d'une demande | Done |
 | Tableau de bord utilisateur (livres + demandes) | Done |
 
-#### Sprint 3 — Administration et PL/SQL (Semaines 5-6)
+#### 6.3 Sprint 3 — Administration et PL/SQL (Semaines 5-6)
 
 **Objectif :** Espace admin, procédures PL/SQL et polish.
 
@@ -244,7 +311,7 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 | Token CSRF sur les formulaires | To Do |
 | Tests automatisés PHPUnit | To Do |
 
-### 2.7 Architecture Logique
+### 7. Architecture Logique
 
 ```
                    ┌──────────────────────────────────────────────┐
@@ -272,7 +339,7 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
               └─────────────────────────┘
 ```
 
-### 2.8 Définition of Done
+### 8. Définition of Done
 
 Une fonctionnalité est considérée **Done** si :
 
@@ -285,13 +352,26 @@ Une fonctionnalité est considérée **Done** si :
 
 ---
 
-## 3. Partie RPA — Réingénierie des Processus d'Affaires
+&nbsp;
 
-### 3.1 Cartographie des Processus Métier
+<div align="center">
+
+## Chapitre III
+### Partie RPA — Réingénierie des Processus d'Affaires
+
+</div>
+
+---
+
+### Introduction
+
+Au niveau de ce chapitre, nous analysons les processus métier de la plateforme BookCycle Tunisia selon une approche **Data-Driven Reengineering**. Nous cartographions les processus, évaluons leur performance actuelle via des SLA et KPI, sélectionnons le processus à fort potentiel de rupture, et proposons une solution cible intégrant Intelligence Artificielle et automatisation RPA.
+
+### 1. Cartographie des Processus Métier
 
 La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de processus.
 
-#### Processus Cœur (Valeur directe pour l'utilisateur)
+#### 1.1 Processus Cœur (Valeur directe pour l'utilisateur)
 
 | Processus | Description | Acteurs |
 |---|---|---|
@@ -301,7 +381,7 @@ La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de pr
 | **Traitement d'une demande** | Réponse du propriétaire (acceptation ou refus) | Utilisateur |
 | **Finalisation d'un échange** | Confirmation et enregistrement de l'échange | Utilisateur + Système |
 
-#### Processus Support (Infrastructure)
+#### 1.2 Processus Support (Infrastructure)
 
 | Processus | Description |
 |---|---|
@@ -310,7 +390,7 @@ La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de pr
 | Maintenance Oracle | Scripts SQL, sauvegardes, administration de la BD |
 | Maintenance applicative | Déploiement, mises à jour du code PHP |
 
-#### Processus de Management (Pilotage)
+#### 1.3 Processus de Management (Pilotage)
 
 | Processus | Description |
 |---|---|
@@ -318,9 +398,9 @@ La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de pr
 | Modération | Contrôle des contenus et des utilisateurs |
 | Suivi des statistiques | Analyse des KPI et de l'activité de la plateforme |
 
-### 3.2 Évaluation de la Performance — État As-Is
+### 2. Évaluation de la Performance — État As-Is
 
-#### SLA (Service Level Agreements) Actuels
+#### 2.1 SLA (Service Level Agreements) Actuels
 
 | Processus | SLA défini | Performance réelle | Statut |
 |---|---|---|---|
@@ -330,7 +410,7 @@ La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de pr
 | **Traitement d'une demande** | **< 24h** | **24h à 7 jours (dépend du propriétaire)** | **Inacceptable** |
 | Finalisation d'un échange | Automatique | Manuel et variable | Dégradé |
 
-#### KPI Actuels (As-Is)
+#### 2.2 KPI Actuels (As-Is)
 
 | KPI | Valeur estimée As-Is | Cible To-Be |
 |---|---|---|
@@ -340,7 +420,7 @@ La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de pr
 | Taux d'abandon de demandes | ~25% | < 10% |
 | Satisfaction utilisateur (estimée) | Moyenne | Élevée |
 
-### 3.3 Processus Sélectionné pour le BPR
+### 3. Processus Sélectionné pour le BPR
 
 **Processus sélectionné : le traitement d'une demande de livre**
 
@@ -350,7 +430,7 @@ Ce processus présente le plus fort potentiel de rupture car :
 - Il génère le plus d'insatisfaction et d'abandons utilisateurs
 - Il se prête à des gains de performance supérieurs à **50%** par automatisation
 
-#### Flux As-Is Détaillé
+#### 3.1 Flux As-Is Détaillé
 
 ```
  Demandeur          Propriétaire        Système
@@ -373,9 +453,9 @@ Ce processus présente le plus fort potentiel de rupture car :
 **Durée totale As-Is :** 24h à 7 jours
 **Dépendance :** 100% manuelle côté propriétaire
 
-### 3.4 Analyse SWOT — État As-Is
+### 4. Analyse SWOT — État As-Is
 
-#### Forces (Strengths)
+#### 4.1 Forces (Strengths)
 
 | Force | Description |
 |---|---|
@@ -384,7 +464,7 @@ Ce processus présente le plus fort potentiel de rupture car :
 | Traçabilité | Historique des demandes conservé dans Oracle |
 | Notification existante | Le demandeur est informé une fois la décision prise |
 
-#### Faiblesses (Weaknesses)
+#### 4.2 Faiblesses (Weaknesses)
 
 | Faiblesse | Impact |
 |---|---|
@@ -394,7 +474,7 @@ Ce processus présente le plus fort potentiel de rupture car :
 | Pas d'indicateurs de performance | Impossible de mesurer et d'améliorer |
 | Pas de clôture automatique | Les demandes redondantes restent en attente |
 
-#### Opportunités (Opportunities)
+#### 4.3 Opportunités (Opportunities)
 
 | Opportunité | Description |
 |---|---|
@@ -403,7 +483,7 @@ Ce processus présente le plus fort potentiel de rupture car :
 | Tableaux de bord enrichis | Meilleure visibilité pour l'admin et les utilisateurs |
 | Réengagement utilisateurs | Relances ciblées pour réactiver la plateforme |
 
-#### Menaces (Threats)
+#### 4.4 Menaces (Threats)
 
 | Menace | Description |
 |---|---|
@@ -411,13 +491,11 @@ Ce processus présente le plus fort potentiel de rupture car :
 | Faux positifs des rappels | Des rappels trop fréquents peuvent être perçus comme du spam |
 | Dépendance à la donnée | La qualité des prédictions IA dépend du volume de données |
 
-### 3.5 Méthodologie BPR Adoptée
+### 5. Méthodologie BPR Adoptée
 
 #### Choix : Réingénierie Progressive mais Radicale
 
 La méthodologie retenue est une **réingénierie progressive mais radicale**, et non une approche "Greenfield" (table rase).
-
-**Justification :**
 
 | Critère | Greenfield | Progressive Radicale | Choix |
 |---|---|---|---|
@@ -429,9 +507,9 @@ La méthodologie retenue est une **réingénierie progressive mais radicale**, e
 
 L'approche progressive radicale permet de conserver la base Oracle, le code PHP et l'expérience utilisateur existants, tout en y greffant des composants IA et d'automatisation qui transforment radicalement le processus de traitement des demandes, en visant un gain de performance **≥ 50%** sur le délai de traitement.
 
-### 3.6 Solution Cible — État To-Be
+### 6. Solution Cible — État To-Be
 
-#### Architecture To-Be avec IA et Automatisation
+#### 6.1 Architecture To-Be avec IA et Automatisation
 
 ```
  Demandeur    Propriétaire    Système Central    Moteur IA    Moteur RPA
@@ -460,7 +538,7 @@ L'approche progressive radicale permet de conserver la base Oracle, le code PHP 
 **Durée totale To-Be :** < 12 heures (objectif)
 **Gain estimé :** > 75% de réduction du délai de traitement
 
-#### Composants Technologiques de la Solution To-Be
+#### 6.2 Composants Technologiques de la Solution To-Be
 
 **1. Intelligence Artificielle — Scoring des Demandes**
 
@@ -482,7 +560,6 @@ Les demandes à score élevé remontent automatiquement en tête du tableau de b
 Le moteur RPA détecte les demandes `pending` depuis plus de 48 heures et déclenche une relance automatique :
 
 ```sql
--- Détection des demandes à relancer
 SELECT r.id, r.book_id, b.owner_id, b.title,
        ROUND(SYSDATE - r.request_date) AS jours_attente
 FROM requests r
@@ -508,9 +585,9 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 - Tri automatique des demandes par score de priorité IA
 - Indicateurs de performance visibles par l'administrateur en temps réel
 
-### 3.7 Analyse SWOT — État To-Be
+### 7. Analyse SWOT — État To-Be
 
-#### Forces (Strengths)
+#### 7.1 Forces (Strengths)
 
 | Force | Description |
 |---|---|
@@ -520,7 +597,7 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 | Clôture automatique | Cohérence des données garantie sans action manuelle |
 | Indicateurs de pilotage | KPI en temps réel pour l'administrateur |
 
-#### Faiblesses (Weaknesses)
+#### 7.2 Faiblesses (Weaknesses)
 
 | Faiblesse | Description |
 |---|---|
@@ -528,7 +605,7 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 | Complexité accrue | Composants IA et RPA à maintenir en plus du code PHP |
 | Risque de faux positifs | Relances potentiellement perçues comme spam si mal calibrées |
 
-#### Opportunités (Opportunities)
+#### 7.3 Opportunités (Opportunities)
 
 | Opportunité | Description |
 |---|---|
@@ -536,7 +613,7 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 | Extension du modèle IA | Prédiction de la disponibilité future des livres |
 | Analytics avancés | Rapports automatiques pour l'administration |
 
-#### Menaces (Threats)
+#### 7.4 Menaces (Threats)
 
 | Menace | Description |
 |---|---|
@@ -544,7 +621,7 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 | Dépendance technologique | Panne du moteur RPA = retour au mode manuel |
 | Adoption utilisateurs | Les propriétaires peuvent désactiver les notifications |
 
-### 3.8 Comparaison As-Is vs To-Be
+### 8. Comparaison As-Is vs To-Be
 
 | Dimension | As-Is | To-Be | Gain |
 |---|---|---|---|
@@ -555,7 +632,7 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 | Clôture des demandes redondantes | Manuelle | Automatique (PL/SQL) | **100%** |
 | Visibilité KPI pour l'admin | Nulle | Temps réel | Nouveau |
 
-### 3.9 KPI et Indicateurs de Pilotage
+### 9. KPI et Indicateurs de Pilotage
 
 | Indicateur | Formule | Unité | Cible |
 |---|---|---|---|
@@ -570,7 +647,15 @@ La procédure `accept_request` implémente déjà la clôture automatique des de
 
 ---
 
-## 4. Conclusion
+&nbsp;
+
+<div align="center">
+
+## Conclusion
+
+</div>
+
+---
 
 ### Bilan AGL
 

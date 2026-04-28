@@ -1,35 +1,116 @@
-# RAPPORT PROGRAMMATION WEB 2
-## BookCycle Tunisia
+<div align="center">
+
+**Ecole Supérieure d'Economie Numérique**
+**UNIVERSITÉ DE LA MANOUBA**
+
+&nbsp;
+
+&nbsp;
+
+**Projet de Fin d'Année**
+
+*Filière : Licence 2 — Big Data et Intelligence Artificielle*
+
+&nbsp;
+
+&nbsp;
+
+Application web de don, d'échange et de réutilisation des livres scolaires
+**\<\<BookCycle Tunisia\>\>**
+
+&nbsp;
+
+**Module : Programmation Web 2**
+
+&nbsp;
+
+&nbsp;
+
+**Réalisé par :**
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Mortadha Yakoubi
+
+&nbsp;
+
+**Présenté le :** 28/04/2026
+
+&nbsp;
+
+**Année Universitaire: 2025/2026**
+
+</div>
 
 ---
 
-**Université de la Manouba — ESEN**
-**Licence 2 — Big Data et Intelligence Artificielle**
-**Année universitaire 2025 / 2026**
+&nbsp;
 
-**Réalisé par :** Mortadha Yakoubi
-**Module :** Programmation Web 2
+## Sommaire
+
+```
+I    Introduction                                                              5
+
+II   Objectif de l'Application                                                6
+
+III  Technologies Utilisées                                                   7
+
+IV   Architecture MVC Détaillée                                               8
+     Introduction                                                             8
+     1)   Structure des Fichiers                                              8
+     2)   Couche Modèle                                                      10
+     3)   Couche Contrôleur                                                  11
+     4)   Couche Vue                                                         12
+
+V    Connexion Oracle via PDO                                               13
+
+VI   Routeur et Front Controller                                            14
+
+VII  Gestion des Sessions et des Rôles                                      16
+
+VIII Pages Web Réalisées                                                    17
+
+IX   Fonctionnalités Principales                                            18
+     1)   Inscription et Connexion                                          18
+     2)   Catalogue Public avec Filtres Dynamiques                          19
+     3)   Ajout d'un Livre                                                  19
+     4)   Gestion des Demandes                                              20
+     5)   Tableau de Bord Utilisateur                                       21
+     6)   Modification d'un Livre                                           21
+     7)   Espace Administrateur                                             22
+
+X    Validation et Sécurité                                                23
+     1)   Protection contre les Injections SQL                              23
+     2)   Protection contre le XSS                                          23
+     3)   Contrôle d'Accès par Rôle                                         24
+     4)   Règles Métier de Sécurité                                         24
+     5)   Sécurité des Sessions                                             24
+
+XI   Captures d'Écran des Interfaces                                        25
+     1)   Page d'Accueil                                                    25
+     2)   Page Catalogue                                                    25
+     3)   Page Connexion                                                    26
+     4)   Page Inscription                                                  26
+     5)   Page Tableau de Bord                                              26
+     6)   Page Modification de Livre                                        27
+     7)   Page Ajout de Livre                                               27
+     8)   Page Administration                                               27
+
+XII  Points Forts et Limites                                               28
+
+XIII Conclusion                                                            29
+```
 
 ---
 
-## Table des Matières
+&nbsp;
 
-1. [Introduction](#introduction)
-2. [Objectif de l'Application](#objectif)
-3. [Technologies Utilisées](#technologies)
-4. [Architecture MVC Détaillée](#architecture-mvc)
-5. [Connexion Oracle via PDO](#connexion-oracle)
-6. [Routeur et Front Controller](#routeur)
-7. [Gestion des Sessions et des Rôles](#sessions-et-rôles)
-8. [Pages Web Réalisées](#pages-web)
-9. [Fonctionnalités Principales](#fonctionnalités)
-10. [Validation et Sécurité](#validation-et-sécurité)
-11. [Points Forts et Limites](#points-forts-et-limites)
-12. [Conclusion](#conclusion)
+<div align="center">
+
+## Chapitre I
+### Introduction
+
+</div>
 
 ---
-
-## 1. Introduction
 
 La partie Programmation Web 2 du projet **BookCycle Tunisia** consiste à développer une application web complète en PHP, organisée selon le patron d'architecture **MVC**, connectée à une base de données **Oracle XE** via **PDO_OCI**, et accessible via un navigateur web standard.
 
@@ -39,7 +120,16 @@ Ce rapport présente les choix techniques, l'architecture de l'application, les 
 
 ---
 
-## 2. Objectif de l'Application
+&nbsp;
+
+<div align="center">
+
+## Chapitre II
+### Objectif de l'Application
+
+</div>
+
+---
 
 L'application **BookCycle Tunisia** doit permettre :
 
@@ -53,7 +143,16 @@ L'application **BookCycle Tunisia** doit permettre :
 
 ---
 
-## 3. Technologies Utilisées
+&nbsp;
+
+<div align="center">
+
+## Chapitre III
+### Technologies Utilisées
+
+</div>
+
+---
 
 | Technologie | Version | Rôle dans le projet |
 |---|---|---|
@@ -78,11 +177,22 @@ Puis accéder à : `http://localhost:8000`
 
 ---
 
-## 4. Architecture MVC Détaillée
+&nbsp;
 
-Le projet suit strictement le patron **MVC (Modèle-Vue-Contrôleur)**, qui sépare les responsabilités en trois couches indépendantes.
+<div align="center">
 
-### 4.1 Structure des Fichiers
+## Chapitre IV
+### Architecture MVC Détaillée
+
+</div>
+
+---
+
+### Introduction
+
+Au niveau de ce chapitre, nous décrivons en détail l'architecture **MVC (Modèle-Vue-Contrôleur)** adoptée pour le projet BookCycle Tunisia. Nous présentons la structure des fichiers, le rôle de chaque couche et un extrait représentatif de code pour chaque composant.
+
+### 1. Structure des Fichiers
 
 ```
 bookcycle-tunisia/
@@ -138,7 +248,7 @@ bookcycle-tunisia/
             └── privacy-policy.php
 ```
 
-### 4.2 Couche Modèle
+### 2. Couche Modèle
 
 Les modèles encapsulent toutes les interactions avec Oracle via PDO. Chaque modèle correspond à une ou plusieurs tables de la base de données.
 
@@ -152,7 +262,7 @@ Les modèles encapsulent toutes les interactions avec Oracle via PDO. Chaque mod
 
 **Exemple — Modèle `AcademicOption` :** Ce modèle est particulièrement important car il alimente dynamiquement les formulaires d'ajout de livre depuis Oracle, et valide la cohérence niveau/classe/matière.
 
-### 4.3 Couche Contrôleur
+### 3. Couche Contrôleur
 
 Les contrôleurs reçoivent les requêtes HTTP, appellent les méthodes des modèles, et transmettent les données aux vues.
 
@@ -200,7 +310,7 @@ public function store()
 }
 ```
 
-### 4.4 Couche Vue
+### 4. Couche Vue
 
 Les vues sont des fichiers PHP purs qui reçoivent des variables depuis le contrôleur et génèrent le HTML. Elles s'appuient sur un système de layout partagé (`header.php` + `footer.php`) pour éviter la duplication.
 
@@ -224,7 +334,16 @@ L'utilisation systématique de `htmlspecialchars()` dans les vues prévient les 
 
 ---
 
-## 5. Connexion Oracle via PDO
+&nbsp;
+
+<div align="center">
+
+## Chapitre V
+### Connexion Oracle via PDO
+
+</div>
+
+---
 
 La connexion est gérée par le singleton `Database` dans `app/Core/Database.php` :
 
@@ -260,7 +379,16 @@ Le pattern **singleton** garantit qu'une seule connexion PDO est ouverte par req
 
 ---
 
-## 6. Routeur et Front Controller
+&nbsp;
+
+<div align="center">
+
+## Chapitre VI
+### Routeur et Front Controller
+
+</div>
+
+---
 
 Le fichier `router.php` constitue le **point d'entrée unique** de l'application. Il intercepte toutes les requêtes HTTP et les redirige vers le contrôleur et l'action appropriés selon l'URL demandée.
 
@@ -294,7 +422,16 @@ Le fichier `router.php` constitue le **point d'entrée unique** de l'application
 
 ---
 
-## 7. Gestion des Sessions et des Rôles
+&nbsp;
+
+<div align="center">
+
+## Chapitre VII
+### Gestion des Sessions et des Rôles
+
+</div>
+
+---
 
 La classe `Auth` dans `app/Core/Auth.php` centralise toute la gestion des sessions :
 
@@ -331,7 +468,16 @@ if (!Auth::isAdmin()) {
 
 ---
 
-## 8. Pages Web Réalisées
+&nbsp;
+
+<div align="center">
+
+## Chapitre VIII
+### Pages Web Réalisées
+
+</div>
+
+---
 
 | URL | Accès | Description | Fonctionnalités |
 |---|---|---|---|
@@ -349,9 +495,18 @@ if (!Auth::isAdmin()) {
 
 ---
 
-## 9. Fonctionnalités Principales
+&nbsp;
 
-### 9.1 Inscription et Connexion
+<div align="center">
+
+## Chapitre IX
+### Fonctionnalités Principales
+
+</div>
+
+---
+
+### 1. Inscription et Connexion
 
 ```
 Inscription :
@@ -368,7 +523,7 @@ Connexion :
   ✔ Redirection vers /dashboard
 ```
 
-### 9.2 Catalogue Public avec Filtres Dynamiques
+### 2. Catalogue Public avec Filtres Dynamiques
 
 Le catalogue charge les options de filtrage **directement depuis Oracle** via le modèle `AcademicOption` :
 
@@ -381,7 +536,7 @@ Filtres disponibles :
 
 La mise à jour des listes de classes et de matières selon les sélections est gérée par `app.js` en JavaScript natif, via des requêtes sur les données pré-chargées depuis Oracle.
 
-### 9.3 Ajout d'un Livre
+### 3. Ajout d'un Livre
 
 ```
 Champs du formulaire :
@@ -399,7 +554,7 @@ Validations côté serveur :
   ✔ Le titre est généré automatiquement : "Matière - Classe - Niveau"
 ```
 
-### 9.4 Gestion des Demandes
+### 4. Gestion des Demandes
 
 ```
 Envoi d'une demande :
@@ -420,7 +575,7 @@ Administration :
   ✔ L'administrateur peut annuler n'importe quelle demande
 ```
 
-### 9.5 Tableau de Bord Utilisateur
+### 5. Tableau de Bord Utilisateur
 
 Le tableau de bord (`/dashboard`) centralise en une seule page :
 
@@ -429,9 +584,7 @@ Le tableau de bord (`/dashboard`) centralise en une seule page :
 - **Demandes envoyées** : suivi des demandes envoyées à d'autres propriétaires
 - **Notifications** : historique des messages reçus avec marquage « lu »
 
-### 9.6 Modification d'un Livre (`/edit-book`)
-
-Un utilisateur peut modifier un livre qu'il a publié, tant que ce livre lui appartient :
+### 6. Modification d'un Livre (`/edit-book`)
 
 ```
 Champs modifiables :
@@ -449,7 +602,7 @@ Sécurité :
   ✔ Redirection vers /dashboard si livre introuvable ou accès refusé
 ```
 
-### 9.7 Espace Administrateur
+### 7. Espace Administrateur
 
 Le tableau de bord administrateur (`/admin`) affiche :
 
@@ -468,9 +621,18 @@ Le tableau de bord administrateur (`/admin`) affiche :
 
 ---
 
-## 10. Validation et Sécurité
+&nbsp;
 
-### 10.1 Protection contre les Injections SQL
+<div align="center">
+
+## Chapitre X
+### Validation et Sécurité
+
+</div>
+
+---
+
+### 1. Protection contre les Injections SQL
 
 Toutes les interactions avec Oracle passent par des **requêtes préparées PDO** avec des paramètres liés :
 
@@ -482,7 +644,7 @@ $stmt = Database::connection()->prepare(
 $stmt->execute([':owner_id' => $userId]);
 ```
 
-### 10.2 Protection contre le XSS
+### 2. Protection contre le XSS
 
 Toutes les variables affichées dans les vues sont échappées avec `htmlspecialchars()` :
 
@@ -490,7 +652,7 @@ Toutes les variables affichées dans les vues sont échappées avec `htmlspecial
 echo htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8');
 ```
 
-### 10.3 Contrôle d'Accès par Rôle
+### 3. Contrôle d'Accès par Rôle
 
 ```
 Niveau 1 — Actions publiques     : aucune vérification requise
@@ -498,7 +660,7 @@ Niveau 2 — Actions utilisateur   : Auth::check() vérifié avant chaque action
 Niveau 3 — Actions administrateur: Auth::isAdmin() vérifié, HTTP 403 sinon
 ```
 
-### 10.4 Règles Métier de Sécurité
+### 4. Règles Métier de Sécurité
 
 | Règle | Implémentation |
 |---|---|
@@ -508,7 +670,7 @@ Niveau 3 — Actions administrateur: Auth::isAdmin() vérifié, HTTP 403 sinon
 | Cohérence classe/matière | Requête sur `class_subjects` avant validation |
 | Compte inactif bloqué | Vérification `users.is_active = 1` à la connexion |
 
-### 10.5 Sécurité des Sessions
+### 5. Sécurité des Sessions
 
 ```php
 Auth::logout();
@@ -516,7 +678,7 @@ Auth::logout();
 // Appelle session_regenerate_id(true) pour prévenir la fixation de session
 ```
 
-### 10.6 Résumé des Mesures de Sécurité
+### 6. Résumé des Mesures de Sécurité
 
 | Menace | Contre-mesure appliquée |
 |---|---|
@@ -529,12 +691,18 @@ Auth::logout();
 
 ---
 
-## 11. Captures d'Écran des Interfaces
+&nbsp;
 
-> Les captures d'écran suivantes illustrent les principales interfaces de l'application.
-> Pour les visualiser, lancer l'application via `start_oracle_app.bat` puis accéder à `http://localhost:8000`.
+<div align="center">
 
-### 11.1 Page d'Accueil (`/`)
+## Chapitre XI
+### Captures d'Écran des Interfaces
+
+</div>
+
+---
+
+### 1. Page d'Accueil (`/`)
 
 **Description :** Page d'accueil publique affichant la présentation de la plateforme et les derniers livres publiés.
 
@@ -547,7 +715,7 @@ Auth::logout();
 - Administrateur : `admin@bookcycle.tn` / `admin123`
 - Utilisateur : `ahmed@bookcycle.tn` / `user123`
 
-### 11.2 Page Catalogue (`/catalog`)
+### 2. Page Catalogue (`/catalog`)
 
 **Description :** Catalogue public filtrable, accessible sans authentification.
 
@@ -556,7 +724,7 @@ Auth::logout();
 - Bouton "Demander" visible uniquement pour les utilisateurs connectés
 - Message "Aucun livre trouvé" si les filtres ne correspondent à aucun résultat
 
-### 11.3 Page Connexion (`/login`)
+### 3. Page Connexion (`/login`)
 
 **Description :** Formulaire d'authentification.
 
@@ -565,7 +733,7 @@ Auth::logout();
 - Lien vers la page d'inscription
 - Redirection vers `/dashboard` après connexion réussie
 
-### 11.4 Page Inscription (`/register`)
+### 4. Page Inscription (`/register`)
 
 **Description :** Formulaire de création de compte.
 
@@ -575,7 +743,7 @@ Auth::logout();
 - Hash du mot de passe avec `password_hash()` avant insertion
 - Redirection vers `/login` après inscription réussie
 
-### 11.5 Page Tableau de Bord (`/dashboard`)
+### 5. Page Tableau de Bord (`/dashboard`)
 
 **Description :** Espace personnel de l'utilisateur connecté, organisé en sections.
 
@@ -584,7 +752,7 @@ Auth::logout();
 - **Demandes envoyées** : suivi des demandes envoyées avec statut, coordonnées du propriétaire si accepté
 - **Notifications** : liste des notifications avec lien « Marquer comme lue »
 
-### 11.6 Page Modification de Livre (`/edit-book`)
+### 6. Page Modification de Livre (`/edit-book`)
 
 **Description :** Formulaire de modification d'un livre appartenant à l'utilisateur connecté.
 
@@ -595,7 +763,7 @@ Auth::logout();
 - Boutons : Enregistrer les modifications / Annuler (retour vers `/dashboard`)
 - Accès refusé si le livre n'appartient pas à l'utilisateur connecté
 
-### 11.8 Page Ajout de Livre (`/add-book`)
+### 7. Page Ajout de Livre (`/add-book`)
 
 **Description :** Formulaire de publication d'un livre scolaire.
 
@@ -607,7 +775,7 @@ Auth::logout();
 - Champ Prix estimé (numérique, en DT)
 - Messages de validation côté serveur si les champs sont incomplets ou incohérents
 
-### 11.9 Page Administration (`/admin`)
+### 8. Page Administration (`/admin`)
 
 **Description :** Tableau de bord administrateur, accessible uniquement avec le rôle `admin`.
 
@@ -631,9 +799,18 @@ Auth::logout();
 
 ---
 
-## 12. Points Forts et Limites
+&nbsp;
 
-### 12.1 Points Forts
+<div align="center">
+
+## Chapitre XII
+### Points Forts et Limites
+
+</div>
+
+---
+
+### 1. Points Forts
 
 | Point fort | Détail |
 |---|---|
@@ -644,7 +821,7 @@ Auth::logout();
 | **Tableau de bord admin complet** | Statistiques, modération et notifications en un seul espace |
 | **Procédure PL/SQL intégrée** | `accept_request` appelée depuis PHP pour garantir l'atomicité |
 
-### 12.2 Limites Actuelles
+### 2. Limites Actuelles
 
 | Limite | Impact | Solution envisagée |
 |---|---|---|
@@ -657,7 +834,15 @@ Auth::logout();
 
 ---
 
-## 12. Conclusion
+&nbsp;
+
+<div align="center">
+
+## Conclusion
+
+</div>
+
+---
 
 La partie Programmation Web 2 de **BookCycle Tunisia** livre une application web complète, structurée et fonctionnelle. Elle démontre la maîtrise des concepts fondamentaux du développement web côté serveur :
 
