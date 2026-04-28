@@ -1,27 +1,18 @@
-# Documents D'aide - BookCycle Tunisia
+# Documents D'aide
 
-Ce dossier contient des documents utiles pour comprendre le code, reviser et preparer la soutenance.
+Ce dossier contient des documents utiles pour comprendre le projet, reviser, et preparer la soutenance.
 
 ## Contenu
 
 - `CODE_EXPLANATION_GUIDE.md`
-  Guide technique : connexion PDO, MVC, CRUD, sessions, requetes preparees,
-  objets PL/SQL. Points cles pour la soutenance.
-
+  Ancien guide simple pour comprendre le code.
+- `RPA_AGL_DIAGRAMMES_ET_SECTIONS.md`
+  Ancien document de support pour AGL et RPA.
 - `EXPLICATION_CODE_COMME_A_UN_ENFANT.md`
-  Guide detaille qui explique le projet pas a pas avec des mots simples.
-
+  Nouveau guide tres detaille qui explique le projet pas a pas avec des mots simples.
 - `DIAGRAMMES_PROJET_COMPLETS.md`
-  Diagrammes Mermaid complets : classes, sequence, BDD, MVC.
-
+  Nouveau fichier avec des diagrammes Mermaid utiles pour comprendre et presenter le projet.
 - `DIAGRAMMES_SOUTENANCE_SIMPLIFIES.md`
   Version courte avec les diagrammes les plus faciles a presenter a l'oral.
 
-- `RPA_AGL_DIAGRAMMES_ET_SECTIONS.md`
-  Support pour les parties AGL et RPA.
-
-## Rappel Soutenance
-
-**URL du site :** `https://bookcycle-tunisia.page.gd`
-**Admin :** `admin@bookcycle.tn` / `admin123`
-**User :** `ahmed@bookcycle.tn` / `user123`
+Ce dossier est separe de `rapports/` pour garder les rapports finals propres.

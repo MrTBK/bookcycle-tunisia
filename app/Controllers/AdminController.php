@@ -182,47 +182,6 @@ class AdminController extends Controller
         $this->setFlashAndRedirect('flash_success', 'Notification envoyee avec succes.', '/admin');
     }
 
-    /**
-     * Supprimer definitivement un utilisateur de la base de donnees (DELETE physique).
-     * Cette action est irreversible. Elle n'est disponible que si l'utilisateur
-     * n'a pas de livres actifs sur la plateforme.
-     */
-    public function permanentDeleteUser()
-    {
-        // Verifier que la personne connectee est bien administrateur.
-        if (!$this->checkAdminAccess()) {
-            return;
-        }
-
-        // Lire l'identifiant de l'utilisateur a supprimer depuis la requete POST.
-        $userId = isset($_POST['user_id']) ? (int) $_POST['user_id'] : 0;
-        $targetUser = $this->users->findById($userId);
-
-        // Verifier que l'utilisateur cible existe dans la base.
-        if (!$targetUser) {
-            $this->setFlashAndRedirect('flash_error', 'Utilisateur introuvable.', '/admin');
-            return;
-        }
-
-        // Interdire la suppression de son propre compte pour eviter de bloquer l'administration.
-        if ((int) $targetUser['id'] === (int) Auth::id()) {
-            $this->setFlashAndRedirect('flash_error', 'Vous ne pouvez pas supprimer votre propre compte.', '/admin');
-            return;
-        }
-
-        // Interdire la suppression si l'utilisateur possede encore des livres actifs.
-        // Il faut d'abord masquer ou transferer ses livres avant de supprimer le compte.
-        if ($this->users->hasActiveBooks($userId)) {
-            $this->setFlashAndRedirect('flash_error', 'Impossible de supprimer : cet utilisateur a encore des livres actifs. Masquez-les d\'abord.', '/admin');
-            return;
-        }
-
-        // Executer la suppression physique : notifications, demandes, puis utilisateur.
-        $this->users->delete($userId);
-
-        $this->setFlashAndRedirect('flash_success', 'Utilisateur supprime definitivement.', '/admin');
-    }
-
     private function checkAdminAccess()
     {
         //ken el user li 7ab yed5el lel admin area mch admin, iraja3ou lel dashboard w may5alouch yed5el

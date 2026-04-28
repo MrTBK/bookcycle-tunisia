@@ -1,521 +1,579 @@
-# Rapport AGL Et RPA — BookCycle Tunisia
-
-**Université de La Manouba — ESEN — L2 Big Data et Intelligence Artificielle**
-**Année universitaire 2025/2026 — Projet Intégré**
+# RAPPORT AGL ET RPA
+## BookCycle Tunisia
 
 ---
 
-## Introduction
+**Université de la Manouba — École Supérieure d'Économie Numérique (ESEN)**
+**Licence 2 — Big Data et Intelligence Artificielle**
+**Année universitaire 2025 / 2026**
 
-Ce rapport présente la partie **Atelier Génie Logiciel (AGL)** et la partie **Réingénierie des Processus d'Affaires (RPA)** du projet **BookCycle Tunisia**.
-
-La partie AGL décrit l'organisation du projet selon le framework Scrum : acteurs, besoins, backlog, user stories, et diagrammes de conception.
-
-La partie RPA analyse les processus métier actuels (As-Is), identifie les axes d'amélioration, applique la démarche BPR, et propose une solution technique cible (To-Be) intégrant des briques d'automatisation et d'intelligence artificielle.
+**Réalisé par :** Mortadha Yakoubi
+**Modules :** Atelier Génie Logiciel (AGL) · Réingénierie des Processus d'Affaires (RPA)
 
 ---
 
-## PARTIE 1 — ATELIER GÉNIE LOGICIEL (AGL)
+## Table des Matières
 
-### 1.1 Démarche Adoptée
+1. [Introduction](#introduction)
+2. [Partie AGL — Atelier Génie Logiciel](#partie-agl)
+   - 2.1 Démarche Scrum
+   - 2.2 Identification des Acteurs
+   - 2.3 Besoins Fonctionnels et Non Fonctionnels
+   - 2.4 User Stories
+   - 2.5 Product Backlog
+   - 2.6 Sprint Backlog et Avancement
+   - 2.7 Architecture Logique
+   - 2.8 Définition of Done
+3. [Partie RPA — Réingénierie des Processus d'Affaires](#partie-rpa)
+   - 3.1 Cartographie des Processus Métier
+   - 3.2 Évaluation de la Performance — État As-Is
+   - 3.3 Processus Sélectionné pour le BPR
+   - 3.4 Analyse SWOT — État As-Is
+   - 3.5 Méthodologie BPR Adoptée
+   - 3.6 Solution Cible — État To-Be
+   - 3.7 Analyse SWOT — État To-Be
+   - 3.8 Comparaison As-Is vs To-Be
+   - 3.9 KPI et Indicateurs de Pilotage
+4. [Conclusion](#conclusion)
 
-Le projet a suivi une approche Scrum simplifiée :
+---
 
-1. Identification des acteurs et des besoins
-2. Rédaction du Product Backlog
-3. Démarrage du premier Sprint
-4. Développement itératif et tests
-5. Sprint Review final = soutenance
+## 1. Introduction
 
-### 1.2 Acteurs Du Système
+Ce rapport présente la partie **Atelier Génie Logiciel (AGL)** et la partie **Réingénierie des Processus d'Affaires (RPA)** du projet intégré **BookCycle Tunisia**.
 
-#### Visiteur (non connecté)
-- Consulter la page d'accueil
-- Parcourir le catalogue de livres
-- Filtrer les livres (niveau, classe, matière)
-- Consulter les pages About, Contact, Privacy Policy
-- Accéder à l'inscription et à la connexion
+**BookCycle Tunisia** est une plateforme web académique visant à faciliter la réutilisation des livres scolaires en Tunisie, en mettant en relation des propriétaires de manuels et des demandeurs, avec une interface d'administration dédiée.
+
+La partie **AGL** applique le framework **Scrum** : backlog produit priorisé avec estimation des efforts, sprint backlog avec états (Done / Doing / To-Do), et sprint review.
+
+La partie **RPA** (Data-Driven Reengineering) analyse les processus métier de la plateforme, évalue leur performance actuelle (As-Is) via des SLA et KPI, choisit un processus à forte opportunité de rupture, et propose une solution cible (To-Be) intégrant l'**Intelligence Artificielle**, l'**automatisation RPA** et un **workflow moderne**.
+
+---
+
+## 2. Partie AGL — Atelier Génie Logiciel
+
+### 2.1 Démarche Scrum
+
+Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au contexte académique d'un développeur solo sur une durée de quelques semaines.
+
+| Artefact Scrum | Contenu dans ce projet |
+|---|---|
+| **Product Backlog** | Liste priorisée de toutes les fonctionnalités avec effort estimé |
+| **Sprint Backlog** | Fonctionnalités sélectionnées pour le sprint en cours |
+| **Incrément** | Application fonctionnelle livrée à la fin de chaque sprint |
+| **Definition of Done** | Critères de complétion d'une fonctionnalité |
+
+### 2.2 Identification des Acteurs
+
+#### Visiteur (non authentifié)
+
+| Action | Description |
+|---|---|
+| Consulter l'accueil | Page d'accueil avec présentation et livres récents |
+| Parcourir le catalogue | Catalogue public avec filtres niveau/classe/matière |
+| Voir le détail d'un livre | Fiche complète d'un livre disponible |
+| Pages institutionnelles | À propos, Contact, Politique de confidentialité |
+| S'inscrire / se connecter | Accès aux formulaires d'authentification |
 
 #### Utilisateur Connecté
-- Créer un compte et se connecter
-- Ajouter un livre au catalogue
-- **Modifier ses propres livres** (état, prix, description)
-- Envoyer une demande pour un livre
-- Accepter ou refuser les demandes reçues
-- Consulter ses notifications
+
+| Action | Description |
+|---|---|
+| Tableau de bord | Accès à l'espace personnel |
+| Publier un livre | Formulaire d'ajout avec validation Oracle |
+| Consulter ses livres | Liste de ses publications |
+| Envoyer une demande | Solliciter un livre d'un autre utilisateur |
+| Gérer ses demandes | Accepter ou refuser les demandes reçues |
+| Consulter les notifications | Lire les notifications système |
 
 #### Administrateur
-- Toutes les fonctionnalités utilisateur
-- Consulter les statistiques globales de la plateforme
-- Activer ou désactiver des comptes utilisateurs
-- **Supprimer définitivement un utilisateur** (DELETE physique)
-- Masquer ou restaurer des livres
-- Annuler des demandes
-- Envoyer des notifications individuelles ou globales
 
-### 1.3 Diagramme De Cas D'Utilisation
+| Action | Description |
+|---|---|
+| Statistiques globales | Utilisateurs, livres, échanges, économie estimée |
+| Gestion des comptes | Activer / désactiver des utilisateurs |
+| Modération des livres | Masquer / restaurer des livres |
+| Annulation de demandes | Annuler n'importe quelle demande |
+| Envoi de notifications | Notifier un ou plusieurs utilisateurs |
 
-```
-+----------------------------------------------------------+
-|              SYSTÈME BOOKCYCLE TUNISIA                     |
-|                                                            |
-|  [Visiteur] -------> Consulter le catalogue               |
-|             -------> Filtrer les livres                   |
-|             -------> S'inscrire / Se connecter            |
-|                                                            |
-|  [Utilisateur] --> Ajouter un livre                       |
-|               --> Modifier un livre  <<include>> Auth     |
-|               --> Envoyer une demande <<include>> Auth    |
-|               --> Accepter/Refuser une demande            |
-|               --> Consulter notifications                 |
-|                                                            |
-|  [Admin] ------> Toutes fonctions utilisateur             |
-|          ------> Gérer les utilisateurs                   |
-|          ------> Supprimer un utilisateur                 |
-|          ------> Modérer les livres                       |
-|          ------> Consulter les statistiques               |
-|          ------> Envoyer des notifications                |
-+----------------------------------------------------------+
-```
+### 2.3 Besoins Fonctionnels et Non Fonctionnels
 
-### 1.4 Diagramme De Classes UML
+#### Besoins Fonctionnels
 
-Le diagramme respecte les contraintes du projet : **5+ classes persistantes**, **association 1:N**, **association N:M porteuse de données**, et **généralisation**.
-
-```mermaid
-classDiagram
-    class Utilisateur {
-        +int id
-        +String nom
-        +String email
-        +String password
-        +String telephone
-        +String role
-        +bool estActif
-        +Date creeLe
-        +seConnecter()
-        +seDeconnecter()
-    }
-
-    class AdminUtilisateur {
-        +gererUtilisateurs()
-        +modererLivres()
-        +envoyerNotification()
-        +consulterStatistiques()
-        +supprimerUtilisateur()
-    }
-
-    class UtilisateurConnecte {
-        +ajouterLivre()
-        +modifierLivre()
-        +envoyerDemande()
-        +consulterNotifications()
-    }
-
-    class Livre {
-        +int id
-        +String titre
-        +String matiere
-        +String classe
-        +String niveau
-        +String etat
-        +float prixEstime
-        +String description
-        +String statut
-        +bool estActif
-        +Date creeLe
-        +Date modifieLe
-    }
-
-    class Demande {
-        +int id
-        +String statut
-        +String noteRendezVous
-        +Date dateDemande
-        +accepter()
-        +rejeter()
-        +annuler()
-    }
-
-    class Echange {
-        +int id
-        +Date dateEchange
-        +String statut
-    }
-
-    class Notification {
-        +int id
-        +String message
-        +String expediteur
-        +bool estLue
-        +Date creeLe
-        +marquerCommeLue()
-    }
-
-    class Matiere {
-        +int id
-        +String nom
-        +int ordreAffichage
-        +bool estActive
-    }
-
-    class ClasseScolaire {
-        +int id
-        +String niveau
-        +String nomClasse
-        +int ordreAffichage
-        +bool estActive
-    }
-
-    class ClasseMatiere {
-        +int id
-        +int ordreAffichage
-        +bool estActive
-    }
-
-    Utilisateur <|-- AdminUtilisateur : généralisation
-    Utilisateur <|-- UtilisateurConnecte : généralisation
-    Utilisateur "1" --> "0..*" Livre : publie
-    UtilisateurConnecte "1" --> "0..*" Demande : envoie
-    Livre "1" --> "0..*" Demande : reçoit
-    Demande "1" --> "0..1" Echange : génère
-    Utilisateur "1" --> "0..*" Notification : reçoit
-    Echange --> Livre : concerne
-    Echange --> Utilisateur : implique
-    ClasseScolaire "1" --> "0..*" ClasseMatiere : comprend
-    Matiere "1" --> "0..*" ClasseMatiere : contient
-```
-
-**Annotations des associations :**
-- **Généralisation** : `Utilisateur` est la super-classe de `AdminUtilisateur` et `UtilisateurConnecte`
-- **Association 1:N** : Un `Utilisateur` publie 0 ou plusieurs `Livre`
-- **Association N:M porteuse de données** : `ClasseMatiere` est la classe d'association entre `ClasseScolaire` et `Matiere`, portant les attributs `ordreAffichage` et `estActive`
-- `Demande` est aussi une association N:M avec données entre `Utilisateur` (demandeur) et `Livre`, portant `statut`, `noteRendezVous`, `dateDemande`
-
-### 1.5 User Stories
-
-| ID | User Story | Priorité | Estimation | Statut |
-|---|---|---|---|---|
-| US01 | En tant que visiteur, je veux consulter le catalogue sans me connecter | Haute | 4h | Done |
-| US02 | En tant que visiteur, je veux filtrer les livres par niveau/classe/matière | Haute | 6h | Done |
-| US03 | En tant qu'utilisateur, je veux créer un compte | Haute | 3h | Done |
-| US04 | En tant qu'utilisateur, je veux me connecter | Haute | 2h | Done |
-| US05 | En tant qu'utilisateur, je veux ajouter un livre | Haute | 5h | Done |
-| US06 | En tant qu'utilisateur, je veux **modifier mon livre** (état, prix) | Haute | 4h | Done |
-| US07 | En tant qu'utilisateur, je veux envoyer une demande | Haute | 4h | Done |
-| US08 | En tant que propriétaire, je veux accepter/refuser une demande | Haute | 5h | Done |
-| US09 | En tant qu'utilisateur, je veux consulter mes notifications | Moyenne | 3h | Done |
-| US10 | En tant qu'admin, je veux voir les statistiques | Haute | 6h | Done |
-| US11 | En tant qu'admin, je veux activer/désactiver un utilisateur | Haute | 3h | Done |
-| US12 | En tant qu'admin, je veux **supprimer définitivement un utilisateur** | Haute | 3h | Done |
-| US13 | En tant qu'admin, je veux masquer/restaurer un livre | Haute | 2h | Done |
-| US14 | En tant qu'admin, je veux envoyer des notifications | Moyenne | 2h | Done |
-
-### 1.6 Product Backlog
-
-| ID | Item | Priorité | Effort (j) |
+| ID | Besoin | Acteur | Priorité |
 |---|---|---|---|
-| PB1 | Catalogue public avec filtres multi-critères | Haute | 2 |
-| PB2 | Inscription et connexion sécurisée | Haute | 1 |
-| PB3 | Ajout de livre avec validation niveau/classe/matière | Haute | 2 |
-| PB4 | **Modification d'un livre** | Haute | 1 |
-| PB5 | Gestion des demandes (envoi, acceptation, refus) | Haute | 3 |
-| PB6 | Système de notifications | Moyenne | 1 |
-| PB7 | Tableau de bord utilisateur | Haute | 2 |
-| PB8 | Espace administrateur avec statistiques | Haute | 3 |
-| PB9 | **Suppression physique d'utilisateur** | Haute | 1 |
-| PB10 | Modération des livres (masquer/restaurer) | Haute | 1 |
-| PB11 | Scripts Oracle + PL/SQL complets | Haute | 4 |
-| PB12 | Déploiement en ligne (MySQL hosted) | Haute | 2 |
+| BF-01 | Inscription avec validation email | Visiteur | Haute |
+| BF-02 | Connexion / déconnexion sécurisée | Visiteur | Haute |
+| BF-03 | Catalogue filtrable (niveau, classe, matière) | Tous | Haute |
+| BF-04 | Publication d'un livre avec validation Oracle | Utilisateur | Haute |
+| BF-05 | Envoi d'une demande | Utilisateur | Haute |
+| BF-06 | Acceptation / refus d'une demande | Utilisateur | Haute |
+| BF-07 | Tableau de bord personnel | Utilisateur | Haute |
+| BF-08 | Système de notifications | Utilisateur | Moyenne |
+| BF-09 | Tableau de bord administrateur | Admin | Haute |
+| BF-10 | Modération livres et utilisateurs | Admin | Haute |
 
-### 1.7 Diagramme De Séquence — Accepter Une Demande
+#### Besoins Non Fonctionnels
 
-```mermaid
-sequenceDiagram
-    actor Proprietaire
-    participant Browser
-    participant RequestController
-    participant BookRequest
-    participant Book
-    participant Database
+| Catégorie | Exigence |
+|---|---|
+| **Architecture** | Séparation MVC stricte |
+| **Sécurité** | Requêtes préparées PDO, contrôle des rôles, XSS prevention |
+| **Performance** | Index Oracle sur les colonnes interrogées fréquemment |
+| **Maintenabilité** | Namespaces PHP, classes séparées par responsabilité |
+| **Compatibilité** | Oracle XE + PHP 7.4 + PDO_OCI |
+| **Déployabilité** | Lancement local en une commande |
 
-    Proprietaire->>Browser: Clique "Accepter" + saisit note RDV
-    Browser->>RequestController: POST /accept-request?id=X (meetingNote)
-    RequestController->>RequestController: Vérifier Auth::check()
-    RequestController->>BookRequest: find(requestId)
-    BookRequest->>Database: SELECT * FROM requests WHERE id = ?
-    Database-->>BookRequest: données de la demande
-    BookRequest-->>RequestController: request object
-    RequestController->>BookRequest: accept(requestId, meetingNote)
-    BookRequest->>Database: UPDATE requests SET status='accepted' WHERE id=?
-    BookRequest->>Database: UPDATE requests SET status='rejected' WHERE book_id=? AND id<>?
-    BookRequest->>Database: UPDATE books SET status='reserved' WHERE id=?
-    BookRequest->>Database: INSERT INTO notifications (user_id, message)
-    Database-->>BookRequest: OK
-    RequestController->>Browser: Redirect /dashboard + flash_success
-    Browser-->>Proprietaire: "Demande acceptée avec succès"
+### 2.4 User Stories
+
+```
+US-01 : En tant que visiteur,
+        je veux consulter le catalogue sans me connecter,
+        afin de voir les livres disponibles avant de créer un compte.
+
+US-02 : En tant qu'utilisateur,
+        je veux publier un livre avec niveau, classe, matière et état,
+        afin de le mettre à disposition d'autres utilisateurs.
+
+US-03 : En tant qu'utilisateur,
+        je veux filtrer le catalogue par niveau, classe et matière,
+        afin de trouver rapidement le livre dont j'ai besoin.
+
+US-04 : En tant qu'utilisateur,
+        je veux envoyer une demande pour un livre disponible,
+        afin de prendre contact avec son propriétaire.
+
+US-05 : En tant que propriétaire,
+        je veux accepter ou refuser une demande avec une note de rendez-vous,
+        afin de finaliser ou décliner l'échange depuis mon tableau de bord.
+
+US-06 : En tant qu'utilisateur,
+        je veux recevoir une notification lorsque ma demande est traitée,
+        afin d'être informé sans consulter constamment mon tableau de bord.
+
+US-07 : En tant qu'administrateur,
+        je veux consulter les statistiques globales de la plateforme,
+        afin de surveiller l'activité et prendre des décisions de modération.
+
+US-08 : En tant qu'administrateur,
+        je veux désactiver un compte ou masquer un livre non conforme,
+        afin de modérer la plateforme de manière ciblée et réversible.
 ```
 
-### 1.8 Architecture MVC
+### 2.5 Product Backlog
 
-```mermaid
-graph TD
-    subgraph Client
-        A[Navigateur Web]
-    end
+Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est estimé en **jours-développeur (JD)**.
 
-    subgraph Serveur
-        B[public/index.php\nRouteur + Front Controller]
-        subgraph Controleurs
-            C1[PageController]
-            C2[AuthController]
-            C3[BookController]
-            C4[RequestController]
-            C5[AdminController]
-        end
-        subgraph Modeles
-            M1[Book]
-            M2[User]
-            M3[BookRequest]
-            M4[Notification]
-            M5[AcademicOption]
-        end
-        subgraph Vues
-            V1[home.php]
-            V2[catalog.php]
-            V3[dashboard.php]
-            V4[edit-book.php]
-            V5[admin.php]
-        end
-        subgraph Core
-            D[Database - PDO\nSingleton]
-            E[Auth - Session]
-            F[Controller - Base]
-        end
-    end
+| ID | User Story | Priorité | Effort (JD) | Statut |
+|---|---|---|---|---|
+| PB-01 | Catalogue public consultable | Haute | 1 | Done |
+| PB-02 | Inscription utilisateur | Haute | 1 | Done |
+| PB-03 | Connexion / déconnexion | Haute | 0.5 | Done |
+| PB-04 | Ajout d'un livre avec validation Oracle | Haute | 2 | Done |
+| PB-05 | Envoi d'une demande | Haute | 1 | Done |
+| PB-06 | Acceptation / refus d'une demande | Haute | 2 | Done |
+| PB-07 | Tableau de bord utilisateur | Haute | 1.5 | Done |
+| PB-08 | Tableau de bord administrateur | Haute | 2 | Done |
+| PB-09 | Gestion des comptes (admin) | Haute | 1 | Done |
+| PB-10 | Modération des livres (admin) | Haute | 0.5 | Done |
+| PB-11 | Système de notifications | Moyenne | 1 | Done |
+| PB-12 | Filtres dynamiques classe → matières | Haute | 1.5 | Done |
+| PB-13 | Tables de référence Oracle (subjects, classes) | Haute | 1 | Done |
+| PB-14 | Upload d'image de couverture | Basse | 2 | To Do |
+| PB-15 | Token CSRF | Moyenne | 0.5 | To Do |
+| PB-16 | Tests automatisés PHPUnit | Basse | 3 | To Do |
 
-    subgraph Base_de_donnees
-        G[(Oracle XE\nLocal)]
-        H[(MySQL\nEn ligne)]
-    end
+**Effort total réalisé :** ~17 jours-développeur
+**Effort restant :** ~5.5 jours-développeur
 
-    A -->|HTTP Request| B
-    B -->|dispatch| C1
-    B -->|dispatch| C2
-    B -->|dispatch| C3
-    C3 -->|query| M1
-    M1 -->|PDO| D
-    D --> G
-    D --> H
-    C1 -->|render| V1
-    V1 -->|HTML| A
+### 2.6 Sprint Backlog et Avancement
+
+#### Sprint 1 — Fondations (Semaines 1-2)
+
+**Objectif :** Mise en place de l'architecture, de la base Oracle et de l'authentification.
+
+| Tâche | État |
+|---|---|
+| Création du schéma Oracle (tables, séquences, triggers, index) | Done |
+| Mise en place de l'architecture MVC PHP | Done |
+| Implémentation de la connexion PDO Oracle | Done |
+| Inscription et connexion utilisateur | Done |
+| Layout partagé (header/footer) | Done |
+| Page d'accueil | Done |
+
+#### Sprint 2 — Fonctionnalités Cœur (Semaines 3-4)
+
+**Objectif :** Catalogue, ajout de livres et gestion des demandes.
+
+| Tâche | État |
+|---|---|
+| Catalogue public avec filtres | Done |
+| Tables de référence Oracle (subjects, school_classes, class_subjects) | Done |
+| Filtres dynamiques JavaScript (classe → matières) | Done |
+| Formulaire d'ajout de livre avec validation Oracle | Done |
+| Envoi d'une demande | Done |
+| Tableau de bord utilisateur (livres + demandes) | Done |
+
+#### Sprint 3 — Administration et PL/SQL (Semaines 5-6)
+
+**Objectif :** Espace admin, procédures PL/SQL et polish.
+
+| Tâche | État |
+|---|---|
+| Acceptation / refus d'une demande | Done |
+| Procédure PL/SQL `accept_request` | Done |
+| Tableau de bord administrateur | Done |
+| Modération livres et utilisateurs | Done |
+| Système de notifications | Done |
+| Objets PL/SQL complets (fonctions, triggers métier) | Done |
+| Pages institutionnelles (About, Contact, Privacy) | Done |
+
+#### Backlog Restant (Non réalisé dans ce sprint)
+
+| Tâche | État |
+|---|---|
+| Upload d'image de couverture | To Do |
+| Token CSRF sur les formulaires | To Do |
+| Tests automatisés PHPUnit | To Do |
+
+### 2.7 Architecture Logique
+
+```
+                   ┌──────────────────────────────────────────────┐
+                   │             router.php (Front Controller)    │
+  Requête HTTP ───►│   Analyse l'URL → dispatche vers le bon      │
+                   │   contrôleur et la bonne action              │
+                   └──────────────────────┬───────────────────────┘
+                                          │
+                   ┌──────────────────────▼───────────────────────┐
+                   │                  Contrôleur                  │
+                   │   Orchestre les appels Modèle ↔ Vue          │
+                   │   Contrôle les droits (Auth::check/isAdmin)  │
+                   └──────────┬───────────────────────┬───────────┘
+                              │                       │
+              ┌───────────────▼─────────┐   ┌────────▼────────────┐
+              │         Modèle          │   │        Vue          │
+              │   Requêtes SQL/PDO      │   │   Rendu HTML PHP    │
+              │   sur Oracle XE         │   │   + Layout partagé  │
+              └───────────────┬─────────┘   └────────────────────┘
+                              │
+              ┌───────────────▼─────────┐
+              │       Oracle XE         │
+              │   Tables, Séquences,    │
+              │   Triggers, PL/SQL      │
+              └─────────────────────────┘
 ```
 
-### 1.9 Définition Of Done
+### 2.8 Définition of Done
 
-Une fonctionnalité est considérée comme terminée si :
-- La logique métier est implémentée dans le contrôleur et le modèle
-- La page ou l'action fonctionne en local et en ligne
-- L'interface est accessible et navigable
-- Les données sont validées côté serveur
-- Les requêtes PDO sont préparées (sécurité)
-- La fonctionnalité a été testée manuellement
+Une fonctionnalité est considérée **Done** si :
+
+1. La logique métier est implémentée dans le contrôleur et le modèle
+2. Toutes les entrées utilisateur sont validées côté serveur
+3. La vue est accessible et affiche les bonnes informations
+4. Les messages de succès et d'erreur sont correctement gérés
+5. Les règles métier spécifiques sont respectées (ex. : pas de demande sur son propre livre)
+6. La fonctionnalité a été testée manuellement via le navigateur avec des données réelles
 
 ---
 
-## PARTIE 2 — RÉINGÉNIERIE DES PROCESSUS D'AFFAIRES (RPA)
+## 3. Partie RPA — Réingénierie des Processus d'Affaires
 
-### 2.1 Cartographie Des Processus Métier
+### 3.1 Cartographie des Processus Métier
 
-```mermaid
-graph TB
-    subgraph Processus_Coeur["Processus Cœur (création de valeur directe)"]
-        PC1[Publication d'un livre]
-        PC2[Recherche et filtrage]
-        PC3[Envoi d'une demande]
-        PC4[Traitement d'une demande]
-        PC5[Finalisation d'un échange]
-    end
+La plateforme **BookCycle Tunisia** s'organise autour de trois catégories de processus.
 
-    subgraph Processus_Support["Processus Support"]
-        PS1[Gestion des comptes]
-        PS2[Authentification]
-        PS3[Système de notifications]
-        PS4[Maintenance base de données]
-    end
+#### Processus Cœur (Valeur directe pour l'utilisateur)
 
-    subgraph Processus_Management["Processus de Management"]
-        PM1[Administration et modération]
-        PM2[Suivi des statistiques]
-        PM3[Reporting]
-    end
+| Processus | Description | Acteurs |
+|---|---|---|
+| **Publication d'un livre** | Saisie, validation et mise en ligne d'un livre scolaire | Utilisateur |
+| **Recherche et filtrage** | Exploration du catalogue avec critères | Tous |
+| **Envoi d'une demande** | Sollicitation d'un livre auprès de son propriétaire | Utilisateur |
+| **Traitement d'une demande** | Réponse du propriétaire (acceptation ou refus) | Utilisateur |
+| **Finalisation d'un échange** | Confirmation et enregistrement de l'échange | Utilisateur + Système |
 
-    PC3 --> PC4
-    PC4 --> PC5
-    PS3 --> PC4
-    PM1 --> PS1
-    PM2 --> PM3
-```
+#### Processus Support (Infrastructure)
 
-### 2.2 Évaluation As-Is — SLA Et KPI
+| Processus | Description |
+|---|---|
+| Gestion des comptes | Inscription, authentification, activation/désactivation |
+| Notifications système | Envoi et lecture des notifications |
+| Maintenance Oracle | Scripts SQL, sauvegardes, administration de la BD |
+| Maintenance applicative | Déploiement, mises à jour du code PHP |
 
-| Processus | KPI | Valeur Actuelle | Objectif Cible | SLA |
-|---|---|---|---|---|
-| Traitement d'une demande | Délai moyen de réponse | 72 heures | 24 heures | < 48h |
-| Traitement d'une demande | Taux de réponse du propriétaire | 40% | 80% | > 70% |
-| Publication d'un livre | Temps de publication | 5 minutes | 2 minutes | < 5 min |
-| Échanges complétés | Taux de finalisation | 30% | 70% | > 60% |
-| Satisfaction utilisateur | Note / 5 | Non mesuré | 4/5 | > 3.5/5 |
-| Notifications | Taux de lecture | 25% | 70% | > 50% |
+#### Processus de Management (Pilotage)
 
-**Processus choisi pour le BPR : Le traitement d'une demande de livre**
+| Processus | Description |
+|---|---|
+| Administration | Supervision globale de la plateforme |
+| Modération | Contrôle des contenus et des utilisateurs |
+| Suivi des statistiques | Analyse des KPI et de l'activité de la plateforme |
+
+### 3.2 Évaluation de la Performance — État As-Is
+
+#### SLA (Service Level Agreements) Actuels
+
+| Processus | SLA défini | Performance réelle | Statut |
+|---|---|---|---|
+| Publication d'un livre | < 2 min | 3 à 5 min (configuration initiale incluse) | Dégradé |
+| Recherche et filtrage | < 3 sec | < 1 sec (Oracle + index) | Acceptable |
+| Envoi d'une demande | Immédiat | Immédiat | Acceptable |
+| **Traitement d'une demande** | **< 24h** | **24h à 7 jours (dépend du propriétaire)** | **Inacceptable** |
+| Finalisation d'un échange | Automatique | Manuel et variable | Dégradé |
+
+#### KPI Actuels (As-Is)
+
+| KPI | Valeur estimée As-Is | Cible To-Be |
+|---|---|---|
+| Délai moyen de traitement d'une demande | 48 à 96 heures | < 12 heures |
+| Taux de réponse des propriétaires | ~60% (oublis fréquents) | > 90% |
+| Taux d'acceptation des demandes | ~40% | > 60% |
+| Taux d'abandon de demandes | ~25% | < 10% |
+| Satisfaction utilisateur (estimée) | Moyenne | Élevée |
+
+### 3.3 Processus Sélectionné pour le BPR
+
+**Processus sélectionné : le traitement d'une demande de livre**
 
 Ce processus présente le plus fort potentiel de rupture car :
-- Il est entièrement dépendant de l'action manuelle du propriétaire
-- Un délai de réponse élevé décourage les demandeurs
-- L'absence de relance automatique entraîne 60% d'abandons
-- Un saut de performance de plus de 50% est atteignable par automatisation
+- Son SLA actuel est **inacceptable** (délai de 24h à 7 jours)
+- Il constitue le **cœur de valeur** de la plateforme
+- Il génère le plus d'insatisfaction et d'abandons utilisateurs
+- Il se prête à des gains de performance supérieurs à **50%** par automatisation
 
-### 2.3 Analyse SWOT As-Is (Avant BPR)
+#### Flux As-Is Détaillé
 
-| | **Forces** | **Faiblesses** |
-|---|---|---|
-| **Interne** | • Besoin social réel et concret | • Processus entièrement manuel |
-| | • Interface simple et accessible | • Pas de relance automatique |
-| | • Catalogue filtrable | • Dépendance à l'action du propriétaire |
-| | • Base de données structurée | • Délai de réponse non maîtrisé |
-| | • Coût de démarrage faible | • Pas de priorisation des demandes |
-
-| | **Opportunités** | **Menaces** |
-|---|---|---|
-| **Externe** | • Croissance des échanges en ligne | • Résistance au changement |
-| | • Adoption mobile grandissante | • Concurrence informelle (réseaux sociaux) |
-| | • IA disponible et accessible | • Manque de confiance entre utilisateurs |
-| | • ODD 12 : consommation responsable | • Problèmes de données personnelles |
-| | • Marché scolaire tunisien en croissance | • Dépendance à la connexion internet |
-
-### 2.4 Choix De La Méthodologie BPR
-
-**Méthodologie choisie : Réingénierie progressive mais radicale**
-
-**Justification :** La plateforme existe déjà et fonctionne. Une approche "Greenfield" (table rase) serait destructrice car elle supprimerait les données et fonctionnalités déjà opérationnelles. La réingénierie progressive cible spécifiquement le processus de traitement des demandes tout en conservant l'architecture existante.
-
-Le saut de performance visé est **+60% sur le taux de réponse** et **-67% sur le délai moyen** (de 72h à 24h), ce qui justifie une approche de réingénierie plutôt qu'une simple amélioration continue.
-
-### 2.5 Processus As-Is (État Actuel)
-
-```mermaid
-graph TD
-    A([Demandeur clique\n'Demander ce livre']) --> B[Demande insérée\nen base de données]
-    B --> C{Le propriétaire\nse connecte-t-il\nà temps ?}
-    C -->|Non - plusieurs jours| D[Demande reste\nen attente indéfiniment]
-    C -->|Oui| E[Propriétaire voit\nla demande dans\nson dashboard]
-    E --> F{Propriétaire\ndécide}
-    F -->|Accepte| G[Saisit note de RDV\nmanuellement]
-    F -->|Refuse| H[Demande rejetée\nDemandeur notifié]
-    G --> I[Livre passe en\n'reserved']
-    I --> J[Échange enregistré\nmanuellement]
-    D --> K([Abandon\npar frustration])
+```
+ Demandeur          Propriétaire        Système
+     │                    │                │
+     ├── Envoie demande ──►│                │
+     │                    │                │
+     │          [Propriétaire doit se      │
+     │          connecter manuellement]    │
+     │                    │◄─── Consulte dashboard ──┤
+     │                    │◄─── Lit demandes reçues  │
+     │                    │                │
+     │              [Décision manuelle     │
+     │               sans délai imposé]   │
+     │                    ├── Accepte ou ──►│
+     │                    │    refuse       │
+     │◄── Notification ───┼─────────────────┤
+     │                    │                │
 ```
 
-**Limites identifiées :**
-- Pas de relance automatique si le propriétaire ne répond pas
-- Pas de délai maximum imposé
-- Pas de priorisation des demandes
-- L'économie estimée n'est calculée qu'après échange
+**Durée totale As-Is :** 24h à 7 jours
+**Dépendance :** 100% manuelle côté propriétaire
 
-### 2.6 Solution Technique Cible (To-Be)
+### 3.4 Analyse SWOT — État As-Is
 
-La solution cible intègre **trois briques technologiques** :
+#### Forces (Strengths)
 
-#### Brique 1 — Automatisation RPA
-- **Relance automatique** : si le propriétaire ne répond pas en 48h, une notification de relance est envoyée automatiquement (trigger Oracle : `trg_notify_owner_on_request` déjà implémenté pour la notification initiale)
-- **Clôture automatique** : quand une demande est acceptée, les autres sont automatiquement rejetées (procédure `accept_request` déjà implémentée)
-- **Journalisation** : chaque échange est automatiquement enregistré via le trigger `trg_book_exchange_log`
+| Force | Description |
+|---|---|
+| Processus simple | Peu d'étapes, facile à comprendre pour l'utilisateur |
+| Autonomie du propriétaire | Décision finale reste humaine |
+| Traçabilité | Historique des demandes conservé dans Oracle |
+| Notification existante | Le demandeur est informé une fois la décision prise |
 
-#### Brique 2 — Intelligence Artificielle (scoring/recommandation)
-- **Scoring des livres** : prédire la probabilité qu'une demande aboutisse en fonction du niveau scolaire, de la matière, et de la saison
-- **Recommandations** : suggérer des livres pertinents à l'utilisateur en fonction de ses recherches précédentes
-- **Détection des doublons** : identifier les livres similaires déjà publiés
+#### Faiblesses (Weaknesses)
 
-#### Brique 3 — Workflow Orchestré
-- Tableau de bord administrateur avec alertes sur les demandes en attente > 48h
-- Rapports périodiques automatiques sur les statistiques d'échange
-- Interface unifiée pour que le propriétaire gère toutes ses demandes en un seul endroit
+| Faiblesse | Impact |
+|---|---|
+| Dépendance totale à l'action manuelle | Délais imprévisibles et non maîtrisés |
+| Aucun rappel automatique | Risque élevé d'oubli de la part du propriétaire |
+| Absence de priorisation | Toutes les demandes ont le même traitement |
+| Pas d'indicateurs de performance | Impossible de mesurer et d'améliorer |
+| Pas de clôture automatique | Les demandes redondantes restent en attente |
 
-### 2.7 Processus To-Be (Cible)
+#### Opportunités (Opportunities)
 
-```mermaid
-graph TD
-    A([Demandeur envoie\nune demande]) --> B[INSERT dans requests\n+ Trigger Oracle]
-    B --> C[Notification automatique\nau propriétaire\ntrg_notify_owner_on_request]
-    C --> D{Réponse dans\nles 48h ?}
-    D -->|Oui| E{Propriétaire\ndécide}
-    D -->|Non| F[Relance automatique\nnotification RPA]
-    F --> G{Répond après\nrelance ?}
-    G -->|Non - 72h| H[Admin alerté\nsur dashboard]
-    G -->|Oui| E
-    E -->|Accepte| I[accept_request\nprocédure PL/SQL]
-    E -->|Refuse| J[Demandeur notifié\nautomatiquement]
-    I --> K[Livre passe en\n'reserved']
-    I --> L[Autres demandes\nrejetées automatiquement]
-    I --> M[Échange enregistré\ntrg_book_exchange_log]
-    K --> N([Échange finalisé\nÉconomie calculée])
-```
+| Opportunité | Description |
+|---|---|
+| Automatisation des rappels | Réduction significative des oublis |
+| Intégration IA | Prédiction des acceptations, scoring des demandes |
+| Tableaux de bord enrichis | Meilleure visibilité pour l'admin et les utilisateurs |
+| Réengagement utilisateurs | Relances ciblées pour réactiver la plateforme |
 
-### 2.8 Analyse SWOT To-Be (Après BPR)
+#### Menaces (Threats)
 
-| | **Forces** | **Faiblesses Réduites** |
-|---|---|---|
-| **Interne** | • Toutes les forces As-Is conservées | • Délai de réponse contrôlé (48h max) |
-| | • **Relance automatique implémentée** | • Propriétaires inactifs détectés |
-| | • **Notifications proactives** | • Processus traçable |
-| | • **Échanges auto-journalisés** | • KPI mesurables en temps réel |
-| | • Site déployé en ligne | • |
+| Menace | Description |
+|---|---|
+| Résistance au changement | Les propriétaires habitués peuvent mal accepter les relances automatiques |
+| Faux positifs des rappels | Des rappels trop fréquents peuvent être perçus comme du spam |
+| Dépendance à la donnée | La qualité des prédictions IA dépend du volume de données |
 
-| | **Opportunités Saisies** | **Nouveaux Risques** |
-|---|---|---|
-| **Externe** | • IA pour recommandations futures | • Dépendance à la data |
-| | • Automatisation RPA opérationnelle | • Biais algorithmiques potentiels |
-| | • Reporting automatisé possible | • Adoption des notifications |
-| | • Évolution vers mobile app | • Coût d'hébergement si montée en charge |
+### 3.5 Méthodologie BPR Adoptée
 
-**Comparaison As-Is / To-Be :**
+#### Choix : Réingénierie Progressive mais Radicale
 
-| KPI | As-Is | To-Be | Amélioration |
+La méthodologie retenue est une **réingénierie progressive mais radicale**, et non une approche "Greenfield" (table rase).
+
+**Justification :**
+
+| Critère | Greenfield | Progressive Radicale | Choix |
 |---|---|---|---|
-| Délai moyen de réponse | 72h | 24h | **-67%** |
-| Taux de réponse | 40% | 80% | **+100%** |
-| Taux de finalisation | 30% | 70% | **+133%** |
-| Abandon par frustration | 60% | 15% | **-75%** |
+| Conservation des données existantes | Non | Oui | Progressive |
+| Risque de rupture pour les utilisateurs | Très élevé | Maîtrisé | Progressive |
+| Délai de mise en œuvre | Long | Moyen | Progressive |
+| Saut de performance potentiel | Maximum | > 50% | Les deux |
+| Compatibilité avec Oracle/PHP existant | Non | Oui | Progressive |
 
-Le saut de performance dépasse **50%** sur tous les indicateurs, ce qui justifie pleinement l'approche BPR.
+L'approche progressive radicale permet de conserver la base Oracle, le code PHP et l'expérience utilisateur existants, tout en y greffant des composants IA et d'automatisation qui transforment radicalement le processus de traitement des demandes, en visant un gain de performance **≥ 50%** sur le délai de traitement.
 
-### 2.9 Scénarios D'Automatisation
+### 3.6 Solution Cible — État To-Be
 
-#### Scénario 1 : Relance Automatique (48h sans réponse)
-1. Un job Oracle (ou script cron) détecte les demandes `pending` depuis > 48h
-2. Une notification est insérée automatiquement pour le propriétaire
-3. Si pas de réponse à 72h : l'admin voit une alerte dans son dashboard
+#### Architecture To-Be avec IA et Automatisation
 
-#### Scénario 2 : Clôture Automatique d'un Échange
-1. Le propriétaire accepte une demande → `accept_request` PL/SQL s'exécute
-2. Toutes les autres demandes du même livre passent automatiquement à `rejected`
-3. Le livre passe à `reserved`
-4. Les demandeurs rejetés sont notifiés automatiquement
-5. Quand le livre passe à `exchanged` → `trg_book_exchange_log` journalise l'échange
+```
+ Demandeur    Propriétaire    Système Central    Moteur IA    Moteur RPA
+     │               │               │               │              │
+     ├── Envoie ────►│               │               │              │
+     │   demande     ├──────────────►│               │              │
+     │               │               │               │              │
+     │               │ ◄─ Notif. ────┤               │              │
+     │               │   immédiate   │               │              │
+     │               │               │──── Score ───►│              │
+     │               │               │   demande    │              │
+     │               │               │◄── Score ─────┤              │
+     │               │               │   (priorité)  │              │
+     │               │               │                              │
+     │               │         [Si pending > 48h]                   │
+     │               │◄──────────────────────────── Relance auto ───┤
+     │               │                                              │
+     │               ├── Accepte ───►│                              │
+     │               │               │                              │
+     │◄── Notif. ────┤               │──── Clôture auto ────────────►
+     │  (accepté)    │               │    autres demandes            │
+     │               │               │                              │
+     [Autres]◄── Notif. (rejeté) ────┤                              │
+```
 
-#### Scénario 3 : Reporting Automatique
-1. L'admin consulte le dashboard : statistiques calculées en temps réel via SQL
-2. `calculate_money_saved()` retourne l'économie totale générée
-3. `count_books_by_user()` donne l'activité de chaque utilisateur
+**Durée totale To-Be :** < 12 heures (objectif)
+**Gain estimé :** > 75% de réduction du délai de traitement
+
+#### Composants Technologiques de la Solution To-Be
+
+**1. Intelligence Artificielle — Scoring des Demandes**
+
+Un module de scoring IA analyse chaque nouvelle demande et calcule un score de priorité basé sur :
+
+- L'historique de réponse du propriétaire (délai moyen de traitement)
+- Le nombre de demandes en attente pour le même livre
+- L'ancienneté du livre sur la plateforme
+- Le profil du demandeur (nombre d'échanges réussis antérieurs)
+
+```
+Score de priorité = f(délai_historique, nb_demandes_concurrentes, ancienneté_livre, profil_demandeur)
+```
+
+Les demandes à score élevé remontent automatiquement en tête du tableau de bord du propriétaire.
+
+**2. Automatisation RPA — Relances Intelligentes**
+
+Le moteur RPA détecte les demandes `pending` depuis plus de 48 heures et déclenche une relance automatique :
+
+```sql
+-- Détection des demandes à relancer
+SELECT r.id, r.book_id, b.owner_id, b.title,
+       ROUND(SYSDATE - r.request_date) AS jours_attente
+FROM requests r
+JOIN books b ON b.id = r.book_id
+WHERE r.status = 'pending'
+  AND r.request_date < SYSDATE - 2
+ORDER BY jours_attente DESC;
+```
+
+La procédure PL/SQL `add_notification` est appelée automatiquement pour envoyer le rappel.
+
+**3. Workflow Moderne — Clôture Automatique**
+
+La procédure `accept_request` implémente déjà la clôture automatique des demandes redondantes. Dans le To-Be, ce mécanisme est complété par :
+
+- Notification automatique de tous les demandeurs rejetés
+- Mise à jour du score IA des propriétaires actifs (renforcement positif)
+- Enregistrement automatique de l'échange dans `exchanges` via trigger
+
+**4. Interface Utilisateur Unifiée**
+
+- Dashboard propriétaire enrichi avec indicateurs de délai et alertes visuelles
+- Tri automatique des demandes par score de priorité IA
+- Indicateurs de performance visibles par l'administrateur en temps réel
+
+### 3.7 Analyse SWOT — État To-Be
+
+#### Forces (Strengths)
+
+| Force | Description |
+|---|---|
+| Délai de traitement réduit | < 12h grâce aux relances automatiques et à la prioritisation IA |
+| Moins d'oublis | Les relances automatiques réduisent le risque d'abandon |
+| Décision mieux informée | Le scoring IA aide le propriétaire à prioriser |
+| Clôture automatique | Cohérence des données garantie sans action manuelle |
+| Indicateurs de pilotage | KPI en temps réel pour l'administrateur |
+
+#### Faiblesses (Weaknesses)
+
+| Faiblesse | Description |
+|---|---|
+| Dépendance à la qualité des données | Le scoring IA nécessite un volume de données suffisant |
+| Complexité accrue | Composants IA et RPA à maintenir en plus du code PHP |
+| Risque de faux positifs | Relances potentiellement perçues comme spam si mal calibrées |
+
+#### Opportunités (Opportunities)
+
+| Opportunité | Description |
+|---|---|
+| Données d'usage | Chaque échange enrichit le modèle IA et améliore le scoring |
+| Extension du modèle IA | Prédiction de la disponibilité future des livres |
+| Analytics avancés | Rapports automatiques pour l'administration |
+
+#### Menaces (Threats)
+
+| Menace | Description |
+|---|---|
+| Biais algorithmiques | Le scoring peut favoriser certains profils utilisateurs |
+| Dépendance technologique | Panne du moteur RPA = retour au mode manuel |
+| Adoption utilisateurs | Les propriétaires peuvent désactiver les notifications |
+
+### 3.8 Comparaison As-Is vs To-Be
+
+| Dimension | As-Is | To-Be | Gain |
+|---|---|---|---|
+| Délai de traitement moyen | 48 à 96 heures | < 12 heures | **> 75%** |
+| Taux de réponse des propriétaires | ~60% | > 90% | **+50%** |
+| Taux d'abandon des demandes | ~25% | < 10% | **-60%** |
+| Intervention manuelle pour relances | 100% | 0% (automatisé) | **100%** |
+| Clôture des demandes redondantes | Manuelle | Automatique (PL/SQL) | **100%** |
+| Visibilité KPI pour l'admin | Nulle | Temps réel | Nouveau |
+
+### 3.9 KPI et Indicateurs de Pilotage
+
+| Indicateur | Formule | Unité | Cible |
+|---|---|---|---|
+| **Livres actifs** | `COUNT(*) WHERE is_active=1 AND status='available'` | Nb | Croissance continue |
+| **Taux de disponibilité** | Livres `available` / Total livres actifs | % | > 70% |
+| **Demandes en attente** | `COUNT(*) WHERE status='pending'` | Nb | < 20% du total |
+| **Délai moyen de traitement** | `AVG(date_réponse - request_date)` | Heures | < 12h |
+| **Taux d'acceptation** | `COUNT(accepted)` / `COUNT(total)` | % | > 60% |
+| **Taux d'abandon** | Demandes sans réponse > 7 jours | % | < 10% |
+| **Échanges finalisés** | `COUNT(*) FROM exchanges` | Nb | Croissance continue |
+| **Économie estimée** | `SUM(estimated_price)` des livres échangés | DT | Croissance continue |
 
 ---
 
-## 3. Conclusion
+## 4. Conclusion
 
-La partie AGL montre que **BookCycle Tunisia** repose sur des besoins clairement identifiés, une architecture MVC propre, et un backlog complet avec 14 user stories toutes implémentées.
+### Bilan AGL
 
-La partie RPA montre que le processus de traitement des demandes présente un fort potentiel d'amélioration par l'automatisation. Les solutions implémentées (triggers Oracle, procédures PL/SQL, notifications automatiques) constituent une première couche d'automatisation RPA réelle, qui permettrait dans une version future d'intégrer de l'IA pour la recommandation et le scoring.
+La partie AGL démontre une maîtrise de la démarche Scrum : backlog produit complet avec estimation des efforts, organisation en sprints avec états d'avancement clairs (Done / Doing / To-Do), et définition rigoureuse des critères de complétion. L'architecture MVC adoptée répond aux exigences de séparation des responsabilités et facilite l'évolution future du projet.
 
-Le saut de performance théorique estimé dépasse 50% sur tous les KPI mesurés, validant pleinement la démarche BPR adoptée.
+### Bilan RPA
+
+La partie RPA confirme l'existence d'une opportunité réelle de transformation. Le processus de traitement des demandes présente un SLA inacceptable en l'état actuel, et les analyses SWOT As-Is et To-Be montrent clairement comment les automatisations proposées transforment les faiblesses en forces. La solution To-Be — combinant scoring IA, relances RPA automatiques et workflow Oracle PL/SQL — vise un gain de performance supérieur à **75% sur le délai de traitement**, bien au-delà de la barre des 50% requise pour justifier une approche BPR.
+
+La comparaison SWOT entre As-Is et To-Be illustre en particulier comment les menaces initiales (dépendance à l'action manuelle, risque d'oubli) deviennent des opportunités grâce à la réingénierie, tout en introduisant de nouveaux risques à maîtriser (qualité des données IA, dépendance technologique).
+
+---
+
+*Rapport réalisé dans le cadre du Projet Intégré — Licence 2 Big Data et Intelligence Artificielle — ESEN — Université de la Manouba — 2025/2026*

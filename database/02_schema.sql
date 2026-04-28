@@ -202,41 +202,15 @@ BEGIN
 END;
 /
 
-/*
-    Index : structures supplementaires qui accelerent les recherches Oracle.
-    Un index evite un parcours complet de la table (full table scan).
-    On cree un index sur les colonnes utilisees frequemment dans les
-    clauses WHERE, JOIN ON et ORDER BY.
-*/
-
--- index sur subjects : accelere le filtre par is_active et le tri par sort_order
 CREATE INDEX idx_subjects_active ON subjects(is_active, sort_order);
-
--- index sur school_classes : accelere le filtre par niveau scolaire et le tri
 CREATE INDEX idx_school_classes_level ON school_classes(school_level, sort_order);
-
--- index sur class_subjects (cle etrangere class_id) : accelere les jointures avec school_classes
 CREATE INDEX idx_class_subjects_class ON class_subjects(class_id, sort_order);
-
--- index sur class_subjects (cle etrangere subject_id) : accelere les jointures avec subjects
 CREATE INDEX idx_class_subjects_subject ON class_subjects(subject_id, sort_order);
-
--- index sur books.owner_id : accelere la recherche des livres d'un utilisateur
 CREATE INDEX idx_books_owner ON books(owner_id);
-
--- index sur books.subject : accelere le filtre du catalogue par matiere
 CREATE INDEX idx_books_subject ON books(subject);
-
--- index sur books.school_level : accelere le filtre du catalogue par niveau scolaire
 CREATE INDEX idx_books_level ON books(school_level);
-
--- index sur requests.book_id : accelere la jointure entre requests et books
 CREATE INDEX idx_requests_book ON requests(book_id);
-
--- index sur requests.requester_id : accelere la recherche des demandes d'un utilisateur
 CREATE INDEX idx_requests_requester ON requests(requester_id);
-
--- index sur notifications.user_id : accelere la recuperation des notifications d'un utilisateur
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 
 CREATE OR REPLACE VIEW v_book_overview AS

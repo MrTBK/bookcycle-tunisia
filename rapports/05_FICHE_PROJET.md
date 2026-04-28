@@ -1,97 +1,180 @@
-# Fiche Projet - BookCycle Tunisia
+# FICHE PROJET
+## BookCycle Tunisia
 
-## Intitule
+---
 
-**BookCycle Tunisia** - Plateforme web de don, d'echange et de reutilisation des livres scolaires en Tunisie.
+**Université de la Manouba — École Supérieure d'Économie Numérique (ESEN)**
+**Licence 2 — Big Data et Intelligence Artificielle**
+**Année universitaire 2025 / 2026**
 
-## Adresse Web
+---
 
-**`https://bookcycle-tunisia.page.gd`**
+## Informations Générales
 
-Comptes de demonstration :
-- Administrateur : `admin@bookcycle.tn` / `admin123`
-- Utilisateur : `ahmed@bookcycle.tn` / `user123`
+| Champ | Valeur |
+|---|---|
+| **Intitulé du projet** | BookCycle Tunisia |
+| **Thème** | Plateforme web de don, d'échange et de réutilisation des livres scolaires |
+| **Filière** | Licence 2 — Big Data et Intelligence Artificielle |
+| **Établissement** | ESEN — Université de la Manouba |
+| **Année universitaire** | 2025 / 2026 |
+| **Réalisé par** | Mortadha Yakoubi |
+| **Encadré par** | *(à compléter)* |
 
-## Problematique
+---
 
-Chaque annee, de nombreux livres scolaires restent inutilises alors que d'autres familles ont besoin de ces ressources.
-Le projet vise a mettre en relation les proprietaires de livres et les demandeurs dans un systeme simple, administrable et heberge en ligne.
+## Problématique
+
+Chaque année, des familles tunisiennes dépensent des sommes importantes pour acquérir des manuels scolaires, alors que de nombreux anciens exemplaires en bon état restent inutilisés.
+
+> **Comment concevoir une plateforme numérique simple et administrable permettant la mise en relation des propriétaires de livres scolaires et des demandeurs, en s'appuyant sur une architecture MVC PHP et une base de données Oracle ?**
+
+---
 
 ## Objectifs
 
-- publier, **modifier** et gerer des livres scolaires
-- consulter un catalogue public avec filtres
-- envoyer et suivre des demandes
-- notifier les utilisateurs
-- administrer la plateforme (y compris **suppression physique** d'utilisateurs)
+- Permettre la **publication** de livres scolaires par des utilisateurs inscrits
+- Offrir un **catalogue filtrable** par niveau scolaire, classe et matière
+- Gérer l'**envoi, le suivi et le traitement des demandes** d'échange
+- **Notifier** les utilisateurs des événements importants sur la plateforme
+- Fournir un espace d'**administration** avec statistiques et outils de modération
 
-## Modules Concernes
+---
 
-- AGL (analyse, acteurs, backlog, architecture)
-- SGBD (Oracle XE, PL/SQL, triggers, procedures, fonctions, curseurs)
-- Programmation Web 2 (PHP MVC, PDO, CRUD complet)
-- RPA (automatisation des processus metier)
+## Modules Académiques Couverts
 
-## Technologies
+| Module | Apport principal dans le projet |
+|---|---|
+| **AGL** | Analyse des besoins, acteurs, user stories, backlog, architecture logique |
+| **SGBD** | Schéma Oracle, contraintes d'intégrité, SQL, PL/SQL, index, vues |
+| **Programmation Web 2** | Application MVC PHP, sessions, formulaires, sécurité, PDO_OCI |
+| **RPA** | Cartographie des processus, analyse As-Is / To-Be, scénarios d'automatisation |
 
-| Composant | Local | En ligne |
-|---|---|---|
-| Langage | PHP 7.4 | PHP 7.4 |
-| SGBD | Oracle XE | MySQL |
-| Connexion | PDO_OCI | PDO_MYSQL |
-| Frontend | HTML, CSS, JavaScript | Identique |
+---
 
-## Fonctionnalites Principales
+## Stack Technique
 
-| Fonctionnalite | Acces | Operation CRUD |
-|---|---|---|
-| Inscription / connexion | Public | INSERT / SELECT |
-| Catalogue avec filtres | Public | SELECT multi-criteres |
-| Ajouter un livre | Connecte | INSERT |
-| **Modifier un livre** | Proprietaire | **UPDATE** |
-| Envoyer une demande | Connecte | INSERT |
-| Accepter / refuser une demande | Proprietaire | UPDATE |
-| Notifications | Connecte | SELECT |
-| Statistiques admin | Admin | SELECT / COUNT / SUM |
-| Activer / desactiver utilisateur | Admin | UPDATE |
-| **Supprimer un utilisateur** | Admin | **DELETE** |
-| Masquer / restaurer un livre | Admin | UPDATE |
+| Couche | Technologie |
+|---|---|
+| **Langage serveur** | PHP 7.4 |
+| **Base de données** | Oracle XE |
+| **Accès données** | PDO_OCI |
+| **Frontend** | HTML5, CSS3, JavaScript natif |
+| **Architecture** | MVC |
+| **Procédural avancé** | PL/SQL (procédures, fonctions, triggers, curseurs) |
 
-## Architecture MVC
+---
+
+## Architecture de l'Application
 
 ```
-app/
-  Controllers/  <- logique metier
-  Models/       <- acces PDO aux donnees
-  Views/        <- rendu HTML/PHP
-  Core/         <- Database, Auth, Controller
-public/
-  index.php     <- front controller + routage
-  assets/       <- CSS, JS
-database/
-  01_users_privileges.sql
-  02_schema.sql
-  03_sample_data.sql
-  04_queries.sql
-  05_plsql_objects.sql
-  06_triggers.sql
+router.php (Front Controller)
+└── public/index.php (Bootstrap)
+    └── app/
+        ├── Core/      → Auth, Database, Controller
+        ├── Models/    → User, Book, BookRequest, Notification, AcademicOption
+        ├── Controllers/ → Auth, Book, Request, Admin, Page, Notification
+        └── Views/     → layouts/ + pages/
 ```
 
-## Base De Donnees Oracle
+---
 
-8 tables : `users`, `subjects`, `school_classes`, `class_subjects`, `books`, `requests`, `exchanges`, `notifications`
+## Fonctionnalités Implémentées
 
-Objets PL/SQL :
-- 2 procedures : `add_notification`, `accept_request`
-- 2 fonctions : `count_books_by_user`, `calculate_money_saved`
-- 5 triggers metier (dont 1 statement-level)
-- curseurs implicite et explicite
-- 1 vue : `v_book_overview`
-- 8 sequences + 8 triggers PK + 10 index
+| Fonctionnalité | Statut |
+|---|---|
+| Inscription et connexion | Réalisé |
+| Catalogue public avec filtres dynamiques | Réalisé |
+| Ajout d'un livre (validation niveau/classe/matière via Oracle) | Réalisé |
+| Envoi et suivi de demandes | Réalisé |
+| Acceptation / refus d'une demande | Réalisé |
+| Système de notifications | Réalisé |
+| Tableau de bord utilisateur | Réalisé |
+| Tableau de bord administrateur | Réalisé |
+| Modération des livres et des utilisateurs | Réalisé |
+| Statistiques globales et économie estimée | Réalisé |
 
-## Valeur Ajoutee
+---
 
-- reduction des couts scolaires pour les familles
-- reutilisation des livres (ODD 12 : consommation responsable)
-- projet academique integre et coherent
-- site deploye en ligne et demonstrable
+## Base de Données Oracle
+
+### Tables
+
+| Table | Description |
+|---|---|
+| `users` | Comptes utilisateurs (`admin` / `user`) |
+| `subjects` | Matières scolaires (table de référence) |
+| `school_classes` | Classes par niveau (table de référence) |
+| `class_subjects` | Correspondances classe ↔ matières autorisées |
+| `books` | Livres publiés |
+| `requests` | Demandes d'échange |
+| `exchanges` | Échanges finalisés |
+| `notifications` | Notifications système |
+
+### Objets PL/SQL
+
+| Objet | Type | Rôle |
+|---|---|---|
+| `add_notification` | Procédure | Créer une notification pour un utilisateur |
+| `accept_request` | Procédure | Accepter une demande de manière atomique |
+| `count_books_by_user` | Fonction | Compter les livres actifs d'un utilisateur |
+| `calculate_money_saved` | Fonction | Calculer l'économie totale estimée |
+| `trg_books_updated_at` | Trigger | Mettre à jour `updated_at` automatiquement |
+| `trg_book_exchange_log` | Trigger | Journaliser les échanges finalisés |
+
+---
+
+## Pages Principales
+
+| URL | Description |
+|---|---|
+| `/` | Accueil avec livres récents |
+| `/catalog` | Catalogue filtrable |
+| `/login` / `/register` | Authentification |
+| `/dashboard` | Espace personnel |
+| `/add-book` | Publier un livre |
+| `/admin` | Administration |
+
+---
+
+## Valeur Ajoutée
+
+| Dimension | Bénéfice |
+|---|---|
+| **Économique** | Réduction des dépenses scolaires des familles |
+| **Environnemental** | Réutilisation des manuels, moins de gaspillage |
+| **Social** | Accès aux manuels pour les familles à revenus limités |
+| **Académique** | Projet intégré cohérent couvrant 4 modules |
+
+---
+
+## Axes d'Amélioration
+
+| Amélioration | Priorité |
+|---|---|
+| Token CSRF sur les formulaires | Haute |
+| Upload d'images pour les livres | Haute |
+| Tests automatisés (PHPUnit) | Haute |
+| Responsive design mobile | Moyenne |
+| Automatisation des relances de demandes (RPA) | Moyenne |
+| Déploiement sur serveur distant | Basse |
+
+---
+
+## Lancement Rapide
+
+```powershell
+# Depuis la racine du projet
+start_oracle_app.bat
+
+# Puis ouvrir dans le navigateur
+http://localhost:8000
+```
+
+**Comptes de démonstration :**
+- Admin : `admin@bookcycle.tn` / `admin123`
+- Utilisateur : `ahmed@bookcycle.tn` / `user123`
+
+---
+
+*Fiche réalisée dans le cadre du Projet Intégré — Licence 2 Big Data et Intelligence Artificielle — ESEN — Université de la Manouba — 2025/2026*

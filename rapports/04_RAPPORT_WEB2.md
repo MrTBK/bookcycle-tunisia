@@ -1,463 +1,627 @@
-# Rapport Programmation Web 2 — BookCycle Tunisia
-
-**Université de La Manouba — ESEN — L2 Big Data et Intelligence Artificielle**
-**Année universitaire 2025/2026 — Projet Intégré**
-
-**Site hébergé :** `https://bookcycle-tunisia.page.gd`
+# RAPPORT PROGRAMMATION WEB 2
+## BookCycle Tunisia
 
 ---
 
-## Introduction
+**Université de la Manouba — ESEN**
+**Licence 2 — Big Data et Intelligence Artificielle**
+**Année universitaire 2025 / 2026**
 
-La partie Programmation Web 2 consiste à développer une application web complète en PHP permettant de consulter, publier, modifier, supprimer et demander des livres scolaires. L'application est connectée à une base de données via **PDO**, organisée selon une architecture **MVC**, et développée en **POO** (Programmation Orientée Objet).
+**Réalisé par :** Mortadha Yakoubi
+**Module :** Programmation Web 2
 
 ---
 
-## 1. Technologies Utilisées
+## Table des Matières
 
-| Composant | Local (soutenance) | En ligne |
+1. [Introduction](#introduction)
+2. [Objectif de l'Application](#objectif)
+3. [Technologies Utilisées](#technologies)
+4. [Architecture MVC Détaillée](#architecture-mvc)
+5. [Connexion Oracle via PDO](#connexion-oracle)
+6. [Routeur et Front Controller](#routeur)
+7. [Gestion des Sessions et des Rôles](#sessions-et-rôles)
+8. [Pages Web Réalisées](#pages-web)
+9. [Fonctionnalités Principales](#fonctionnalités)
+10. [Validation et Sécurité](#validation-et-sécurité)
+11. [Points Forts et Limites](#points-forts-et-limites)
+12. [Conclusion](#conclusion)
+
+---
+
+## 1. Introduction
+
+La partie Programmation Web 2 du projet **BookCycle Tunisia** consiste à développer une application web complète en PHP, organisée selon le patron d'architecture **MVC**, connectée à une base de données **Oracle XE** via **PDO_OCI**, et accessible via un navigateur web standard.
+
+L'application permet à des visiteurs de consulter un catalogue public de livres scolaires, et à des utilisateurs authentifiés de publier des livres, d'envoyer des demandes et de gérer leurs échanges. Un espace administrateur permet la modération et le suivi de la plateforme.
+
+Ce rapport présente les choix techniques, l'architecture de l'application, les fonctionnalités implémentées et les mesures de sécurité appliquées.
+
+---
+
+## 2. Objectif de l'Application
+
+L'application **BookCycle Tunisia** doit permettre :
+
+| Objectif | Détail |
+|---|---|
+| **Catalogue public** | Tout visiteur peut consulter et filtrer les livres disponibles sans se connecter |
+| **Gestion des livres** | Les utilisateurs connectés peuvent publier leurs livres scolaires |
+| **Gestion des demandes** | Les utilisateurs peuvent envoyer, accepter ou refuser des demandes d'échange |
+| **Notifications** | Les utilisateurs reçoivent des notifications lors des événements importants |
+| **Administration** | L'administrateur supervise, modère et consulte les statistiques de la plateforme |
+
+---
+
+## 3. Technologies Utilisées
+
+| Technologie | Version | Rôle dans le projet |
 |---|---|---|
-| Langage | PHP 7.4 | PHP 7.4 |
-| SGBD | Oracle XE | MySQL |
-| Connexion BD | PDO_OCI | PDO_MYSQL |
-| Frontend | HTML5, CSS3, JavaScript | Identique |
-| Architecture | MVC | MVC |
-| URL | http://localhost:8000 | https://bookcycle-tunisia.page.gd |
+| **PHP** | 7.4 | Logique serveur, contrôleurs, modèles, gestion de session |
+| **Oracle XE** | Express Edition | Base de données relationnelle |
+| **PDO_OCI** | — | Couche d'abstraction PHP pour Oracle |
+| **HTML5** | — | Structure des pages web |
+| **CSS3** | — | Mise en forme, responsive design |
+| **JavaScript** | Natif (ES6) | Interactions légères côté client (filtres dynamiques) |
+
+### Lancement de l'Application
+
+```powershell
+# Méthode recommandée (depuis la racine du projet)
+start_oracle_app.bat
+
+# Méthode manuelle
+C:\php74\php.exe -S localhost:8000 router.php
+```
+
+Puis accéder à : `http://localhost:8000`
 
 ---
 
-## 2. Architecture MVC
+## 4. Architecture MVC Détaillée
 
-L'application suit le patron de conception **Modèle-Vue-Contrôleur (MVC)**.
+Le projet suit strictement le patron **MVC (Modèle-Vue-Contrôleur)**, qui sépare les responsabilités en trois couches indépendantes.
+
+### 4.1 Structure des Fichiers
 
 ```
-Requête HTTP
-     │
-     ▼
-public/index.php ──── Routeur + Front Controller
-     │
-     ▼
-  Controller ──────── Logique métier, validation
-     │
-     ├──► Model ────── Requêtes PDO → Base de données
-     │        └──────── Retourne les données
-     │
-     └──► View ─────── Affichage HTML avec les données
-              │
-              ▼
-         Réponse HTML → Navigateur
+bookcycle-tunisia/
+│
+├── router.php                     ← Front Controller : routage des requêtes HTTP
+│
+├── public/
+│   ├── index.php                  ← Bootstrap : session, autoloader, dispatch
+│   └── assets/
+│       ├── css/                   ← Feuilles de style globales
+│       └── js/
+│           └── app.js             ← Interactions JavaScript légères
+│
+└── app/
+    ├── Config/
+    │   └── config.php             ← Paramètres de connexion Oracle
+    │
+    ├── Core/
+    │   ├── Auth.php               ← Gestion sessions et contrôle des rôles
+    │   ├── Controller.php         ← Classe de base des contrôleurs
+    │   └── Database.php           ← Singleton de connexion PDO/Oracle
+    │
+    ├── Models/
+    │   ├── AcademicOption.php     ← Lecture des tables de référence
+    │   ├── Book.php               ← CRUD livres et filtrage catalogue
+    │   ├── BookRequest.php        ← Gestion des demandes
+    │   ├── Notification.php       ← Lecture et marquage des notifications
+    │   └── User.php               ← Authentification et gestion des comptes
+    │
+    ├── Controllers/
+    │   ├── AdminController.php    ← Tableau de bord admin, modération
+    │   ├── AuthController.php     ← Connexion, inscription, déconnexion
+    │   ├── BookController.php     ← Catalogue, ajout de livre, statistiques
+    │   ├── NotificationController.php ← Lecture des notifications
+    │   ├── PageController.php     ← Pages statiques (accueil, about, contact)
+    │   └── RequestController.php  ← Envoi, acceptation, rejet de demandes
+    │
+    └── Views/
+        ├── layouts/
+        │   ├── header.php         ← En-tête commun (navigation, session)
+        │   └── footer.php         ← Pied de page commun
+        └── pages/
+            ├── home.php
+            ├── catalog.php
+            ├── login.php
+            ├── register.php
+            ├── dashboard.php
+            ├── add-book.php
+            ├── admin.php
+            ├── about.php
+            ├── contact.php
+            └── privacy-policy.php
 ```
 
-### 2.1 Rôle De Chaque Couche
+### 4.2 Couche Modèle
 
-| Couche | Fichiers | Rôle |
+Les modèles encapsulent toutes les interactions avec Oracle via PDO. Chaque modèle correspond à une ou plusieurs tables de la base de données.
+
+| Modèle | Méthodes principales | Tables concernées |
 |---|---|---|
-| **Routeur** | `public/index.php` | Lit l'URL et la méthode HTTP, dispatche vers le bon contrôleur |
-| **Contrôleurs** | `app/Controllers/*.php` | Valide les données, appelle les modèles, passe les résultats aux vues |
-| **Modèles** | `app/Models/*.php` | Contient uniquement les requêtes SQL via PDO |
-| **Vues** | `app/Views/pages/*.php` | Affiche le HTML avec `htmlspecialchars()` pour la sécurité |
-| **Core** | `app/Core/*.php` | Classes partagées (Database, Auth, Controller de base) |
+| `User` | `findByEmail()`, `create()`, `activate()`, `deactivate()` | `users` |
+| `Book` | `all()`, `mine()`, `create()`, `hide()`, `countActive()` | `books` |
+| `BookRequest` | `store()`, `accept()`, `reject()`, `received()`, `sent()` | `requests` |
+| `Notification` | `forUser()`, `markRead()` | `notifications` |
+| `AcademicOption` | `getLevels()`, `getClassesForLevel()`, `getSubjectsForClass()`, `hasClassForLevel()`, `hasSubjectForClass()` | `subjects`, `school_classes`, `class_subjects` |
 
----
+**Exemple — Modèle `AcademicOption` :** Ce modèle est particulièrement important car il alimente dynamiquement les formulaires d'ajout de livre depuis Oracle, et valide la cohérence niveau/classe/matière.
 
-## 3. Programmation Orientée Objet (POO)
+### 4.3 Couche Contrôleur
 
-L'application exploite pleinement les principes de la POO :
+Les contrôleurs reçoivent les requêtes HTTP, appellent les méthodes des modèles, et transmettent les données aux vues.
 
-### 3.1 Encapsulation
-
-```php
-// Dans Database.php — attribut privé, accessible uniquement via connection()
-class Database {
-    private static $connection = null;  // encapsulé, non accessible de l'extérieur
-    public static function connection() { ... }  // seule méthode d'accès publique
-}
-
-// Dans Book.php — attribut privé $db
-class Book {
-    private $db;  // la connexion PDO est encapsulée dans chaque modèle
-    public function all($filters = []) { ... }
-}
-```
-
-### 3.2 Héritage (Généralisation)
+#### `BookController` — Extrait représentatif
 
 ```php
-// Controller.php — classe de base abstraite
-class Controller {
-    protected function render($view, $data = []) { ... }
-    protected function json($payload, $code = 200) { ... }
-}
+public function store()
+{
+    // Vérification de l'authentification
+    if (!Auth::check()) {
+        $this->respondError('Authentification requise.', '/login', 401);
+        return;
+    }
 
-// BookController.php — hérite de Controller
-class BookController extends Controller {
-    public function store() { ... }
-    public function update() { ... }
-}
+    $payload = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
-// AdminController.php — hérite de Controller
-class AdminController extends Controller {
-    public function stats() { ... }
-    public function permanentDeleteUser() { ... }
-}
-```
-
-**Généralisation UML :** `Controller` est la super-classe généralisée par `BookController`, `AuthController`, `AdminController`, `PageController`, `RequestController`, `NotificationController`.
-
-### 3.3 Patron Singleton (Design Pattern)
-
-```php
-// Database.php — une seule instance PDO partagée par toute l'application
-class Database {
-    private static $connection = null;
-    public static function connection() {
-        if (self::$connection instanceof PDO) {
-            return self::$connection;  // réutilise l'instance existante
+    // Validation des champs obligatoires
+    foreach (['subject', 'level', 'class_name', 'condition', 'estimated_price'] as $field) {
+        if (empty($payload[$field])) {
+            $this->respondError('Champs obligatoires manquants.', '/add-book', 422);
+            return;
         }
-        self::$connection = new PDO(...);  // crée une nouvelle instance si besoin
+    }
+
+    // Validation de la cohérence niveau ↔ classe (via Oracle)
+    if (!$this->isValidClassForLevel($payload['level'], $payload['class_name'])) {
+        $this->respondError('Classe invalide pour ce niveau.', '/add-book', 422);
+        return;
+    }
+
+    // Validation de la cohérence classe ↔ matière (via Oracle)
+    if (!$this->isValidSubject($payload['level'], $payload['class_name'], $payload['subject'])) {
+        $this->respondError('Matière invalide pour cette classe.', '/add-book', 422);
+        return;
+    }
+
+    // Création du livre
+    $this->books->create(array_merge($payload, [
+        'title'    => $this->buildBookTitle($payload),
+        'owner_id' => Auth::id(),
+    ]));
+
+    $_SESSION['flash_success'] = 'Livre ajouté avec succès.';
+    $this->redirect('/dashboard');
+}
+```
+
+### 4.4 Couche Vue
+
+Les vues sont des fichiers PHP purs qui reçoivent des variables depuis le contrôleur et génèrent le HTML. Elles s'appuient sur un système de layout partagé (`header.php` + `footer.php`) pour éviter la duplication.
+
+**Exemple de rendu d'une vue avec données Oracle :**
+
+```php
+// Dans le contrôleur
+$books = $this->books->all($filters);
+require __DIR__ . '/../Views/pages/catalog.php';
+
+// Dans la vue (catalog.php)
+foreach ($books as $book) {
+    echo '<div class="book-card">';
+    echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
+    echo '<p>' . htmlspecialchars($book['subject']) . ' — ' . htmlspecialchars($book['class_name']) . '</p>';
+    echo '</div>';
+}
+```
+
+L'utilisation systématique de `htmlspecialchars()` dans les vues prévient les attaques XSS.
+
+---
+
+## 5. Connexion Oracle via PDO
+
+La connexion est gérée par le singleton `Database` dans `app/Core/Database.php` :
+
+```php
+public static function connection()
+{
+    if (self::$connection instanceof PDO) {
         return self::$connection;
     }
-}
-```
 
-### 3.4 Classes Et Responsabilités
+    $config = require dirname(__DIR__) . '/Config/config.php';
+    $db = $config['db'];
 
-| Classe | Type | Attributs clés | Méthodes principales |
-|---|---|---|---|
-| `Database` | Core | `$connection` (static) | `connection()` |
-| `Auth` | Core | — | `user()`, `id()`, `check()`, `isAdmin()`, `login()`, `logout()` |
-| `Controller` | Base (héritage) | — | `render()`, `json()` |
-| `Book` | Modèle | `$db` | `create()`, `all()`, `find()`, `update()`, `mine()`, `deactivate()` |
-| `User` | Modèle | `$db` | `create()`, `findByEmail()`, `setActive()`, `delete()`, `hasActiveBooks()` |
-| `BookRequest` | Modèle | `$db` | `create()`, `accept()`, `reject()`, `mine()`, `received()` |
-| `Notification` | Modèle | `$db` | `create()`, `createForAll()`, `latestForUser()`, `markAsRead()` |
-| `AcademicOption` | Modèle | `$db` | `levels()`, `classesByLevel()`, `subjects()`, `hasSubjectForClass()` |
-| `BookController` | Contrôleur | — | `store()`, `update()`, `index()`, `stats()` |
-| `AdminController` | Contrôleur | — | `stats()`, `toggleUser()`, `permanentDeleteUser()`, `notify()` |
-| `PageController` | Contrôleur | — | `home()`, `catalog()`, `dashboard()`, `editBook()`, `admin()` |
-| `AuthController` | Contrôleur | — | `login()`, `register()`, `logout()` |
-
----
-
-## 4. Connexion PDO À La Base De Données
-
-```php
-// Connexion PDO avec gestion d'erreur (try/catch — cours 05)
-try {
-    self::$connection = new PDO($dsn, $user, $password, [
+    self::$connection = new PDO($db['dsn'], $db['user'], $db['password'], [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_CASE               => PDO::CASE_LOWER,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
-} catch (PDOException $e) {
-    http_response_code(500);
-    exit('Erreur de connexion : ' . $e->getMessage());
+
+    return self::$connection;
 }
 ```
 
-**Fermeture de connexion :**
-```php
-// Fermer le curseur après utilisation (cours 05 - closeCursor)
-$statement->closeCursor();
-// PHP ferme automatiquement la connexion en fin de script
-// Fermeture explicite possible : $pdo = null;
-```
+**Options PDO utilisées :**
 
----
-
-## 5. Les 4 Opérations CRUD
-
-### 5.1 Affichage — SELECT + fetch / fetchAll
-
-```php
-// Récupérer tous les livres actifs avec jointure propriétaire
-$stmt = $this->db->prepare(
-    'SELECT b.title, b.subject, b.estimated_price,
-            u.name AS owner_name
-     FROM books b
-     INNER JOIN users u ON u.id = b.owner_id
-     WHERE b.is_active = 1
-     ORDER BY b.created_at DESC'
-);
-$stmt->execute();
-$books = $stmt->fetchAll();  // tableau associatif de toutes les lignes
-$stmt->closeCursor();
-```
-
-### 5.2 Ajout — INSERT via formulaire POST
-
-```php
-// Formulaire HTML (cours 04)
-// <form method="post" action="/add-book">
-//   <input name="subject"> <input name="estimated_price"> ...
-// </form>
-
-// Traitement PHP sécurisé (requête préparée)
-$stmt = $this->db->prepare(
-    'INSERT INTO books (title, subject, class_name, school_level,
-                        condition_label, estimated_price, description,
-                        owner_id, status, is_active)
-     VALUES (:title, :subject, :class_name, :school_level,
-             :book_condition, :estimated_price, :description,
-             :owner_id, :status, :is_active)'
-);
-$stmt->execute([
-    'title'          => $data['title'],
-    'subject'        => $data['subject'],
-    'class_name'     => $data['class_name'],
-    'school_level'   => $data['level'],
-    'book_condition' => $data['condition'],
-    'estimated_price'=> (float) $data['estimated_price'],
-    'description'    => $data['description'] ?? null,
-    'owner_id'       => (int) $data['owner_id'],
-    'status'         => 'available',
-    'is_active'      => 1,
-]);
-```
-
-### 5.3 Modification — UPDATE via formulaire POST
-
-```php
-// Formulaire HTML (/edit-book?id=X)
-// <form method="post" action="/edit-book">
-//   <input type="hidden" name="book_id" value="<?= $book['id'] ?>">
-//   <select name="condition"> ... </select>
-//   <input name="estimated_price" type="number"> ...
-// </form>
-
-// Traitement PHP — seul le propriétaire peut modifier
-$stmt = $this->db->prepare(
-    'UPDATE books
-     SET condition_label   = :condition_label,
-         estimated_price   = :estimated_price,
-         description       = :description,
-         updated_at        = SYSDATE
-     WHERE id       = :id
-       AND owner_id = :owner_id'  // sécurité : vérifier le propriétaire
-);
-$stmt->execute([
-    'condition_label' => $data['condition'],
-    'estimated_price' => (float) $data['estimated_price'],
-    'description'     => $data['description'] ?? null,
-    'id'              => (int) $bookId,
-    'owner_id'        => (int) $ownerId,
-]);
-$stmt->closeCursor();
-```
-
-### 5.4 Suppression — DELETE physique (admin)
-
-```php
-// Suppression physique réelle (DELETE FROM — cours 05)
-// Respecte les clés étrangères en supprimant d'abord les dépendances
-
-// Étape 1 : supprimer les notifications
-$stmt = $this->db->prepare('DELETE FROM notifications WHERE user_id = :id');
-$stmt->execute(['id' => (int) $userId]);
-$stmt->closeCursor();
-
-// Étape 2 : supprimer les demandes envoyées
-$stmt = $this->db->prepare('DELETE FROM requests WHERE requester_id = :id');
-$stmt->execute(['id' => (int) $userId]);
-$stmt->closeCursor();
-
-// Étape 3 : supprimer l'utilisateur
-$stmt = $this->db->prepare('DELETE FROM users WHERE id = :id');
-$stmt->execute(['id' => (int) $userId]);
-$stmt->closeCursor();
-```
-
----
-
-## 6. Recherche Multi-Critères
-
-Le catalogue supporte 4 filtres combinables (niveau, classe, matière, statut) :
-
-```php
-// Construction dynamique selon les filtres actifs (GET)
-$sql = 'SELECT b.id, b.title, b.subject, u.name AS owner_name
-        FROM books b
-        INNER JOIN users u ON u.id = b.owner_id
-        WHERE b.is_active = 1';
-$params = [];
-
-if (!empty($filters['level'])) {
-    $sql .= ' AND b.school_level = :school_level_filter';
-    $params['school_level_filter'] = $filters['level'];
-}
-if (!empty($filters['class_name'])) {
-    $sql .= ' AND b.class_name = :class_name_filter';
-    $params['class_name_filter'] = $filters['class_name'];
-}
-if (!empty($filters['subject'])) {
-    $sql .= ' AND b.subject LIKE :subject';
-    $params['subject'] = '%' . $filters['subject'] . '%';
-}
-
-$stmt = $this->db->prepare($sql);
-$stmt->execute($params);
-$results = $stmt->fetchAll();
-```
-
----
-
-## 7. Données Multi-Tables (Jointures)
-
-L'application accède régulièrement à des données de **plusieurs tables simultanément** :
-
-```php
-// INNER JOIN : livres avec informations propriétaire
-SELECT b.title, b.subject, u.name AS owner_name, u.email
-FROM books b
-INNER JOIN users u ON u.id = b.owner_id
-WHERE b.is_active = 1;
-
-// LEFT JOIN : livres avec nombre de demandes (même sans demandes)
-SELECT b.title, COUNT(r.id) AS nb_demandes
-FROM books b
-LEFT JOIN requests r ON r.book_id = b.id
-WHERE b.is_active = 1
-GROUP BY b.title;
-
-// JOIN triple : demandes + livres + demandeurs
-SELECT r.id, b.title, u.name AS requester_name, r.status
-FROM requests r
-JOIN books b ON b.id = r.book_id
-JOIN users u ON u.id = r.requester_id;
-```
-
----
-
-## 8. Formulaires GET Et POST
-
-```php
-// GET — filtres du catalogue (données dans l'URL, partageables)
-// URL : /catalog?level=Lycée&class_name=Terminale&subject=Maths
-$level      = $_GET['level']      ?? null;
-$class_name = $_GET['class_name'] ?? null;
-$subject    = $_GET['subject']    ?? null;
-
-// POST — soumission de formulaires (données invisibles dans l'URL)
-// <form method="post" action="/add-book">
-$title            = $_POST['title']            ?? '';
-$estimated_price  = $_POST['estimated_price']  ?? 0;
-$condition        = $_POST['condition']        ?? '';
-```
-
----
-
-## 9. Sessions Et Authentification
-
-```php
-// Connexion : stocker les infos en session
-$_SESSION['user'] = [
-    'id'    => $user['id'],
-    'name'  => $user['name'],
-    'email' => $user['email'],
-    'role'  => $user['role'],
-];
-
-// Vérifier si connecté
-if (!Auth::check()) {
-    header('Location: /login');
-    exit;
-}
-
-// Vérifier si administrateur
-if (!Auth::isAdmin()) {
-    header('Location: /dashboard');
-    exit;
-}
-```
-
-**Flash messages :** messages temporaires stockés en session, affichés une fois puis supprimés automatiquement.
-```php
-$_SESSION['flash_success'] = 'Livre modifié avec succès.';
-// Côté vue : lus et supprimés par pullFlash()
-```
-
----
-
-## 10. Pages Réalisées
-
-| Page | URL | Méthode | Accès | Fonctionnalité |
-|---|---|---|---|---|
-| Accueil | `/` | GET | Public | Livres récents + statistiques |
-| Catalogue | `/catalog` | GET | Public | Liste + filtres multi-critères |
-| Connexion | `/login` | GET+POST | Public | Authentification |
-| Inscription | `/register` | GET+POST | Public | Création de compte |
-| À propos | `/about` | GET | Public | Présentation |
-| Contact | `/contact` | GET | Public | Informations contact |
-| Confidentialité | `/privacy-policy` | GET | Public | Politique |
-| Tableau de bord | `/dashboard` | GET | Connecté | Livres + demandes + notifications |
-| Ajouter un livre | `/add-book` | GET+POST | Connecté | Formulaire d'ajout (INSERT) |
-| **Modifier un livre** | `/edit-book?id=X` | GET+POST | Propriétaire | Formulaire de modification (UPDATE) |
-| Administration | `/admin` | GET | Admin | Statistiques + gestion |
-| **Supprimer user** | `/admin/delete-user` | POST | Admin | Suppression physique (DELETE) |
-
----
-
-## 11. Validation Et Sécurité
-
-| Mesure | Implémentation |
-|---|---|
-| **Injection SQL** | Toutes les requêtes utilisent `prepare()` + `execute()` avec paramètres liés |
-| **XSS** | Toutes les sorties HTML utilisent `htmlspecialchars()` |
-| **Authentification** | Vérification `Auth::check()` avant toute action privée |
-| **Autorisation** | Vérification `Auth::isAdmin()` pour les actions admin |
-| **Propriété** | `WHERE id = ? AND owner_id = ?` pour les modifications |
-| **Hash mot de passe** | `password_hash($pwd, PASSWORD_DEFAULT)` à l'inscription |
-| **Session sécurisée** | `session_regenerate_id()` à la déconnexion |
-| **Validation métier** | Cohérence niveau/classe/matière vérifiée avant INSERT |
-
----
-
-## 12. Rapports Et Statistiques
-
-L'application génère des rapports automatiques :
-
-| Rapport | Requête SQL | Affiché sur |
+| Option | Valeur | Effet |
 |---|---|---|
-| Nombre total d'utilisateurs | `SELECT COUNT(*) FROM users` | Admin dashboard |
-| Nombre total de livres actifs | `SELECT COUNT(*) FROM books WHERE is_active=1` | Admin + accueil |
-| Nombre d'échanges | `SELECT COUNT(*) FROM requests WHERE status='accepted'` | Admin + accueil |
-| Économie totale estimée | `SELECT NVL(SUM(b.estimated_price),0) FROM exchanges e JOIN books b...` | Admin + accueil |
-| Livres par niveau | `SELECT school_level, COUNT(*) ... GROUP BY school_level` | Admin |
-| Matières les + demandées | `SELECT b.subject, COUNT(r.id) ... GROUP BY b.subject ORDER BY...` | Admin |
+| `ATTR_ERRMODE` | `ERRMODE_EXCEPTION` | Les erreurs SQL lèvent une exception PHP |
+| `ATTR_CASE` | `CASE_LOWER` | Les noms de colonnes Oracle sont retournés en minuscules |
+| `ATTR_DEFAULT_FETCH_MODE` | `FETCH_ASSOC` | Les résultats sont retournés sous forme de tableaux associatifs |
+
+Le pattern **singleton** garantit qu'une seule connexion PDO est ouverte par requête HTTP.
 
 ---
 
-## 13. Hebergement En Ligne
+## 6. Routeur et Front Controller
 
-L'application est accessible à l'adresse : **`https://bookcycle-tunisia.page.gd`**
+Le fichier `router.php` constitue le **point d'entrée unique** de l'application. Il intercepte toutes les requêtes HTTP et les redirige vers le contrôleur et l'action appropriés selon l'URL demandée.
 
-| Compte | Email | Mot de passe | Rôle |
+**Exemples de routes définies :**
+
+| Méthode | URL | Contrôleur | Action |
 |---|---|---|---|
-| Administrateur | `admin@bookcycle.tn` | `admin123` | Accès complet |
-| Utilisateur | `ahmed@bookcycle.tn` | `user123` | Accès standard |
+| GET | `/` | `PageController` | `home` |
+| GET | `/catalog` | `BookController` | `index` |
+| GET | `/login` | `AuthController` | `showLogin` |
+| POST | `/login` | `AuthController` | `login` |
+| GET | `/register` | `AuthController` | `showRegister` |
+| POST | `/register` | `AuthController` | `register` |
+| GET | `/dashboard` | `PageController` | `dashboard` |
+| GET | `/add-book` | `BookController` | `showAddBook` |
+| POST | `/add-book` | `BookController` | `store` |
+| POST | `/requests` | `RequestController` | `store` |
+| POST | `/requests/accept` | `RequestController` | `accept` |
+| GET | `/admin` | `AdminController` | `index` |
+| POST | `/logout` | `AuthController` | `logout` |
 
 ---
 
-## 14. Points Forts Et Limites
+## 7. Gestion des Sessions et des Rôles
 
-### Points Forts
-- Architecture MVC claire avec séparation stricte des responsabilités
-- POO complète : encapsulation, héritage, singleton
-- CRUD complet : SELECT (afficher), INSERT (ajouter), UPDATE (modifier), DELETE (supprimer)
-- Recherche multi-critères avec jointures multi-tables
-- `closeCursor()` utilisé systématiquement
-- Requêtes préparées sur toutes les entrées utilisateur
-- Déployé en ligne et démontrable
+La classe `Auth` dans `app/Core/Auth.php` centralise toute la gestion des sessions :
 
-### Limites
-- Pas d'upload d'image pour les livres
-- Ergonomie mobile perfectible
-- Pas de pagination sur les grandes listes
+```php
+// Connexion — stocke les informations essentielles en session
+Auth::login($user);
+// Stocke : id, name, email, role
+
+// Contrôles d'accès
+Auth::check();     // true si l'utilisateur est connecté
+Auth::isAdmin();   // true si le rôle est 'admin'
+Auth::id();        // Retourne l'ID de l'utilisateur courant
+Auth::user();      // Retourne le tableau complet des données de session
+
+// Déconnexion sécurisée
+Auth::logout();    // Détruit $_SESSION['user'] et régénère l'ID de session
+```
+
+**Protection des routes :** Chaque contrôleur vérifie les droits avant toute action sensible :
+
+```php
+// Protection d'une action utilisateur
+if (!Auth::check()) {
+    $this->redirect('/login');
+    return;
+}
+
+// Protection d'une action admin
+if (!Auth::isAdmin()) {
+    http_response_code(403);
+    exit('Accès refusé.');
+}
+```
 
 ---
 
-## Conclusion
+## 8. Pages Web Réalisées
 
-La partie Web 2 de **BookCycle Tunisia** implémente toutes les fonctionnalités demandées : PDO, POO et MVC avec CRUD complet (affichage, ajout, modification, suppression), recherche multi-critères, gestion de sessions, multi-acteurs, et rapports statistiques.
+| URL | Accès | Description | Fonctionnalités |
+|---|---|---|---|
+| `/` | Tous | Page d'accueil | Présentation, livres récents, statistiques |
+| `/catalog` | Tous | Catalogue public | Liste des livres, filtres niveau/classe/matière, détail d'un livre |
+| `/login` | Non connecté | Connexion | Formulaire email + mot de passe, message d'erreur |
+| `/register` | Non connecté | Inscription | Formulaire complet, validation email unique |
+| `/dashboard` | Connecté | Tableau de bord | Mes livres, demandes reçues, demandes envoyées, notifications |
+| `/add-book` | Connecté | Ajout de livre | Formulaire avec filtres dynamiques Oracle, validation complète |
+| `/admin` | Admin | Administration | Statistiques, gestion utilisateurs, modération livres, notifications |
+| `/about` | Tous | À propos | Présentation du projet et de ses objectifs |
+| `/contact` | Tous | Contact | Informations de contact |
+| `/privacy-policy` | Tous | Politique de confidentialité | Politique d'utilisation de la plateforme |
 
-L'application est accessible en ligne à `https://bookcycle-tunisia.page.gd` avec des comptes de démonstration opérationnels, et démontrable localement avec Oracle XE.
+---
+
+## 9. Fonctionnalités Principales
+
+### 9.1 Inscription et Connexion
+
+```
+Inscription :
+  ✔ Validation email (format et unicité dans Oracle)
+  ✔ Validation mot de passe (longueur minimale)
+  ✔ Hash du mot de passe avant insertion (password_hash)
+  ✔ Redirection vers /login après inscription réussie
+
+Connexion :
+  ✔ Vérification email + mot de passe (password_verify)
+  ✔ Contrôle du statut is_active du compte
+  ✔ Stockage des données essentielles en session (id, name, email, role)
+  ✔ Redirection vers /dashboard
+```
+
+### 9.2 Catalogue Public avec Filtres Dynamiques
+
+Le catalogue charge les options de filtrage **directement depuis Oracle** via le modèle `AcademicOption` :
+
+```
+Filtres disponibles :
+  ✔ Niveau scolaire   → chargé depuis school_classes.school_level
+  ✔ Classe            → chargé selon le niveau sélectionné
+  ✔ Matière           → chargé selon la classe sélectionnée (via class_subjects)
+```
+
+La mise à jour des listes de classes et de matières selon les sélections est gérée par `app.js` en JavaScript natif, via des requêtes sur les données pré-chargées depuis Oracle.
+
+### 9.3 Ajout d'un Livre
+
+```
+Champs du formulaire :
+  - Niveau scolaire (liste Oracle)
+  - Classe          (liste Oracle, dépend du niveau)
+  - Matière         (liste Oracle, dépend de la classe)
+  - État du livre   (Très bon état / Bon état / État correct / Abîmé)
+  - Description     (optionnelle)
+  - Prix estimé     (en DT)
+
+Validations côté serveur :
+  ✔ Tous les champs obligatoires sont présents
+  ✔ La classe correspond au niveau (vérification Oracle)
+  ✔ La matière est autorisée pour la classe (vérification Oracle)
+  ✔ Le titre est généré automatiquement : "Matière - Classe - Niveau"
+```
+
+### 9.4 Gestion des Demandes
+
+```
+Envoi d'une demande :
+  ✔ Réservé aux utilisateurs connectés
+  ✔ Impossible de demander son propre livre (règle métier)
+  ✔ Impossible d'avoir deux demandes pending pour le même livre (anti-doublon)
+
+Traitement d'une demande (propriétaire) :
+  ✔ Acceptation avec note de rendez-vous obligatoire
+  ✔ Appel de la procédure Oracle accept_request :
+     - La demande passe à 'accepted'
+     - Les autres demandes du livre passent à 'rejected'
+     - Le livre passe à 'reserved'
+     - Le demandeur reçoit une notification
+  ✔ Refus simple avec mise à jour du statut
+
+Administration :
+  ✔ L'administrateur peut annuler n'importe quelle demande
+```
+
+### 9.5 Tableau de Bord Utilisateur
+
+Le tableau de bord (`/dashboard`) centralise en une seule page :
+
+- **Mes livres publiés** : liste avec statut et actions (masquer, gérer les demandes)
+- **Demandes reçues** : demandes en attente sur ses livres, avec boutons Accepter / Refuser
+- **Demandes envoyées** : suivi des demandes envoyées à d'autres propriétaires
+
+### 9.6 Espace Administrateur
+
+Le tableau de bord administrateur (`/admin`) affiche :
+
+**Statistiques globales :**
+- Nombre total d'utilisateurs inscrits
+- Nombre total de livres actifs
+- Nombre total d'échanges finalisés
+- Économie totale estimée (calculée via `calculate_money_saved()`)
+
+**Actions de modération :**
+- Activer / désactiver un compte utilisateur
+- Masquer / restaurer un livre (suppression logique : `is_active = 0`)
+- Annuler une demande en cours
+- Envoyer une notification à un utilisateur spécifique
+
+---
+
+## 10. Validation et Sécurité
+
+### 10.1 Protection contre les Injections SQL
+
+Toutes les interactions avec Oracle passent par des **requêtes préparées PDO** avec des paramètres liés :
+
+```php
+// Exemple sécurisé — jamais de concaténation directe
+$stmt = Database::connection()->prepare(
+    'SELECT * FROM books WHERE owner_id = :owner_id AND is_active = 1'
+);
+$stmt->execute([':owner_id' => $userId]);
+```
+
+### 10.2 Protection contre le XSS
+
+Toutes les variables affichées dans les vues sont échappées avec `htmlspecialchars()` :
+
+```php
+echo htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8');
+```
+
+### 10.3 Contrôle d'Accès par Rôle
+
+```
+Niveau 1 — Actions publiques     : aucune vérification requise
+Niveau 2 — Actions utilisateur   : Auth::check() vérifié avant chaque action
+Niveau 3 — Actions administrateur: Auth::isAdmin() vérifié, HTTP 403 sinon
+```
+
+### 10.4 Règles Métier de Sécurité
+
+| Règle | Implémentation |
+|---|---|
+| Pas de demande sur son propre livre | Vérification `book.owner_id !== Auth::id()` |
+| Pas de doublon de demande | Vérification `pending` existant avant insertion |
+| Cohérence niveau/classe | Requête sur `school_classes` avant validation |
+| Cohérence classe/matière | Requête sur `class_subjects` avant validation |
+| Compte inactif bloqué | Vérification `users.is_active = 1` à la connexion |
+
+### 10.5 Sécurité des Sessions
+
+```php
+Auth::logout();
+// Détruit $_SESSION['user']
+// Appelle session_regenerate_id(true) pour prévenir la fixation de session
+```
+
+### 10.6 Résumé des Mesures de Sécurité
+
+| Menace | Contre-mesure appliquée |
+|---|---|
+| Injection SQL | Requêtes préparées PDO avec paramètres liés |
+| XSS (Cross-Site Scripting) | `htmlspecialchars()` systématique dans les vues |
+| Accès non autorisé | Contrôle `Auth::check()` et `Auth::isAdmin()` |
+| Fixation de session | `session_regenerate_id(true)` à la déconnexion |
+| Escalade de privilèges | Vérification du rôle `admin` côté serveur, jamais côté client |
+| Données incohérentes | Validation croisée niveau/classe/matière via Oracle |
+
+---
+
+## 11. Captures d'Écran des Interfaces
+
+> Les captures d'écran suivantes illustrent les principales interfaces de l'application.
+> Pour les visualiser, lancer l'application via `start_oracle_app.bat` puis accéder à `http://localhost:8000`.
+
+### 11.1 Page d'Accueil (`/`)
+
+**Description :** Page d'accueil publique affichant la présentation de la plateforme et les derniers livres publiés.
+
+- En-tête avec navigation : Logo, liens Catalogue, Connexion, Inscription
+- Section hero avec titre et bouton d'appel à l'action
+- Section "Derniers livres" avec les 4 livres les plus récents
+- Pied de page avec liens utiles
+
+**Comptes de démonstration :**
+- Administrateur : `admin@bookcycle.tn` / `admin123`
+- Utilisateur : `ahmed@bookcycle.tn` / `user123`
+
+### 11.2 Page Catalogue (`/catalog`)
+
+**Description :** Catalogue public filtrable, accessible sans authentification.
+
+- Barre de filtres : Niveau scolaire → Classe → Matière (chargement dynamique via Oracle)
+- Grille de livres avec : titre, matière, classe, niveau, état, prix estimé
+- Bouton "Demander" visible uniquement pour les utilisateurs connectés
+- Message "Aucun livre trouvé" si les filtres ne correspondent à aucun résultat
+
+### 11.3 Page Connexion (`/login`)
+
+**Description :** Formulaire d'authentification.
+
+- Champs : Email, Mot de passe
+- Message d'erreur si identifiants incorrects (sans révéler si c'est l'email ou le mot de passe)
+- Lien vers la page d'inscription
+- Redirection vers `/dashboard` après connexion réussie
+
+### 11.4 Page Inscription (`/register`)
+
+**Description :** Formulaire de création de compte.
+
+- Champs : Nom complet, Email, Téléphone, Mot de passe, Confirmation
+- Validation : email unique (vérification Oracle), longueur minimale du mot de passe
+- Message d'erreur inline si l'email est déjà utilisé
+- Redirection vers `/login` après inscription réussie
+
+### 11.5 Page Tableau de Bord (`/dashboard`)
+
+**Description :** Espace personnel de l'utilisateur connecté, organisé en onglets ou sections.
+
+- **Mes livres** : liste des livres publiés avec statut (Disponible / Réservé / Échangé)
+- **Demandes reçues** : demandes en attente sur ses livres, avec boutons Accepter / Refuser
+- **Demandes envoyées** : suivi des demandes envoyées avec leur statut actuel
+- **Notifications** : liste des notifications non lues avec date
+
+### 11.6 Page Ajout de Livre (`/add-book`)
+
+**Description :** Formulaire de publication d'un livre scolaire.
+
+- Champ Niveau scolaire (liste déroulante chargée depuis Oracle)
+- Champ Classe (mise à jour automatique selon le niveau via JavaScript)
+- Champ Matière (mise à jour automatique selon la classe via JavaScript)
+- Champ État du livre (Très bon état / Bon état / État correct / Abîmé)
+- Champ Description (optionnel, textarea)
+- Champ Prix estimé (numérique, en DT)
+- Messages de validation côté serveur si les champs sont incomplets ou incohérents
+
+### 11.7 Page Administration (`/admin`)
+
+**Description :** Tableau de bord administrateur, accessible uniquement avec le rôle `admin`.
+
+**Section Statistiques globales :**
+- Nombre total d'utilisateurs inscrits
+- Nombre total de livres actifs
+- Nombre total d'échanges finalisés
+- Économie totale estimée (en DT, calculée via `calculate_money_saved()`)
+
+**Section Gestion des utilisateurs :**
+- Liste des utilisateurs avec email, rôle, statut (actif / inactif)
+- Boutons Activer / Désactiver par utilisateur
+
+**Section Modération des livres :**
+- Liste des livres récents avec titre, propriétaire, statut
+- Boutons Masquer / Restaurer par livre
+
+**Section Notifications :**
+- Formulaire pour envoyer une notification ciblée à un utilisateur
+- Champs : destinataire (ID ou email), message
+
+---
+
+## 12. Points Forts et Limites
+
+### 11.1 Points Forts
+
+| Point fort | Détail |
+|---|---|
+| **Architecture claire** | Séparation stricte MVC, code modulaire et lisible |
+| **Intégration Oracle réelle** | Requêtes SQL exécutées sur une vraie base Oracle XE |
+| **Tables de référence dynamiques** | Les matières et classes viennent d'Oracle, pas de listes PHP codées en dur |
+| **Validation cohérente** | La logique de validation côté PHP s'appuie sur les contraintes Oracle |
+| **Tableau de bord admin complet** | Statistiques, modération et notifications en un seul espace |
+| **Procédure PL/SQL intégrée** | `accept_request` appelée depuis PHP pour garantir l'atomicité |
+
+### 11.2 Limites Actuelles
+
+| Limite | Impact | Solution envisagée |
+|---|---|---|
+| Pas d'upload d'image | Interface moins riche, livres sans couverture visuelle | Upload vers `/storage/` |
+| Pas de token CSRF | Risque d'attaque CSRF sur les formulaires POST | Ajout d'un token dans chaque formulaire |
+| Pas de tests automatisés | Validation uniquement manuelle | Intégration de PHPUnit |
+| Responsive mobile limité | Ergonomie dégradée sur smartphones | Refonte CSS avec media queries |
+| Pas d'envoi d'email | Inscription sans confirmation par email | Intégration d'un service SMTP |
+| Hébergement local uniquement | L'application tourne sur `localhost:8000`, pas accessible en ligne | Déploiement sur serveur distant avec Oracle ou migration vers MySQL |
+
+---
+
+## 12. Conclusion
+
+La partie Programmation Web 2 de **BookCycle Tunisia** livre une application web complète, structurée et fonctionnelle. Elle démontre la maîtrise des concepts fondamentaux du développement web côté serveur :
+
+- Le patron **MVC** est appliqué rigoureusement, assurant une séparation claire entre les données, la logique et la présentation
+- La connexion à **Oracle via PDO_OCI** est encapsulée de façon propre dans un singleton, et toutes les requêtes utilisent des paramètres liés
+- La gestion des **sessions et des rôles** est centralisée dans la classe `Auth` et appliquée de façon cohérente sur toutes les routes protégées
+- La **validation des données** combine des vérifications PHP et des contraintes Oracle pour garantir l'intégrité des informations saisies
+- L'ensemble des **10 pages principales** est opérationnel et couvre tous les besoins fonctionnels identifiés en phase d'analyse
+
+Le projet constitue une base solide et extensible, notamment pour l'ajout de la gestion des images, des tests automatisés et du renforcement de la sécurité.
+
+---
+
+*Rapport réalisé dans le cadre du Projet Intégré — Licence 2 Big Data et Intelligence Artificielle — ESEN — Université de la Manouba — 2025/2026*

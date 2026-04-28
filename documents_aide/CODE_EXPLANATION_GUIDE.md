@@ -1,168 +1,388 @@
-# Guide D'Explication Du Code - BookCycle Tunisia
+# Code Explanation Guide
 
-Ce document explique les choix techniques et les parties importantes du code
-pour preparer la soutenance.
+This file explains `BookCycle Tunisia` in very simple words, step by step.
 
----
+## 1. What this project is
 
-## 1. Connexion PDO (Database.php)
+`BookCycle Tunisia` is a PHP web app connected to an Oracle database.
 
-```php
-// Patron Singleton : une seule connexion partagee par toute l'application.
-self::$connection = new PDO($dsn, $user, $password, [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_CASE               => PDO::CASE_LOWER,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-]);
-```
+It helps people:
+- create an account
+- log in
+- add school books
+- search for books
+- ask for a book
+- accept or reject requests
+- receive notifications
+- manage the platform as an admin
 
-**Methodes PDO utilisees dans le projet :**
-- `prepare($sql)` : preparer une requete avec des parametres (securite SQL)
-- `execute($params)` : executer la requete en remplacant les `:param`
-- `fetch()` : recuperer une seule ligne
-- `fetchAll()` : recuperer toutes les lignes
-- `fetchColumn()` : recuperer la premiere colonne (COUNT, SUM...)
-- `closeCursor()` : liberer les ressources du curseur apres lecture
-- `query($sql)` : requete simple sans parametre
-- `exec($sql)` : modification directe (INSERT/UPDATE/DELETE)
+## 2. The big idea
 
----
+The project follows a simple MVC structure:
 
-## 2. Requetes Preparees (securite contre SQL injection)
+- `public/index.php`
+  This is the front door of the website.
+- `app/Controllers/`
+  Controllers receive the request and decide what to do.
+- `app/Models/`
+  Models talk to the Oracle database.
+- `app/Views/`
+  Views show HTML to the user.
 
-```php
-// VULNERABLE (ne jamais faire) :
-$sql = "SELECT * FROM users WHERE email = '$email'";
+So the path is usually:
 
-// SECURISE (requis par le cours) :
-$stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
-$stmt->execute(['email' => $email]);
-$user = $stmt->fetch();
-$stmt->closeCursor();
-```
+1. browser sends request
+2. `public/index.php` starts the app
+3. `public/index.php` chooses the right controller action
+4. controller asks model for data
+5. model talks to Oracle
+6. controller sends data to a view
+7. view shows the page
 
----
+## 3. How one request enters the app
 
-## 3. Architecture MVC
+### Step 1: `public/index.php`
 
-```
-Navigateur → index.php (routeur) → Controller → Model → Vue
-                                      ↓
-                                   Database (PDO)
-```
+This file:
+- loads the bootstrap
+- reads the request URL
+- calls the matching controller action directly
 
-- **index.php** : lit l'URL et la methode HTTP, choisit le controleur et l'action
-- **Controller** : valide les donnees, appelle le modele, passe les resultats a la vue
-- **Model** : contient uniquement les requetes SQL
-- **Vue** : affiche le HTML avec les donnees
+In simple words:
 
----
+> "Somebody opened a page. Which part of the app should answer?"
 
-## 4. Les 4 Operations CRUD
+### Step 2: `app/bootstrap.php`
 
-### CREATE (INSERT) - Ajouter un livre
-```php
-$stmt = $this->db->prepare(
-    'INSERT INTO books (title, subject, ...) VALUES (:title, :subject, ...)'
-);
-$stmt->execute(['title' => $data['title'], ...]);
-```
+This file prepares the app:
+- helper string functions
+- session storage
+- autoload for classes
 
-### READ (SELECT) - Lire des livres
-```php
-$stmt = $this->db->prepare($sql);
-$stmt->execute($params);
-$books = $stmt->fetchAll();
-```
+In simple words:
 
-### UPDATE - Modifier un livre
-```php
-$stmt = $this->db->prepare(
-    'UPDATE books SET condition_label = :condition, estimated_price = :price,
-     updated_at = SYSDATE WHERE id = :id AND owner_id = :owner_id'
-);
-$stmt->execute([...]);
-$stmt->closeCursor();
-```
+> "Before the app works, prepare the toolbox."
 
-### DELETE - Supprimer un utilisateur (admin uniquement)
-```php
-$this->db->prepare('DELETE FROM notifications WHERE user_id = :id')->execute(['id' => $id]);
-$this->db->prepare('DELETE FROM requests WHERE requester_id = :id')->execute(['id' => $id]);
-$this->db->prepare('DELETE FROM users WHERE id = :id')->execute(['id' => $id]);
-```
+## 4. How pages work
 
----
+### Public pages
 
-## 5. Sessions Et Authentification
+Handled mostly by `PageController`:
+- home
+- about
+- catalog
+- contact
+- privacy policy
+- login page
+- register page
 
-```php
-$_SESSION['user'] = ['id' => $user['id'], 'name' => $user['name'], 'role' => $user['role']];
-if (!Auth::check()) { header('Location: /login'); exit; }
-if (!Auth::isAdmin()) { header('Location: /dashboard'); exit; }
-```
+These methods usually:
+- collect data
+- call `render(...)`
+- show a page
 
----
+### Private pages
 
-## 6. Formulaires GET et POST
+Also handled by `PageController`:
+- dashboard
+- add-book page
+- admin page
 
-```php
-$level = $_GET['level'] ?? null;  // filtres catalogue dans l'URL
-$title = $_POST['title'] ?? '';   // formulaire d'ajout de livre
-```
+Before showing them, the controller checks:
+- is the user logged in?
+- is the user admin?
 
----
+## 5. How login works
 
-## 7. Recherche Multi-Criteres
+Files:
+- `app/Views/pages/login.php`
+- `app/Controllers/AuthController.php`
+- `app/Models/User.php`
+- `app/Core/Auth.php`
 
-```php
-$sql = 'SELECT ... FROM books b WHERE b.is_active = 1';
-if (!empty($filters['level']))  { $sql .= ' AND b.school_level = :level'; }
-if (!empty($filters['subject'])) { $sql .= ' AND b.subject LIKE :subject'; }
-$stmt = $this->db->prepare($sql);
-$stmt->execute($params);
-```
+Flow:
 
----
+1. user fills login form
+2. form sends `POST /login`
+3. `AuthController::login()` reads email and password
+4. it asks `User::findByEmail(...)`
+5. it checks the hashed password with `password_verify(...)`
+6. if valid, `Auth::login($user)` stores the user in session
+7. user is redirected to dashboard
 
-## 8. Objets PL/SQL Importants
+In simple words:
 
-### Procedure `accept_request`
-Accepte une demande, rejette les autres, met a jour le livre, notifie le demandeur.
+> "Find the user, check the secret password, remember the user in session."
 
-### Trigger `trg_notify_owner_on_request`
-AFTER INSERT sur `requests`. Cree automatiquement une notification pour le proprietaire.
+## 6. How registration works
 
-### Trigger `trg_books_audit_statement`
-**Trigger de niveau instruction** (sans FOR EACH ROW). Se declenche une fois par
-ordre SQL, peu importe le nombre de lignes. Illustre la difference avec les triggers
-de niveau ligne (FOR EACH ROW).
+Files:
+- `register.php`
+- `AuthController::register()`
+- `User::create()`
 
-### Curseur explicite
-```sql
-DECLARE
-    CURSOR c_books IS SELECT id, title FROM books WHERE status = 'available';
-    v_book c_books%ROWTYPE;
-BEGIN
-    OPEN c_books;
-    LOOP
-        FETCH c_books INTO v_book;
-        EXIT WHEN c_books%NOTFOUND;
-        DBMS_OUTPUT.PUT_LINE(v_book.title);
-    END LOOP;
-    CLOSE c_books;
-END;
-```
+Flow:
 
----
+1. user fills name, email, phone, password
+2. controller checks that fields are not empty
+3. controller checks that email is not already used
+4. model creates user row
+5. password is hashed before saving
+6. user is sent to login page
 
-## 9. Points Cles Pour La Soutenance
+Important:
+- passwords are not stored as plain text
+- they are stored as hashes
 
-1. **PDO** : prepare/execute + fetch/fetchAll + closeCursor
-2. **MVC** : separation claire des responsabilites
-3. **CRUD complet** : SELECT, INSERT, UPDATE, DELETE
-4. **Requetes preparees** : securite SQL injection
-5. **Sessions** : maintien de la connexion entre pages
-6. **Triggers** : ligne vs instruction, BEFORE vs AFTER
-7. **Curseurs** : implicite (SQL%ROWCOUNT) vs explicite (OPEN/FETCH/CLOSE)
-8. **URL du site** : `https://bookcycle-tunisia.page.gd`
+## 7. How adding a book works
+
+Files:
+- `add-book.php`
+- `BookController::store()`
+- `Book::create()`
+
+Flow:
+
+1. connected user opens add-book page
+2. user chooses:
+   - subject
+   - level
+   - class
+   - condition
+   - estimated price
+3. controller checks required fields
+4. controller checks that class belongs to level using `school_classes`
+5. controller checks that subject is allowed for that class using `class_subjects` and `subjects`
+6. controller builds a title automatically
+7. model inserts the book in Oracle
+
+In simple words:
+
+> "Take book information, verify it, then save it."
+
+## 8. How the catalogue works
+
+Files:
+- `catalog.php`
+- `PageController::catalog()`
+- `Book::all()`
+
+Flow:
+
+1. visitor chooses filters
+2. filters go into URL:
+   - `level`
+   - `class_name`
+   - `subject`
+3. controller reads filters from `$_GET`
+4. model builds one SQL query step by step
+5. result is shown as book cards
+
+Extra behavior:
+- the class list reacts to the chosen level
+- if a book id is selected, the page shows book details below
+
+## 9. How a request for a book works
+
+Files:
+- `catalog.php`
+- `RequestController::store()`
+- `BookRequest::create()`
+- `Notification::create()`
+
+Flow:
+
+1. connected user clicks "Envoyer une demande"
+2. controller reads the book id
+3. it checks:
+   - book exists
+   - user is not the owner
+   - no pending duplicate request already exists
+4. model inserts new request with status `pending`
+5. owner receives a notification
+
+In simple words:
+
+> "Ask for a book, but only if the request is valid."
+
+## 10. How accepting a request works
+
+Files:
+- `dashboard.php`
+- `RequestController::accept()`
+- `BookRequest::accept()`
+- `Book::updateStatus()`
+- `Notification::create()`
+
+Flow:
+
+1. owner opens dashboard
+2. owner writes a meeting note
+3. owner clicks accept
+4. controller checks:
+   - user is logged in
+   - request exists
+   - book belongs to this owner
+   - meeting note is not empty
+5. model starts a transaction
+6. chosen request becomes `accepted`
+7. other pending requests for same book become `rejected`
+8. book becomes `reserved`
+9. both sides receive notifications with contact details
+
+Why transaction?
+
+Because several related updates must succeed together.
+
+In simple words:
+
+> "If one person gets the book, the others must stop waiting."
+
+## 11. How rejection works
+
+Files:
+- `RequestController::reject()`
+- `BookRequest::reject()`
+
+Flow:
+
+1. owner chooses reject
+2. controller checks access and ownership
+3. request status becomes `rejected`
+4. requester receives a notification
+
+## 12. How notifications work
+
+Files:
+- `Notification` model
+- `NotificationController`
+- header dropdown
+- dashboard notifications section
+
+Notifications are small in-app messages.
+
+They are created when:
+- a new request is sent
+- a request is accepted
+- a request is rejected
+- admin sends a message
+
+They are shown:
+- in the navbar dropdown
+- on the dashboard
+
+When user opens one notification:
+- `NotificationController::read()` marks it as read
+
+## 13. How admin works
+
+Files:
+- `PageController::admin()`
+- `AdminController`
+- `admin.php`
+
+Admin can:
+- see global statistics
+- search users
+- activate or deactivate users
+- hide or restore books
+- cancel requests
+- send notifications
+
+Important admin rule:
+
+> normal users must not access admin page
+
+That is why controllers check `Auth::isAdmin()`.
+
+## 14. How models talk to Oracle
+
+The models use `PDO`.
+
+The Oracle connection is created in:
+- `app/Core/Database.php`
+
+Configuration comes from:
+- `app/Config/config.php`
+
+Important Oracle details:
+- `ROWNUM` is used to limit rows
+- sequences and triggers generate ids
+- `NVL(...)` is used for null-safe sums
+
+## 15. Database structure in simple words
+
+### `users`
+People using the platform.
+
+### `books`
+Books added by users.
+
+### `subjects`
+Official list of school subjects.
+
+### `school_classes`
+Official list of classes grouped by school level.
+
+### `class_subjects`
+Official mapping between each class and its allowed subjects.
+
+### `requests`
+Requests from one user asking for one book.
+
+### `exchanges`
+History of completed exchanges.
+
+### `notifications`
+Messages shown inside the app.
+
+## 16. Main Oracle scripts
+
+### `01_users_privileges.sql`
+Creates Oracle users and grants rights.
+
+### `02_schema.sql`
+Creates tables, constraints, sequences, triggers, indexes, and view.
+
+### `03_sample_data.sql`
+Adds demo users, subjects, classes, class-subject mappings, books, requests, exchanges, and notifications.
+
+### `04_queries.sql`
+Shows sample SQL queries for learning and reporting.
+
+### `05_plsql_objects.sql`
+Adds procedures, functions, triggers, and PL/SQL examples.
+
+## 18. Why comments were added this way
+
+The comments explain:
+- what a file is for
+- what a method does
+- why a check exists
+- what happens before and after database updates
+
+They do **not** explain every single obvious line, because too many comments can make code harder to read.
+
+## 19. Best files to study first
+
+If you want to understand the project quickly, read them in this order:
+
+1. `README.md`
+2. `public/index.php`
+3. `app/bootstrap.php`
+4. `app/Controllers/PageController.php`
+5. `app/Controllers/AuthController.php`
+6. `app/Controllers/BookController.php`
+7. `app/Controllers/RequestController.php`
+8. `app/Models/AcademicOption.php`
+9. `app/Models/User.php`
+10. `app/Models/Book.php`
+11. `app/Models/BookRequest.php`
+12. `database/02_schema.sql`
+13. `database/05_plsql_objects.sql`
+
+## 20. Short summary
+
+If you remember only one thing, remember this:
+
+> `public/index.php` picks a controller action, the controller asks a model, the model talks to Oracle, and the view shows the result.

@@ -91,53 +91,12 @@ class BookController extends Controller
         $this->json($this->books->mine((int) Auth::id()));
     }
 
-    /**
-     * Modifier un livre existant appartenant a l'utilisateur connecte.
-     * Seuls l'etat, le prix estime et la description peuvent etre modifies.
-     * Le niveau, la classe et la matiere restent fixes pour garder la coherence
-     * avec les demandes deja envoyees sur ce livre.
-     */
-    public function update()
-    {
-        // Verifier que l'utilisateur est connecte avant toute modification.
-        if (!Auth::check()) {
-            $this->respondError('Authentification requise.', '/login', 401);
-            return;
-        }
-
-        // Lire l'identifiant du livre depuis le formulaire POST.
-        $bookId = isset($_POST['book_id']) ? (int) $_POST['book_id'] : 0;
-
-        // Verifier que le livre existe et appartient a l'utilisateur connecte.
-        $book = $this->books->find($bookId);
-        if (!$book || (int) $book['owner_id'] !== (int) Auth::id()) {
-            $_SESSION['flash_error'] = 'Livre introuvable ou acces refuse.';
-            $this->redirect('/dashboard');
-            return;
-        }
-
-        // Valider que les champs obligatoires sont bien presents dans la requete.
-        if (empty($_POST['condition']) || empty($_POST['estimated_price'])) {
-            $_SESSION['flash_error'] = 'Veuillez remplir tous les champs obligatoires.';
-            $this->redirect('/edit-book?id=' . $bookId);
-            return;
-        }
-
-        // Appeler le modele pour executer la requete UPDATE en base.
-        $this->books->update($bookId, (int) Auth::id(), $_POST);
-
-        // Informer l'utilisateur que la modification a reussi.
-        $_SESSION['flash_success'] = 'Livre modifie avec succes.';
-        $this->redirect('/dashboard');
-    }
-
     public function stats()
     {
-        // Retourner les statistiques globales du catalogue en JSON.
         $this->json([
-            'totalBooks'    => $this->books->countActive(),
-            'totalExchanges'=> $this->requests->countAccepted(),
-            'moneySaved'    => $this->requests->sumAcceptedValueGlobal(),
+            'totalBooks' => $this->books->countActive(),
+            'totalExchanges' => $this->requests->countAccepted(),
+            'moneySaved' => $this->requests->sumAcceptedValueGlobal(),
         ]);
     }
 

@@ -85,10 +85,6 @@ if ($requestMethod === 'GET') {
         case '/add-book':
             $handler = [PageController::class, 'addBook'];
             break;
-        case '/edit-book':
-            // Affiche le formulaire pre-rempli pour modifier un livre existant.
-            $handler = [PageController::class, 'editBook'];
-            break;
         case '/admin':
             $handler = [PageController::class, 'admin'];
             break;
@@ -103,10 +99,6 @@ if ($requestMethod === 'GET') {
             break;
         case '/add-book':
             $handler = [BookController::class, 'store'];
-            break;
-        case '/edit-book':
-            // Traite le formulaire de modification d'un livre (UPDATE en base).
-            $handler = [BookController::class, 'update'];
             break;
         case '/request-book':
             $handler = [RequestController::class, 'store'];
@@ -131,10 +123,6 @@ if ($requestMethod === 'GET') {
             break;
         case '/admin/notify':
             $handler = [AdminController::class, 'notify'];
-            break;
-        case '/admin/delete-user':
-            // Suppression physique d'un utilisateur (DELETE reel en base de donnees).
-            $handler = [AdminController::class, 'permanentDeleteUser'];
             break;
         case '/logout':
             $handler = [AuthController::class, 'logout'];
