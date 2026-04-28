@@ -81,7 +81,8 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 |---|---|
 | Tableau de bord | Accès à l'espace personnel |
 | Publier un livre | Formulaire d'ajout avec validation Oracle |
-| Consulter ses livres | Liste de ses publications |
+| Modifier un livre | Modifier l'état, le prix et la description d'un livre publié |
+| Consulter ses livres | Liste de ses publications avec statut et bouton Modifier |
 | Envoyer une demande | Solliciter un livre d'un autre utilisateur |
 | Gérer ses demandes | Accepter ou refuser les demandes reçues |
 | Consulter les notifications | Lire les notifications système |
@@ -92,9 +93,10 @@ Le projet a été conduit selon une démarche **Scrum** simplifiée, adaptée au
 |---|---|
 | Statistiques globales | Utilisateurs, livres, échanges, économie estimée |
 | Gestion des comptes | Activer / désactiver des utilisateurs |
+| Suppression permanente | Supprimer définitivement un utilisateur sans livres actifs |
 | Modération des livres | Masquer / restaurer des livres |
 | Annulation de demandes | Annuler n'importe quelle demande |
-| Envoi de notifications | Notifier un ou plusieurs utilisateurs |
+| Envoi de notifications | Notifier un utilisateur ou tous les utilisateurs actifs |
 
 ### 2.3 Besoins Fonctionnels et Non Fonctionnels
 
@@ -179,11 +181,14 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 | PB-11 | Système de notifications | Moyenne | 1 | Done |
 | PB-12 | Filtres dynamiques classe → matières | Haute | 1.5 | Done |
 | PB-13 | Tables de référence Oracle (subjects, classes) | Haute | 1 | Done |
-| PB-14 | Upload d'image de couverture | Basse | 2 | To Do |
-| PB-15 | Token CSRF | Moyenne | 0.5 | To Do |
-| PB-16 | Tests automatisés PHPUnit | Basse | 3 | To Do |
+| PB-14 | Modification d'un livre (edit-book) | Haute | 1 | Done |
+| PB-15 | Suppression permanente d'un utilisateur (admin) | Haute | 0.5 | Done |
+| PB-16 | Validation téléphone 8 chiffres à l'inscription | Haute | 0.5 | Done |
+| PB-17 | Upload d'image de couverture | Basse | 2 | To Do |
+| PB-18 | Token CSRF | Moyenne | 0.5 | To Do |
+| PB-19 | Tests automatisés PHPUnit | Basse | 3 | To Do |
 
-**Effort total réalisé :** ~17 jours-développeur
+**Effort total réalisé :** ~19 jours-développeur
 **Effort restant :** ~5.5 jours-développeur
 
 ### 2.6 Sprint Backlog et Avancement
@@ -224,9 +229,12 @@ Le backlog est priorisé selon la valeur métier et l'urgence. L'effort est esti
 | Procédure PL/SQL `accept_request` | Done |
 | Tableau de bord administrateur | Done |
 | Modération livres et utilisateurs | Done |
+| Suppression permanente d'un utilisateur (admin) | Done |
 | Système de notifications | Done |
 | Objets PL/SQL complets (fonctions, triggers métier) | Done |
 | Pages institutionnelles (About, Contact, Privacy) | Done |
+| Modification d'un livre (`/edit-book`) | Done |
+| Validation téléphone 8 chiffres à l'inscription | Done |
 
 #### Backlog Restant (Non réalisé dans ce sprint)
 

@@ -143,6 +143,7 @@ En plus des droits du visiteur, l'utilisateur connecté peut :
 
 - Accéder à son tableau de bord personnel (`/dashboard`)
 - Publier un nouveau livre (`/add-book`)
+- Modifier un livre publié (`/edit-book`) — état, prix estimé, description
 - Consulter ses livres publiés
 - Envoyer une demande pour un livre d'un autre utilisateur
 - Consulter ses demandes envoyées et reçues
@@ -156,9 +157,10 @@ En plus des droits de l'utilisateur, l'administrateur peut :
 - Accéder au tableau de bord d'administration (`/admin`)
 - Consulter les statistiques globales (utilisateurs, livres, échanges, économie estimée)
 - Activer ou désactiver des comptes utilisateurs
+- Supprimer définitivement un compte utilisateur (si sans livres actifs)
 - Masquer ou restaurer des livres signalés
 - Annuler des demandes en cours
-- Envoyer des notifications ciblées
+- Envoyer des notifications ciblées ou globales
 
 ### 3.2 Besoins Fonctionnels
 
@@ -601,9 +603,10 @@ Ces vérifications s'appuient sur les tables `school_classes` et `class_subjects
 | `/contact` | Tous | Formulaire de contact |
 | `/privacy-policy` | Tous | Politique de confidentialité |
 | `/login` | Non connecté | Formulaire de connexion |
-| `/register` | Non connecté | Formulaire d'inscription |
-| `/dashboard` | Connecté | Livres publiés, demandes envoyées/reçues |
+| `/register` | Non connecté | Formulaire d'inscription (téléphone 8 chiffres obligatoire) |
+| `/dashboard` | Connecté | Livres publiés, demandes envoyées/reçues, notifications |
 | `/add-book` | Connecté | Formulaire d'ajout de livre |
+| `/edit-book` | Connecté (propriétaire) | Formulaire de modification d'un livre |
 | `/admin` | Admin | Tableau de bord d'administration |
 
 ### 5.8 Sécurité Appliquée

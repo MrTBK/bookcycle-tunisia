@@ -84,14 +84,17 @@ router.php (Front Controller)
 | Fonctionnalité | Statut |
 |---|---|
 | Inscription et connexion | Réalisé |
+| Validation téléphone 8 chiffres à l'inscription | Réalisé |
 | Catalogue public avec filtres dynamiques | Réalisé |
 | Ajout d'un livre (validation niveau/classe/matière via Oracle) | Réalisé |
+| Modification d'un livre (état, prix, description) | Réalisé |
 | Envoi et suivi de demandes | Réalisé |
 | Acceptation / refus d'une demande | Réalisé |
 | Système de notifications | Réalisé |
 | Tableau de bord utilisateur | Réalisé |
 | Tableau de bord administrateur | Réalisé |
 | Modération des livres et des utilisateurs | Réalisé |
+| Suppression permanente d'un utilisateur (admin) | Réalisé |
 | Statistiques globales et économie estimée | Réalisé |
 
 ---
@@ -130,9 +133,10 @@ router.php (Front Controller)
 |---|---|
 | `/` | Accueil avec livres récents |
 | `/catalog` | Catalogue filtrable |
-| `/login` / `/register` | Authentification |
+| `/login` / `/register` | Authentification (téléphone 8 chiffres obligatoire) |
 | `/dashboard` | Espace personnel |
 | `/add-book` | Publier un livre |
+| `/edit-book` | Modifier un livre publié |
 | `/admin` | Administration |
 
 ---

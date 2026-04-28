@@ -131,6 +131,7 @@ bookcycle-tunisia/
             ├── register.php
             ├── dashboard.php
             ├── add-book.php
+            ├── edit-book.php
             ├── admin.php
             ├── about.php
             ├── contact.php
@@ -268,17 +269,27 @@ Le fichier `router.php` constitue le **point d'entrée unique** de l'application
 | Méthode | URL | Contrôleur | Action |
 |---|---|---|---|
 | GET | `/` | `PageController` | `home` |
-| GET | `/catalog` | `BookController` | `index` |
-| GET | `/login` | `AuthController` | `showLogin` |
+| GET | `/catalog` | `PageController` | `catalog` |
+| GET | `/login` | `PageController` | `login` |
 | POST | `/login` | `AuthController` | `login` |
-| GET | `/register` | `AuthController` | `showRegister` |
+| GET | `/register` | `PageController` | `register` |
 | POST | `/register` | `AuthController` | `register` |
 | GET | `/dashboard` | `PageController` | `dashboard` |
-| GET | `/add-book` | `BookController` | `showAddBook` |
+| GET | `/add-book` | `PageController` | `addBook` |
 | POST | `/add-book` | `BookController` | `store` |
-| POST | `/requests` | `RequestController` | `store` |
-| POST | `/requests/accept` | `RequestController` | `accept` |
-| GET | `/admin` | `AdminController` | `index` |
+| GET | `/edit-book` | `PageController` | `editBook` |
+| POST | `/edit-book` | `BookController` | `update` |
+| POST | `/request-book` | `RequestController` | `store` |
+| POST | `/accept-request` | `RequestController` | `accept` |
+| POST | `/reject-request` | `RequestController` | `reject` |
+| GET | `/notifications/read` | `NotificationController` | `read` |
+| GET | `/admin` | `PageController` | `admin` |
+| POST | `/admin/toggle-user` | `AdminController` | `toggleUser` |
+| POST | `/admin/delete-user` | `AdminController` | `permanentDeleteUser` |
+| POST | `/admin/delete-book` | `AdminController` | `deleteBook` |
+| POST | `/admin/restore-book` | `AdminController` | `restoreBook` |
+| POST | `/admin/cancel-request` | `AdminController` | `cancelRequest` |
+| POST | `/admin/notify` | `AdminController` | `notify` |
 | POST | `/logout` | `AuthController` | `logout` |
 
 ---
@@ -327,10 +338,11 @@ if (!Auth::isAdmin()) {
 | `/` | Tous | Page d'accueil | Présentation, livres récents, statistiques |
 | `/catalog` | Tous | Catalogue public | Liste des livres, filtres niveau/classe/matière, détail d'un livre |
 | `/login` | Non connecté | Connexion | Formulaire email + mot de passe, message d'erreur |
-| `/register` | Non connecté | Inscription | Formulaire complet, validation email unique |
-| `/dashboard` | Connecté | Tableau de bord | Mes livres, demandes reçues, demandes envoyées, notifications |
+| `/register` | Non connecté | Inscription | Formulaire complet, validation email unique, téléphone 8 chiffres |
+| `/dashboard` | Connecté | Tableau de bord | Mes livres (avec bouton Modifier), demandes reçues, demandes envoyées, notifications |
 | `/add-book` | Connecté | Ajout de livre | Formulaire avec filtres dynamiques Oracle, validation complète |
-| `/admin` | Admin | Administration | Statistiques, gestion utilisateurs, modération livres, notifications |
+| `/edit-book` | Connecté (propriétaire) | Modification de livre | Modifier l'état, le prix estimé et la description d'un livre publié |
+| `/admin` | Admin | Administration | Statistiques, gestion utilisateurs, suppression permanente, modération livres, notifications |
 | `/about` | Tous | À propos | Présentation du projet et de ses objectifs |
 | `/contact` | Tous | Contact | Informations de contact |
 | `/privacy-policy` | Tous | Politique de confidentialité | Politique d'utilisation de la plateforme |
@@ -344,6 +356,7 @@ if (!Auth::isAdmin()) {
 ```
 Inscription :
   ✔ Validation email (format et unicité dans Oracle)
+  ✔ Validation téléphone (exactement 8 chiffres, espaces ignorés)
   ✔ Validation mot de passe (longueur minimale)
   ✔ Hash du mot de passe avant insertion (password_hash)
   ✔ Redirection vers /login après inscription réussie
@@ -411,11 +424,32 @@ Administration :
 
 Le tableau de bord (`/dashboard`) centralise en une seule page :
 
-- **Mes livres publiés** : liste avec statut et actions (masquer, gérer les demandes)
+- **Mes livres publiés** : liste avec état, prix estimé, description, statut et bouton **Modifier** vers `/edit-book`
 - **Demandes reçues** : demandes en attente sur ses livres, avec boutons Accepter / Refuser
 - **Demandes envoyées** : suivi des demandes envoyées à d'autres propriétaires
+- **Notifications** : historique des messages reçus avec marquage « lu »
 
-### 9.6 Espace Administrateur
+### 9.6 Modification d'un Livre (`/edit-book`)
+
+Un utilisateur peut modifier un livre qu'il a publié, tant que ce livre lui appartient :
+
+```
+Champs modifiables :
+  ✔ État du livre (Neuf / Bon / Usagé)
+  ✔ Prix estimé (en DT)
+  ✔ Description (optionnelle)
+
+Champs en lecture seule (non modifiables) :
+  ✗ Niveau scolaire
+  ✗ Classe
+  ✗ Matière
+
+Sécurité :
+  ✔ Vérification que le livre appartient à l'utilisateur connecté
+  ✔ Redirection vers /dashboard si livre introuvable ou accès refusé
+```
+
+### 9.7 Espace Administrateur
 
 Le tableau de bord administrateur (`/admin`) affiche :
 
@@ -426,10 +460,11 @@ Le tableau de bord administrateur (`/admin`) affiche :
 - Économie totale estimée (calculée via `calculate_money_saved()`)
 
 **Actions de modération :**
-- Activer / désactiver un compte utilisateur
+- Activer / désactiver un compte utilisateur (suppression logique)
+- **Supprimer définitivement** un utilisateur (DELETE physique sur `users`, `requests`, `notifications`) — bloqué si l'utilisateur a encore des livres actifs
 - Masquer / restaurer un livre (suppression logique : `is_active = 0`)
 - Annuler une demande en cours
-- Envoyer une notification à un utilisateur spécifique
+- Envoyer une notification ciblée ou globale (à tous les utilisateurs actifs)
 
 ---
 
@@ -534,21 +569,33 @@ Auth::logout();
 
 **Description :** Formulaire de création de compte.
 
-- Champs : Nom complet, Email, Téléphone, Mot de passe, Confirmation
-- Validation : email unique (vérification Oracle), longueur minimale du mot de passe
-- Message d'erreur inline si l'email est déjà utilisé
+- Champs : Nom complet, Email, Téléphone, Mot de passe
+- Validation téléphone : exactement **8 chiffres** (HTML5 `pattern="[0-9]{8}"` + vérification serveur `preg_match`)
+- Validation email : format valide et unicité vérifiée en base Oracle
+- Hash du mot de passe avec `password_hash()` avant insertion
 - Redirection vers `/login` après inscription réussie
 
 ### 11.5 Page Tableau de Bord (`/dashboard`)
 
-**Description :** Espace personnel de l'utilisateur connecté, organisé en onglets ou sections.
+**Description :** Espace personnel de l'utilisateur connecté, organisé en sections.
 
-- **Mes livres** : liste des livres publiés avec statut (Disponible / Réservé / Échangé)
-- **Demandes reçues** : demandes en attente sur ses livres, avec boutons Accepter / Refuser
-- **Demandes envoyées** : suivi des demandes envoyées avec leur statut actuel
-- **Notifications** : liste des notifications non lues avec date
+- **Mes livres** : liste des livres publiés avec état, prix, description, statut (Disponible / Réservé / Échangé) et bouton **Modifier**
+- **Demandes reçues** : demandes en attente sur ses livres, avec boutons Accepter / Refuser et champ note de rendez-vous
+- **Demandes envoyées** : suivi des demandes envoyées avec statut, coordonnées du propriétaire si accepté
+- **Notifications** : liste des notifications avec lien « Marquer comme lue »
 
-### 11.6 Page Ajout de Livre (`/add-book`)
+### 11.6 Page Modification de Livre (`/edit-book`)
+
+**Description :** Formulaire de modification d'un livre appartenant à l'utilisateur connecté.
+
+- Champs niveau, classe et matière affichés en **lecture seule** (non modifiables pour préserver la cohérence avec les demandes existantes)
+- Champ **État** (liste déroulante : Neuf / Bon / Usagé), pré-sélectionné avec la valeur actuelle
+- Champ **Prix estimé** pré-rempli avec la valeur actuelle
+- Champ **Description** optionnel
+- Boutons : Enregistrer les modifications / Annuler (retour vers `/dashboard`)
+- Accès refusé si le livre n'appartient pas à l'utilisateur connecté
+
+### 11.8 Page Ajout de Livre (`/add-book`)
 
 **Description :** Formulaire de publication d'un livre scolaire.
 
@@ -560,7 +607,7 @@ Auth::logout();
 - Champ Prix estimé (numérique, en DT)
 - Messages de validation côté serveur si les champs sont incomplets ou incohérents
 
-### 11.7 Page Administration (`/admin`)
+### 11.9 Page Administration (`/admin`)
 
 **Description :** Tableau de bord administrateur, accessible uniquement avec le rôle `admin`.
 
@@ -586,7 +633,7 @@ Auth::logout();
 
 ## 12. Points Forts et Limites
 
-### 11.1 Points Forts
+### 12.1 Points Forts
 
 | Point fort | Détail |
 |---|---|
@@ -597,7 +644,7 @@ Auth::logout();
 | **Tableau de bord admin complet** | Statistiques, modération et notifications en un seul espace |
 | **Procédure PL/SQL intégrée** | `accept_request` appelée depuis PHP pour garantir l'atomicité |
 
-### 11.2 Limites Actuelles
+### 12.2 Limites Actuelles
 
 | Limite | Impact | Solution envisagée |
 |---|---|---|
